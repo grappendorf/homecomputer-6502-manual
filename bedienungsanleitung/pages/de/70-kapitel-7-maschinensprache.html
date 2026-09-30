@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 7 – Maschinensprache</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="7" data-titel="Maschinensprache" data-kurztitel="Maschinensprache">
+  <p>BASIC ist bequem, aber für manche Dinge zu langsam. Dann spricht man den Prozessor direkt an. Ein Maschinenprogramm ist eine Folge von Bytes im Speicher. Der 6502 führt sie der Reihe nach aus. Dieses Kapitel zeigt den Prozessor, ein paar Befehle und die Wege, so ein Programm zu laden und aus BASIC zu starten.</p>
+
+  <h2>Der Prozessor 6502</h2>
+  <p>Der 6502 rechnet mit einem Byte, einer Zahl von 0 bis 255. Er kennt 65536 Speicherplätze, von 0 bis 65535. Im Maschinencode schreibt man Adressen hexadezimal, mit einem Dollarzeichen davor: <code>$0000</code> bis <code>$FFFF</code>. BASIC will dieselben Adressen dezimal.</p>
+  <table>
+    <thead><tr><th>Register</th><th>Breite</th><th>Aufgabe</th></tr></thead>
+    <tbody>
+      <tr><td>A</td><td>8 Bit</td><td>der Akku. Hier landet das Rechenergebnis</td></tr>
+      <tr><td>X und Y</td><td>8 Bit</td><td>zählen und Adressen bilden</td></tr>
+      <tr><td>PC</td><td>16 Bit</td><td>Adresse des nächsten Befehls</td></tr>
+      <tr><td>S</td><td>8 Bit</td><td>zeigt auf den Stapel</td></tr>
+      <tr><td>P</td><td>8 Bit</td><td>Merker, etwa ob das letzte Ergebnis null war</td></tr>
+    </tbody>
+  </table>
+  <p>Zwei Bereiche haben feste Aufgaben. Der <strong>Stapel</strong> liegt bei <code>$0100</code> bis <code>$01FF</code>. Dorthin legt der Prozessor die Rücksprungadresse, wenn er ein Unterprogramm aufruft. Die <strong>Zero Page</strong>, <code>$0000</code> bis <code>$00FF</code>, erreicht er mit kürzeren Befehlen. Die benutzt BASIC selbst.</p>
+  <table>
+    <thead><tr><th>Bereich</th><th>Adresse</th><th>Inhalt</th></tr></thead>
+    <tbody>
+      <tr><td>Programm</td><td><code>$0440</code>–<code>$7EFF</code></td><td>BASIC und Ihre Maschinenprogramme</td></tr>
+      <tr><td>Ein- und Ausgabe</td><td><code>$7F00</code>–<code>$7FFF</code></td><td>Anzeige, Tastatur, serielle Schnittstelle, SID</td></tr>
+      <tr><td>Festspeicher</td><td><code>$8000</code>–<code>$FFFF</code></td><td>BASIC, Kernal und Monitor</td></tr>
+    </tbody>
+  </table>
+  <p>Die genaue Belegung steht in Anhang C.</p>
+
+  <h3>Ein paar Befehle</h3>
+  <p>Ein Befehl beginnt mit einem Byte, dem Opcode. Dahinter folgen oft ein oder zwei Bytes: ein Wert oder eine Adresse. Das Zeichen <code>#</code> bedeutet: nimm diese Zahl selbst, nicht den Inhalt einer Speicherstelle.</p>
+  <table>
+    <thead><tr><th>Befehl</th><th>Beispiel</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>LDA</code></td><td><code>LDA #65</code></td><td>lädt 65 in den Akku, den Buchstaben A</td></tr>
+      <tr><td><code>STA</code></td><td><code>STA $7E00</code></td><td>schreibt den Akku an die Adresse</td></tr>
+      <tr><td><code>LDX</code></td><td><code>LDX #0</code></td><td>lädt das Register X</td></tr>
+      <tr><td><code>JSR</code></td><td><code>JSR $FF80</code></td><td>ruft das Unterprogramm an der Adresse auf</td></tr>
+      <tr><td><code>RTS</code></td><td><code>RTS</code></td><td>kehrt aus dem Unterprogramm zurück</td></tr>
+    </tbody>
+  </table>
+  <p><code>JMP $7E00</code> springt ebenfalls, merkt sich aber keine Rückkehradresse. Eine Adresse steht im Speicher mit dem niedrigen Byte zuerst. Aus <code>$FF80</code> werden die Bytes 128 und 255.</p>
+
+  <h2>Maschinenprogramme laden</h2>
+  <p>Ein fertiges Maschinenprogramm liegt meist in einer Datei mit der Endung <code>.prg</code>, wie beim Commodore 64. Die ersten zwei Bytes sind die Ladeadresse, das niedrige zuerst. Sie muss <code>$0441</code> sein, also die Bytes 65 und 4. Dahinter steht eine BASIC-Zeile, die nur <code>SYS</code> und die Startadresse enthält, und dahinter der Maschinencode.</p>
+  <p><code>LOAD "name"</code> legt das Abbild ab und setzt das Ende der Variablen dahinter, damit <code>RUN</code> den Code nicht überschreibt. <code>LIST</code> zeigt die <code>SYS</code>-Zeile, <code>RUN</code> führt sie aus. Passt die Adresse nicht oder ist die Datei zu groß, bleibt der Speicher leer und es steht <code>BAD LOAD</code>. <code>SAVE</code> schreibt nur die BASIC-Zeilen, den Maschinencode nicht.</p>
+  <p>Das Spiel <code>raid</code> ist so eine Datei. Ist das Laufwerk aus Kapitel 6 verbunden, starten <code>LOAD "raid"</code> und <code>RUN</code> es. Hoch und runter weichen den Wänden aus, <kbd>Q</kbd> kehrt nach BASIC zurück.</p>
+  <p>Dieselben Bytes können Sie auch von Hand ablegen: im Monitor aus Kapitel 6, dort startet <code>G</code>, oder aus BASIC mit <code>POKE</code>, wie am Ende dieses Kapitels.</p>
+
+  <h2>SYS, PEEK und POKE</h2>
+  <p><code>POKE Adresse, Wert</code> schreibt ein Byte. <code>PEEK(Adresse)</code> liest eines. <code>SYS Adresse</code> springt dorthin. Endet das Maschinenprogramm mit <code>RTS</code>, läuft BASIC danach weiter.</p>
+<pre class="listing">POKE 32256,96
+PRINT PEEK(32256)
+SYS 32256</pre>
+  <p>32256 ist <code>$7E00</code>, weit oben im Arbeitsspeicher. 96 ist der Befehl <code>RTS</code>. <code>PRINT</code> zeigt zur Kontrolle 96, <code>SYS</code> kehrt sofort zurück. Adresse und Wert müssen passen: die Adresse von 0 bis 65535, der Wert von 0 bis 255. Sonst kommt <code>?ILLEGAL QUANTITY ERROR</code>.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Achtung</div>
+    <p><code>POKE</code> schreibt überall hin, auch mitten in Ihr BASIC-Programm. Das beginnt bei 1089 (<code>$0441</code>). Zero Page und Stapel gehören dem System. Der Festspeicher ab 32768 (<code>$8000</code>) lässt sich nicht ändern.</p>
+  </aside>
+
+  <h2>Die Kernal-Sprungtabelle</h2>
+  <p>Ab <code>$FF80</code> liegen feste Einsprünge für Anzeige, Tastatur und Ton. Ein Maschinenprogramm ruft sie mit <code>JSR</code> auf. Die Adressen bleiben, auch wenn sich die Firmware dahinter ändert. A, X und Y werden dabei verändert. Nur beim Lesen der Taste bleiben X und Y erhalten.</p>
+  <table>
+    <thead><tr><th>Adresse</th><th>Aufruf</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>$FF80</code></td><td><code>JSR</code></td><td>Anzeige löschen</td></tr>
+      <tr><td><code>$FF83</code></td><td><code>JSR</code></td><td>Cursor setzen. A ist die Zeile 0 bis 3, X die Spalte 0 bis 39</td></tr>
+      <tr><td><code>$FF86</code></td><td><code>JSR</code></td><td>das Zeichen in A ausgeben</td></tr>
+      <tr><td><code>$FF89</code></td><td><code>JSR</code></td><td>Unterstrich: A = 0 aus, sonst an</td></tr>
+      <tr><td><code>$FF8C</code></td><td><code>JSR</code></td><td>Taste nach A, oder 0 wenn keine gedrückt ist</td></tr>
+      <tr><td><code>$FF8F</code></td><td><code>JSR</code></td><td>A Millisekunden warten</td></tr>
+      <tr><td><code>$FF92</code></td><td><code>JSR</code></td><td>SID stumm schalten</td></tr>
+      <tr><td><code>$FF95</code></td><td><code>JSR</code></td><td>Effekt, A = 1 bis 9 wie bei <code>EFFECT</code></td></tr>
+    </tbody>
+  </table>
+  <p>Die Pfeiltasten kommen als 17 links, 18 rechts, 19 hoch und 20 runter.</p>
+
+  <h2>Ein Maschinenprogramm aus DATA</h2>
+  <p>Statt einer <code>.prg</code>-Datei kann BASIC die Bytes selbst ablegen. <code>READ</code> holt sie aus <code>DATA</code>, <code>POKE</code> schreibt sie, <code>SYS</code> startet. Dieses Programm löscht die Anzeige und schreibt links oben ein A:</p>
+  <table>
+    <thead><tr><th>Bytes</th><th>Befehl</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td>32, 128, 255</td><td><code>JSR $FF80</code></td><td>Anzeige löschen</td></tr>
+      <tr><td>169, 65</td><td><code>LDA #65</code></td><td>den Buchstaben A in den Akku</td></tr>
+      <tr><td>32, 134, 255</td><td><code>JSR $FF86</code></td><td>das Zeichen ausgeben</td></tr>
+      <tr><td>96</td><td><code>RTS</code></td><td>zurück nach BASIC</td></tr>
+    </tbody>
+  </table>
+<pre class="listing">10 AD=32256
+20 FOR I=0 TO 8
+30 READ B
+40 POKE AD+I,B
+50 NEXT I
+60 SYS AD
+70 DATA 32,128,255,169,65,32,134,255,96</pre>
+  <p>Die neun Bytes in Zeile 70 stehen in derselben Reihenfolge wie in der Tabelle. <code>$FF80</code> wird zu 128, 255 und <code>$FF86</code> zu 134, 255. Zeile 60 springt an 32256. Danach wartet BASIC wieder auf eine Eingabe.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>32256 (<code>$7E00</code>) liegt weit oben, weg vom BASIC-Programm. Textvariablen legt BASIC vom oberen Speicherende her ab. Viele oder lange Texte können diese Bytes überschreiben.</p>
+  </aside>
+
+  <h2>Weiterlesen</h2>
+  <p>Wenn Sie sich mehr dafür interessieren und tiefer einsteigen wollen, empfehlen wir das Buch <em>Programmierung des 6502</em> von Rodney Zaks. Die deutsche Ausgabe steht bei archive.org: <a href="https://archive.org/details/programmierung-des-6502-sybex">https://archive.org/details/programmierung-des-6502-sybex</a>.</p>
+</section>
+</main>
+</body>
+</html>

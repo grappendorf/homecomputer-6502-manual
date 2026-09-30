@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 4 – BASIC für Fortgeschrittene</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="4" data-titel="BASIC für Fortgeschrittene" data-kurztitel="BASIC für Fortgeschrittene">
+  <p>Mit Variablen, Schleifen, <code>IF</code> und <code>INPUT</code> können Sie schon viel anfangen. In diesem Kapitel kommen die Werkzeuge dazu, mit denen größere Programme übersichtlich bleiben: Felder für viele Werte, Unterprogramme, Daten im Programm, eigene Funktionen und Zufall. Danach lernen Sie, die Anzeige gezielt zu beschreiben, die Tastatur direkt abzufragen und die LED zu schalten. Am Ende steht ein Spiel, das all das zusammenbringt.</p>
+
+  <h2>Felder mit DIM</h2>
+  <p>Wollen Sie fünf Punktzahlen speichern, könnten Sie fünf Variablen nehmen: <code>P1</code>, <code>P2</code> und so weiter. Einfacher ist ein <strong>Feld</strong>. Das ist eine Variable mit mehreren Fächern, die über eine Nummer angesprochen werden, den <strong>Index</strong>:</p>
+<pre class="listing">10 DIM P(4)
+20 S=0
+30 FOR I=0 TO 4
+40 INPUT "PUNKTE";P(I)
+50 S=S+P(I)
+60 NEXT I
+70 PRINT "DURCHSCHNITT:";S/5
+80 FOR I=0 TO 4
+90 IF P(I)&gt;S/5 THEN PRINT "WERT";I+1;"LIEGT DARUEBER"
+100 NEXT I</pre>
+  <figure class="lcd">
+<pre>PUNKTE? 2
+DURCHSCHNITT: 2.4
+WERT 2 LIEGT DARUEBER
+WERT 4 LIEGT DARUEBER</pre>
+    <figcaption>Fünf Werte in einem Feld</figcaption>
+  </figure>
+  <p><code>DIM P(4)</code> legt ein Feld mit den Fächern <code>P(0)</code> bis <code>P(4)</code> an, also fünf Stück. Der Index darf eine Variable oder eine Rechnung sein. Genau das macht Felder so nützlich: Eine Schleife kann alle Fächer der Reihe nach bearbeiten.</p>
+  <ul>
+    <li>Ein Feld ohne <code>DIM</code> hat die Fächer 0 bis 10.</li>
+    <li>Ein Index außerhalb des Feldes führt zu <code>?BAD SUBSCRIPT ERROR</code>.</li>
+    <li>Jedes Feld darf nur einmal mit <code>DIM</code> angelegt werden. Ein zweites Mal ist <code>?REDIM'D ARRAY ERROR</code>. <code>RUN</code> und <code>CLEAR</code> löschen alle Felder.</li>
+    <li>Felder gibt es für alle drei Arten von Variablen: <code>DIM N$(20)</code> für Texte, <code>DIM Z%(100)</code> für ganze Zahlen.</li>
+    <li>Ein Feld kann auch zwei Indizes haben, wie eine Tabelle mit Zeilen und Spalten: <code>DIM F(2,3)</code>, dann <code>F(2,3)=7</code>.</li>
+  </ul>
+
+  <h2>Unterprogramme</h2>
+  <p>Oft braucht ein Programm dieselben Befehle an mehreren Stellen. Statt sie mehrmals zu schreiben, legen Sie sie als <strong>Unterprogramm</strong> ab. <code>GOSUB</code> springt hinein, <code>RETURN</code> springt zurück hinter das <code>GOSUB</code>:</p>
+<pre class="listing">10 PRINT "ANFANG"
+20 GOSUB 100
+30 PRINT "MITTE"
+40 GOSUB 100
+50 END
+100 PRINT "--------"
+110 RETURN</pre>
+  <figure class="lcd">
+<pre>ANFANG
+--------
+MITTE
+--------</pre>
+    <figcaption>Zweimal dasselbe Unterprogramm</figcaption>
+  </figure>
+  <p>Wichtig ist das <code>END</code> in Zeile 50. Ohne diese Zeile liefe das Programm nach dem zweiten Aufruf einfach weiter in das Unterprogramm hinein. Beim <code>RETURN</code> wüsste es dann nicht, wohin zurück, und meldet <code>?RETURN WITHOUT GOSUB ERROR</code>. Man legt Unterprogramme deshalb ans Ende und setzt davor ein <code>END</code>.</p>
+  <p>Ein Unterprogramm darf selbst wieder <code>GOSUB</code> benutzen. Jedes <code>RETURN</code> kehrt zum jeweils letzten <code>GOSUB</code> zurück.</p>
+
+  <h3>Verteiler mit ON</h3>
+  <p><code>ON</code> wählt anhand einer Zahl eines von mehreren Sprungzielen:</p>
+<pre class="listing">ON W GOSUB 100,200,300</pre>
+  <p>Ist W gleich 1, geht es zu Zeile 100. Bei 2 zu Zeile 200, bei 3 zu Zeile 300. Ist W gleich 0 oder größer als die Zahl der Ziele, passiert nichts, und das Programm macht mit dem nächsten Befehl weiter. Kommazahlen werden abgerundet. <code>ON W GOTO …</code> funktioniert genauso, nur ohne Rückkehr.</p>
+
+  <h2>DATA und READ</h2>
+  <p>Manche Werte stehen schon fest, wenn Sie das Programm schreiben: eine Wortliste, die Namen der Wochentage, die Töne einer Melodie. Solche Werte schreiben Sie hinter <code>DATA</code>. <code>READ</code> liest sie der Reihe nach in Variablen:</p>
+<pre class="listing">10 DIM T$(6)
+20 FOR I=0 TO 6:READ T$(I):NEXT I
+30 INPUT "TAG (1-7)";N
+40 IF N&lt;1 OR N&gt;7 THEN 30
+50 PRINT "DAS IST ";T$(N-1)
+60 DATA MONTAG,DIENSTAG,MITTWOCH,DONNERSTAG
+70 DATA FREITAG,SAMSTAG,SONNTAG</pre>
+  <figure class="lcd">
+<pre>TAG (1-7)? 9
+TAG (1-7)? 3
+DAS IST MITTWOCH
+<span class="cursor"> </span></pre>
+    <figcaption>Zeile 40 fragt nach, bis die Eingabe passt</figcaption>
+  </figure>
+  <p>Wo die <code>DATA</code>-Zeilen stehen, ist egal. Der Computer liest sie in der Reihenfolge der Zeilennummern, über alle <code>DATA</code>-Zeilen hinweg. Ein paar Regeln:</p>
+  <ul>
+    <li>Die Werte werden durch Kommas getrennt. Enthält ein Text selbst ein Komma, setzen Sie ihn in Anführungszeichen: <code>DATA "KIRSCHE, SUESS",3</code>.</li>
+    <li>Text hinter <code>DATA</code> bleibt so, wie Sie ihn tippen, klein oder groß. Soll das Programm ihn später mit großen Buchstaben vergleichen, tippen Sie ihn mit <kbd>Shift</kbd>.</li>
+    <li><code>RESTORE</code> setzt den Lesezeiger zurück an den Anfang. Das nächste <code>READ</code> liest wieder den ersten Wert.</li>
+    <li>Sind alle Werte gelesen, führt ein weiteres <code>READ</code> zu <code>?OUT OF DATA ERROR</code>.</li>
+  </ul>
+  <p>Weiß man vorher nicht, wie viele Werte es sind, setzt man ein Endezeichen ans Ende der Liste, zum Beispiel <code>*</code>, und liest, bis es kommt. Das Spiel am Ende dieses Kapitels macht es so.</p>
+
+  <h2>Funktionen</h2>
+  <p>Eine Funktion nimmt einen Wert in Klammern und liefert ein Ergebnis zurück. Sie steht überall dort, wo eine Zahl stehen darf: <code>PRINT SQR(16)</code>, <code>A=INT(X)</code>. Die wichtigsten Rechenfunktionen:</p>
+  <table>
+    <thead><tr><th>Funktion</th><th>Ergebnis</th><th>Beispiel</th></tr></thead>
+    <tbody>
+      <tr><td><code>INT(x)</code></td><td>größte ganze Zahl, die nicht größer als x ist</td><td><code>INT(3.7)</code> = 3, <code>INT(-3.7)</code> = −4</td></tr>
+      <tr><td><code>ABS(x)</code></td><td>Betrag, ohne Vorzeichen</td><td><code>ABS(-4)</code> = 4</td></tr>
+      <tr><td><code>SGN(x)</code></td><td>Vorzeichen: −1, 0 oder 1</td><td><code>SGN(-2)</code> = −1</td></tr>
+      <tr><td><code>SQR(x)</code></td><td>Quadratwurzel</td><td><code>SQR(16)</code> = 4</td></tr>
+      <tr><td><code>SIN</code>, <code>COS</code>, <code>TAN</code>, <code>ATN</code></td><td>Winkelfunktionen, Winkel im Bogenmaß</td><td><code>ATN(1)*4</code> = 3.14159266</td></tr>
+      <tr><td><code>EXP(x)</code>, <code>LOG(x)</code></td><td>e hoch x, natürlicher Logarithmus</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Potenzen schreiben Sie mit <code>^</code>: <code>2^10</code> ist 1024. Den Rest einer Division gibt es nicht als eigene Funktion. Sie bekommen ihn mit <code>A-INT(A/B)*B</code>. Für 17 geteilt durch 5 ist das 2.</p>
+
+  <h3>Eigene Funktionen mit DEF FN</h3>
+  <p>Eine Rechnung, die Sie oft brauchen, können Sie als eigene Funktion festlegen. Der Name beginnt mit <code>FN</code>, dahinter folgt ein Variablenname:</p>
+<pre class="listing">10 DEF FNQ(A)=A*A
+20 PRINT FNQ(7)</pre>
+  <p>Das gibt 49 aus. Das <code>A</code> in der Klammer ist nur ein Platzhalter. Beim Aufruf steht dort der Wert, den Sie übergeben. Eine Funktion hat genau einen solchen Wert. <code>DEF FN</code> geht nur in einem Programm, direkt eingetippt meldet der Computer <code>?ILLEGAL DIRECT ERROR</code>.</p>
+
+  <h2>Zufallszahlen</h2>
+  <p><code>RND(1)</code> liefert eine Zufallszahl, die mindestens 0 und kleiner als 1 ist. Für einen Würfel brauchen Sie aber die ganzen Zahlen von 1 bis 6. Die Formel dafür lautet:</p>
+<pre class="listing">INT(RND(1)*6)+1</pre>
+  <p><code>RND(1)*6</code> ergibt eine Zahl von 0 bis knapp unter 6. <code>INT</code> schneidet die Nachkommastellen ab, übrig bleiben 0 bis 5. Plus eins ergibt 1 bis 6. Allgemein bekommen Sie mit <code>INT(RND(1)*N)+1</code> eine Zahl von 1 bis N. Als eigene Funktion:</p>
+<pre class="listing">10 DEF FNW(X)=INT(RND(1)*X)+1
+20 FOR I=1 TO 10:PRINT FNW(6);:NEXT I</pre>
+
+  <h3>Der Startwert</h3>
+  <p>Die Zahlen von <code>RND</code> sind nicht wirklich zufällig. Sie werden aus einem <strong>Startwert</strong> berechnet. Nach dem Einschalten ist das immer derselbe, darum kommen immer dieselben Zahlen. Mit einer negativen Zahl in der Klammer setzen Sie einen neuen Startwert: <code>X=RND(-42)</code>. Derselbe Startwert ergibt dieselbe Folge. Das ist praktisch zum Testen.</p>
+  <p>Für echten Zufall braucht man einen Startwert, den niemand vorhersagen kann. Ein bewährter Trick: Das Programm zählt, bis Sie eine Taste drücken. Wie lange das dauert, ist jedes Mal anders:</p>
+<pre class="listing">10 PRINT "BITTE EINE TASTE DRUECKEN."
+20 S=0
+30 S=S+1:IF KEY(0)=0 THEN 30
+40 X=RND(-S)</pre>
+  <p>Wie <code>KEY</code> funktioniert, steht weiter unten in diesem Kapitel. <code>RND(0)</code> liefert übrigens noch einmal die letzte Zufallszahl.</p>
+
+  <h2>Zeichenketten</h2>
+  <p>Auch mit Texten lässt sich rechnen. Diese Funktionen zerlegen, prüfen und verwandeln sie:</p>
+  <table>
+    <thead><tr><th>Funktion</th><th>Ergebnis</th><th>Beispiel</th></tr></thead>
+    <tbody>
+      <tr><td><code>LEN(a$)</code></td><td>Anzahl der Zeichen</td><td><code>LEN("HALLO")</code> = 5</td></tr>
+      <tr><td><code>LEFT$(a$,n)</code></td><td>die ersten n Zeichen</td><td><code>LEFT$("HALLO",2)</code> = <code>HA</code></td></tr>
+      <tr><td><code>RIGHT$(a$,n)</code></td><td>die letzten n Zeichen</td><td><code>RIGHT$("HALLO",3)</code> = <code>LLO</code></td></tr>
+      <tr><td><code>MID$(a$,p,n)</code></td><td>n Zeichen ab Stelle p</td><td><code>MID$("HALLO",2,3)</code> = <code>ALL</code></td></tr>
+      <tr><td><code>MID$(a$,p)</code></td><td>alles ab Stelle p</td><td><code>MID$("HALLO",4)</code> = <code>LO</code></td></tr>
+      <tr><td><code>ASC(a$)</code></td><td>Zeichencode des ersten Zeichens</td><td><code>ASC("A")</code> = 65</td></tr>
+      <tr><td><code>CHR$(n)</code></td><td>Zeichen mit dem Code n</td><td><code>CHR$(66)</code> = <code>B</code></td></tr>
+      <tr><td><code>STR$(x)</code></td><td>Zahl als Text</td><td><code>STR$(42)</code> = <code>" 42"</code></td></tr>
+      <tr><td><code>VAL(a$)</code></td><td>Text als Zahl</td><td><code>VAL("12.5")</code> = 12.5</td></tr>
+    </tbody>
+  </table>
+  <p>Die Stellen in einem Text zählen ab 1. <code>STR$</code> setzt vor positive Zahlen ein Leerzeichen, so wie <code>PRINT</code>. <code>VAL</code> liest die Zahl am Anfang des Textes. Steht dort keine, ist das Ergebnis 0. Jeder Buchstabe hat einen Zeichencode: <code>A</code> bis <code>Z</code> sind 65 bis 90, <code>a</code> bis <code>z</code> sind 97 bis 122. Den Zeichensatz finden Sie in Anhang D.</p>
+  <p>Dieses Programm schreibt ein Wort rückwärts. Die Schleife läuft von hinten nach vorn und holt mit <code>MID$</code> jeweils ein Zeichen:</p>
+<pre class="listing">10 INPUT "WORT";W$
+20 FOR I=LEN(W$) TO 1 STEP -1
+30 PRINT MID$(W$,I,1);
+40 NEXT I
+50 PRINT</pre>
+  <figure class="lcd">
+<pre>run
+WORT? Computer
+retupmoC
+<span class="cursor"> </span></pre>
+    <figcaption>Ein Wort rückwärts</figcaption>
+  </figure>
+
+  <h2>Die Anzeige steuern</h2>
+  <p>Bisher hat <code>PRINT</code> einfach Zeile für Zeile geschrieben, und die Anzeige ist nach oben weitergerollt. Für Spiele und übersichtliche Ausgaben wollen Sie aber selbst bestimmen, wo etwas steht. Dafür gibt es diese Befehle:</p>
+  <table>
+    <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLS</code></td><td>Anzeige löschen, Cursor nach links oben</td></tr>
+      <tr><td><code>LOCATE z,s</code></td><td>Cursor in Zeile z (0 bis 3) und Spalte s (0 bis 39) setzen</td></tr>
+      <tr><td><code>CURSOR OFF</code> / <code>CURSOR ON</code></td><td>Unterstrich-Cursor aus- und einschalten</td></tr>
+      <tr><td><code>CURSOR BLINK ON</code> / <code>OFF</code></td><td>Zeichen unter dem Cursor blinken lassen</td></tr>
+      <tr><td><code>DISPLAY OFF</code> / <code>DISPLAY ON</code></td><td>Anzeige dunkel schalten und wieder an. Der Text bleibt erhalten.</td></tr>
+      <tr><td><code>SLEEP s</code></td><td>s Sekunden warten, auch Bruchteile: <code>SLEEP 0.1</code></td></tr>
+    </tbody>
+  </table>
+  <figure class="abbildung">
+    <table>
+      <thead><tr><th></th><th>Spalte 0</th><th>…</th><th>Spalte 39</th></tr></thead>
+      <tbody>
+        <tr><td>Zeile 0</td><td><code>LOCATE 0,0</code></td><td></td><td><code>LOCATE 0,39</code></td></tr>
+        <tr><td>Zeile 1</td><td><code>LOCATE 1,0</code></td><td></td><td></td></tr>
+        <tr><td>Zeile 2</td><td><code>LOCATE 2,0</code></td><td></td><td></td></tr>
+        <tr><td>Zeile 3</td><td><code>LOCATE 3,0</code></td><td></td><td><code>LOCATE 3,39</code></td></tr>
+      </tbody>
+    </table>
+    <figcaption>Zeilen und Spalten zählen ab 0</figcaption>
+  </figure>
+  <p>Dieses Programm zählt die Sekunden, immer an derselben Stelle:</p>
+<pre class="listing">10 CLS:CURSOR OFF
+20 T=0
+30 LOCATE 1,14:PRINT "SEKUNDEN:";T;
+40 SLEEP 1:T=T+1:GOTO 30</pre>
+  <figure class="lcd">
+<pre>
+              SEKUNDEN: 4
+</pre>
+    <figcaption>Die Zahl bleibt an ihrem Platz</figcaption>
+  </figure>
+  <p>Achten Sie auf das Semikolon am Ende von Zeile 30. Ohne Semikolon setzt <code>PRINT</code> den Cursor in die nächste Zeile. In der untersten Zeile rollt dann die ganze Anzeige nach oben. Wenn Sie mit <code>LOCATE</code> arbeiten, beenden Sie <code>PRINT</code> deshalb immer mit <code>;</code>.</p>
+  <p>Wenn Sie das Programm mit <kbd>Pause</kbd> anhalten, bleibt der Cursor ausgeschaltet. Tippen Sie <code>CURSOR ON</code>, dann ist er wieder da.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Tipp</div>
+    <p>Innerhalb von <code>PRINT</code> gibt es noch <code>TAB(n)</code> und <code>SPC(n)</code>. <code>TAB(10)</code> rückt bis Spalte 10 vor, <code>SPC(3)</code> schreibt drei Leerzeichen. <code>POS(0)</code> verrät, in welcher Spalte der Cursor gerade steht.</p>
+  </aside>
+
+  <h2>Die Tastatur abfragen</h2>
+  <p><code>INPUT</code> wartet, bis Sie <kbd>Enter</kbd> drücken. Für ein Spiel ist das zu langsam. Die Funktion <code>KEY(0)</code> schaut stattdessen nach, welche Taste <strong>in diesem Moment</strong> gedrückt ist, und wartet nicht. Ist keine gedrückt, liefert sie 0, sonst den Zeichencode der Taste. Die Zahl in der Klammer spielt keine Rolle.</p>
+  <p>Dieses Programm zeigt die Codes der Tasten, die Sie drücken:</p>
+<pre class="listing">10 CLS:CURSOR OFF
+15 IF KEY(0)&lt;&gt;0 THEN 15
+20 K=KEY(0):IF K=0 THEN 20
+30 PRINT K;
+40 IF KEY(0)&lt;&gt;0 THEN 40
+50 GOTO 20</pre>
+  <p>Zeile 20 wartet, bis eine Taste gedrückt ist. Zeile 40 wartet, bis sie wieder losgelassen ist. Ohne Zeile 40 würde das Programm den Code immer wieder ausgeben, solange Sie die Taste halten. Zeile 15 wartet am Anfang, bis Sie <kbd>Enter</kbd> nach dem <code>RUN</code> losgelassen haben. Sonst wäre die erste Zahl immer 13.</p>
+  <table>
+    <thead><tr><th>Taste</th><th>Code</th><th>Taste</th><th>Code</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>A</kbd> bis <kbd>Z</kbd></td><td>97 bis 122</td><td><kbd>←</kbd></td><td>17</td></tr>
+      <tr><td><kbd>Shift</kbd> + <kbd>A</kbd> bis <kbd>Z</kbd></td><td>65 bis 90</td><td><kbd>→</kbd></td><td>18</td></tr>
+      <tr><td><kbd>0</kbd> bis <kbd>9</kbd></td><td>48 bis 57</td><td><kbd>↑</kbd></td><td>19</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>13</td><td><kbd>↓</kbd></td><td>20</td></tr>
+      <tr><td><kbd>Leertaste</kbd></td><td>32</td><td><kbd>Pos1</kbd></td><td>21</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>27</td><td><kbd>Ende</kbd></td><td>22</td></tr>
+      <tr><td><kbd>Rücktaste</kbd></td><td>8</td><td><kbd>Entf</kbd></td><td>23</td></tr>
+      <tr><td></td><td></td><td><kbd>Einfg</kbd></td><td>24</td></tr>
+    </tbody>
+  </table>
+  <p>Weil <code>KEY</code> meldet, solange eine Taste gedrückt ist, eignet es sich gut für Bewegungen. Hier wandert ein Stern mit den Pfeiltasten über die Anzeige. Halten Sie die Taste fest, läuft er weiter. <kbd>Esc</kbd> beendet das Programm:</p>
+<pre class="listing">10 CLS:CURSOR OFF:X=20:Y=1
+20 LOCATE Y,X:PRINT "*";
+30 K=KEY(0):IF K=0 THEN 30
+40 LOCATE Y,X:PRINT " ";
+50 IF K=17 AND X&gt;0 THEN X=X-1
+60 IF K=18 AND X&lt;39 THEN X=X+1
+70 IF K=19 AND Y&gt;0 THEN Y=Y-1
+80 IF K=20 AND Y&lt;3 THEN Y=Y+1
+90 IF K=27 THEN CLS:CURSOR ON:END
+100 SLEEP 0.1:GOTO 20</pre>
+  <p>Zeile 40 löscht den Stern an der alten Stelle, bevor die Zeilen 50 bis 80 die neue ausrechnen. Die Bedingungen hinter <code>AND</code> halten ihn innerhalb der Anzeige. Das <code>SLEEP</code> in Zeile 100 bremst ihn. Ohne diese Zeile springt er schon bei einem kurzen Tastendruck mehrere Felder weit.</p>
+
+  <h2>Die LED</h2>
+  <p>Oben rechts am Gerät sitzt eine LED. Nach dem Einschalten und nach einem Reset leuchtet sie eine Sekunde lang von selbst. Danach gehört sie Ihnen: <code>LED ON</code> schaltet sie ein, <code>LED OFF</code> schaltet sie aus.</p>
+<pre class="listing">10 LED ON
+20 SLEEP 0.5
+30 LED OFF
+40 SLEEP 0.5
+50 GOTO 10</pre>
+  <p>Das Programm lässt die LED im Sekundentakt blinken, bis Sie es anhalten. Sie können die LED als Signal nutzen, etwa wenn ein Spiel gewonnen ist, oder um zu zeigen, dass ein langes Programm noch arbeitet.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p><code>ON</code> und <code>OFF</code> sind BASIC-Wörter. Eine Variable darf deshalb nicht <code>OFF</code> heißen.</p>
+  </aside>
+
+  <h2>Ein Spiel: Galgenraten</h2>
+  <p>Zum Abschluss ein größeres Programm, das fast alles aus diesem und dem letzten Kapitel benutzt. Der Computer wählt ein Wort. Sie raten Buchstabe für Buchstabe. Jeder Buchstabe, der nicht im Wort vorkommt, ist ein Fehler. Nach acht Fehlern haben Sie verloren.</p>
+  <figure class="lcd">
+<pre>GALGENRATEN                FEHLER 2 / 8
+K L A N _
+FALSCH: EX
+BUCHSTABE?</pre>
+    <figcaption>Noch ein Buchstabe fehlt</figcaption>
+  </figure>
+  <p>Das Programm ist lang. Tippen Sie es in Ruhe ab und prüfen Sie jeden Abschnitt mit <code>LIST</code>. Sie finden es auch im Firmware-Projekt als <code>examples/galgen.bas</code>. Ist das Laufwerk aus Kapitel 6 verbunden, laden Sie es mit <code>LOAD "galgen"</code>. Die Abschnitte im Einzelnen:</p>
+
+  <h3>Vorbereitung</h3>
+<pre class="listing">10 REM GALGENRATEN
+20 DIM WL$(20),G(25)
+30 DEF FNR(X)=INT(RND(1)*X)
+40 N=0
+50 READ A$:IF A$="*" THEN 80
+60 N=N+1:WL$(N)=A$
+70 GOTO 50
+80 CLS:CURSOR OFF
+90 PRINT "GALGENRATEN":PRINT
+100 PRINT "BITTE EINE TASTE DRUECKEN."
+105 IF KEY(0)&lt;&gt;0 THEN 105
+110 S=0
+120 S=S+1:IF KEY(0)=0 THEN 120
+130 X=RND(-S)
+140 IF KEY(0)&lt;&gt;0 THEN 140</pre>
+  <p>Zeile 20 legt zwei Felder an. <code>WL$</code> ist die Wortliste. <code>G</code> hat ein Fach für jeden Buchstaben von A bis Z. Dort steht später eine 1, wenn der Buchstabe schon geraten wurde. Zeile 30 legt eine Funktion für Zufallszahlen von 0 bis X−1 fest. Die Zeilen 50 bis 70 lesen die Wörter aus den <code>DATA</code>-Zeilen, bis das Endezeichen <code>*</code> kommt. N zählt dabei mit. Die Zeilen 105 bis 140 erzeugen den Startwert für den Zufall mit dem Tastentrick von oben.</p>
+
+  <h3>Eine Runde</h3>
+<pre class="listing">200 REM NEUE RUNDE
+210 W$=WL$(FNR(N)+1):L=LEN(W$)
+220 FOR I=0 TO 25:G(I)=0:NEXT I
+230 F=0:R$="":CLS
+240 GOSUB 500
+250 IF M=0 THEN E=1:GOTO 400
+260 IF F=8 THEN E=2:GOTO 400
+270 LOCATE 3,0:PRINT "BUCHSTABE?        ";
+280 GOSUB 600
+290 B=ASC(B$)-65
+300 IF G(B)=1 THEN 280
+310 G(B)=1:T=0
+320 FOR I=1 TO L
+330 IF MID$(W$,I,1)=B$ THEN T=1
+340 NEXT I
+350 IF T=0 THEN F=F+1:R$=R$+B$
+360 GOTO 240</pre>
+  <p>Zeile 210 wählt ein zufälliges Wort W$ mit der Länge L. Zeile 220 vergisst alle geratenen Buchstaben, Zeile 230 setzt die Fehler F und die Liste der falschen Buchstaben R$ zurück. Dann beginnt die Schleife von Zeile 240 bis 360: Anzeige auffrischen, prüfen, ob die Runde vorbei ist, einen Buchstaben holen.</p>
+  <p>Zeile 290 macht aus dem Buchstaben eine Zahl von 0 (A) bis 25 (Z), passend zum Feld G. Wurde der Buchstabe schon geraten, holt Zeile 300 einfach den nächsten. Die Zeilen 320 bis 340 prüfen jede Stelle des Wortes. T wird 1, sobald der Buchstabe irgendwo vorkommt.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Achtung, Falle</div>
+    <p>Das <code>NEXT I</code> steht absichtlich in einer eigenen Zeile. Stünde es in Zeile 330 hinter dem <code>IF</code>, würde es nur ausgeführt, wenn die Bedingung wahr ist. Bei jedem anderen Buchstaben bliebe die Schleife hängen.</p>
+  </aside>
+
+  <h3>Ende der Runde</h3>
+<pre class="listing">400 ON E GOSUB 700,800
+410 LOCATE 3,0:PRINT "NOCH EINMAL (J/N)?";
+420 GOSUB 600
+430 IF B$="J" THEN 200
+440 IF B$&lt;&gt;"N" THEN 420
+450 CLS:CURSOR ON:END</pre>
+  <p>E ist 1, wenn alle Buchstaben gefunden sind, und 2 nach acht Fehlern. <code>ON E GOSUB</code> springt in das passende Unterprogramm. Danach fragt das Programm nach einer neuen Runde. Jede andere Taste als J und N wird überhört.</p>
+
+  <h3>Die Unterprogramme</h3>
+<pre class="listing">500 REM ANZEIGE
+510 LOCATE 0,0:PRINT "GALGENRATEN";
+520 LOCATE 0,27:PRINT "FEHLER";F;"/ 8";
+530 LOCATE 1,0:M=0
+540 FOR I=1 TO L:C$=MID$(W$,I,1)
+550 IF G(ASC(C$)-65)=1 THEN PRINT C$;" ";:GOTO 570
+560 PRINT "_ ";:M=M+1
+570 NEXT I
+580 LOCATE 2,0:PRINT "FALSCH: ";R$;
+590 RETURN</pre>
+  <p>Das Unterprogramm ab Zeile 500 zeichnet die Anzeige. Für jede Stelle des Wortes schreibt es den Buchstaben, wenn er schon geraten ist, sonst einen Strich. M zählt dabei die Striche. Ist M am Ende 0, ist das Wort vollständig.</p>
+<pre class="listing">600 REM TASTE HOLEN
+610 K=KEY(0):IF K=0 THEN 610
+620 IF KEY(0)&lt;&gt;0 THEN 620
+630 IF K&gt;=97 AND K&lt;=122 THEN K=K-32
+640 IF K&lt;65 OR K&gt;90 THEN 610
+650 B$=CHR$(K):RETURN</pre>
+  <p>Das Unterprogramm ab Zeile 600 wartet auf eine Taste und auf das Loslassen. Zeile 630 macht aus kleinen Buchstaben große, denn die Codes liegen genau 32 auseinander. Zeile 640 lässt nur Buchstaben durch. So funktioniert das Spiel mit und ohne <kbd>Shift</kbd>.</p>
+<pre class="listing">700 REM GEWONNEN
+710 LOCATE 3,0:PRINT "RICHTIG!          ";
+720 FOR I=1 TO 5:LED ON:SLEEP 0.2:LED OFF:SLEEP 0.2:NEXT I
+730 RETURN
+800 REM VERLOREN
+810 FOR I=0 TO 25:G(I)=1:NEXT I
+820 GOSUB 500
+830 LOCATE 3,0:PRINT "LEIDER VERLOREN.  ";
+840 SLEEP 2
+850 RETURN</pre>
+  <p>Beim Gewinnen blinkt die LED fünfmal. Beim Verlieren markiert Zeile 810 einfach alle Buchstaben als geraten. Dann zeigt das Anzeige-Unterprogramm das ganze Wort, ohne dass dafür neuer Code nötig ist. Die Leerzeichen hinter den Meldungen überschreiben Reste der vorigen Zeile.</p>
+
+  <h3>Die Wortliste</h3>
+<pre class="listing">900 DATA COMPUTER,PROZESSOR,TASTATUR,SPEICHER
+910 DATA PROGRAMM,SCHLEIFE,VARIABLE,ANZEIGE
+920 DATA DISKETTE,MONITOR,ZEICHEN,KLANG
+930 DATA *</pre>
+  <p>Eigene Wörter fügen Sie einfach als weitere <code>DATA</code>-Zeilen vor Zeile 930 ein. Drei Regeln gelten: nur große Buchstaben von A bis Z, keine Umlaute, höchstens 20 Buchstaben, sonst passt das Wort nicht in eine Zeile. Insgesamt passen 20 Wörter in das Feld. Für mehr vergrößern Sie <code>WL$</code> in Zeile 20.</p>
+  <figure class="lcd">
+<pre>GALGENRATEN                FEHLER 2 / 8
+K L A N G
+FALSCH: EX
+RICHTIG!</pre>
+    <figcaption>Gewonnen, die LED blinkt</figcaption>
+  </figure>
+  <p>Was in diesem Programm steckt: Felder (<code>DIM</code>), Unterprogramme (<code>GOSUB</code>, <code>ON … GOSUB</code>), Daten (<code>DATA</code>, <code>READ</code>), eine eigene Funktion (<code>DEF FN</code>), Zufall mit Startwert (<code>RND</code>), Textfunktionen (<code>LEN</code>, <code>MID$</code>, <code>ASC</code>, <code>CHR$</code>), die Anzeige (<code>CLS</code>, <code>LOCATE</code>, <code>CURSOR</code>), die Tastatur (<code>KEY</code>) und die LED. Dazu Schleifen, Bedingungen und Variablen aus Kapitel 3. Wenn Sie das Programm verstanden haben, können Sie eigene Spiele schreiben.</p>
+</section>
+</main>
+</body>
+</html>

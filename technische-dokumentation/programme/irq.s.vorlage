@@ -1,0 +1,74 @@
+        .setcpu "6502"
+
+VIA1_ORA  = $7f21
+VIA1_DDRA = $7f23
+VIA1_T1CL = $7f24
+VIA1_T1CH = $7f25
+VIA1_ACR  = $7f2b
+VIA1_IER  = $7f2e
+
+LED            = %10000000
+TIMER_INTERVAL = 10000          ;{interval}
+
+        .zeropage
+ticks:      .res 1              ;{ticks}
+max_ticks:  .res 1              ;{maxticks}
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    jmp nmi_handler
+irq:    jmp irq_handler
+
+main:   sei                     ;{sei}
+        cld
+        ldx #$ff
+        txs
+        lda VIA1_DDRA           ;{ledinit}
+        ora #LED
+        sta VIA1_DDRA
+        lda VIA1_ORA
+        and #<~LED
+        sta VIA1_ORA
+        lda #0
+        sta ticks
+        lda #100                ;{onesecond}
+        sta max_ticks
+        lda #%01000000          ;{acr}
+        sta VIA1_ACR
+        lda #%11000000          ;{ier}
+        sta VIA1_IER
+        lda #<TIMER_INTERVAL    ;{t1}
+        sta VIA1_T1CL
+        lda #>TIMER_INTERVAL
+        sta VIA1_T1CH
+        cli                     ;{cli}
+loop:   jmp loop                ;{idle}
+
+;{nmi}
+nmi_handler:
+        pha
+        lda #10                 ;{tenth}
+        sta max_ticks
+        pla
+        rti
+
+;{irq}
+irq_handler:
+        pha
+        lda VIA1_T1CL           ;{ack}
+        inc ticks
+        lda ticks
+        cmp max_ticks
+        bcc @done
+        lda #0
+        sta ticks
+        lda VIA1_ORA
+        eor #LED                ;{toggle}
+        sta VIA1_ORA
+@done:  pla
+        rti

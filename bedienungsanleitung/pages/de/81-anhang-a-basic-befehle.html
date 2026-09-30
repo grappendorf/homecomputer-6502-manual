@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Anhang A – BASIC-Befehle</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang referenz" data-buchstabe="A" data-kurztitel="Anhang A · BASIC-Befehle">
+  <h1><span class="buchstabe">A</span>BASIC-Befehle</h1>
+  <p>Die Kapitel 3 bis 6 haben Ihnen BASIC Schritt für Schritt gezeigt. Dieser Anhang ist zum Nachschlagen gedacht. Hier steht jeder Befehl und jede Funktion des HomeComputer-6502-BASIC, mit Schreibweise, kurzer Beschreibung und Beispiel. Probieren Sie die Beispiele ruhig aus. Ein falsch getippter Befehl schadet dem Computer nicht. Schlimmstenfalls meldet er einen Fehler, und die Fehler erklärt Anhang B.</p>
+  <p>Der Anhang hat vier Teile:</p>
+  <ol class="teile">
+    <li><strong>Variablen und Operatoren:</strong> Zahlen, Texte, Variablennamen, Felder, Rechenzeichen und Vergleiche.</li>
+    <li><strong>Kommandos:</strong> Befehle, mit denen Sie Programme starten, ansehen, laden, speichern und löschen.</li>
+    <li><strong>Befehle:</strong> alles, was in einer Programmzeile stehen kann, von <code>CLEAR</code> bis <code>WAVE</code>.</li>
+    <li><strong>Funktionen:</strong> Rechen-, Text- und Ausgabefunktionen.</li>
+  </ol>
+  <p class="syntax-legende">In der Schreibweise stehen <var>kursive Wörter</var> für etwas, das Sie selbst einsetzen. Was in <span class="mono">[ ]</span> steht, dürfen Sie weglassen. <span class="mono">…</span> heißt: So kann es weitergehen.</p>
+
+  <!-- ============================================================ -->
+  <h2>Variablen und Operatoren</h2>
+
+  <h3>Zahlen</h3>
+  <p>BASIC rechnet mit Gleitkommazahlen, also Zahlen mit Komma. Sie haben etwa neun gültige Stellen. Statt des Kommas schreiben Sie einen Punkt: <code>3.14</code>. Sehr große und sehr kleine Zahlen schreibt BASIC mit <code>E</code> und einer Zehnerpotenz: <code>1.5E+06</code> ist 1,5 Millionen, <code>2E-03</code> ist 0,002. Die größte Zahl ist etwa <code>1.7E+38</code>. Was darüber hinausgeht, meldet <code>?OVERFLOW ERROR</code>.</p>
+
+  <h3>Variablen</h3>
+  <p>Eine Variable ist ein Name für einen Wert. Es gibt drei Arten. Welche Art eine Variable ist, zeigt das letzte Zeichen ihres Namens:</p>
+  <table>
+    <thead><tr><th>Art</th><th>Beispiel</th><th>enthält</th></tr></thead>
+    <tbody>
+      <tr><td>Gleitkomma</td><td><code>A</code>, <code>X1</code>, <code>PI</code></td><td>Zahl mit etwa 9 gültigen Stellen</td></tr>
+      <tr><td>ganze Zahl</td><td><code>A%</code>, <code>N%</code></td><td>ganze Zahl von −32768 bis 32767</td></tr>
+      <tr><td>Zeichenkette</td><td><code>A$</code>, <code>NA$</code></td><td>Text mit 0 bis 255 Zeichen</td></tr>
+    </tbody>
+  </table>
+  <p>Ein Name beginnt mit einem Buchstaben, danach dürfen Buchstaben und Ziffern folgen. BASIC unterscheidet aber nur die ersten zwei Zeichen. <code>PUNKTE</code> und <code>PUMPE</code> sind dieselbe Variable <code>PU</code>. In einem Namen darf kein BASIC-Wort stecken: <code>TOTAL</code> enthält <code>TO</code> und ergibt <code>?SYNTAX ERROR</code>.</p>
+  <p>Eine neue Variable ist 0 oder leer. <code>RUN</code>, <code>CLEAR</code> und <code>NEW</code> setzen alle Variablen wieder zurück. Geben Sie einer ganzzahligen Variable eine Zahl mit Komma, fallen die Nachkommastellen weg.</p>
+
+  <h3>Felder</h3>
+  <p>Ein Feld ist eine Reihe von Variablen unter einem Namen. Die einzelnen Plätze tragen eine Nummer in Klammern, den Index. Er beginnt bei 0. <code>DIM A(20)</code> legt die Plätze <code>A(0)</code> bis <code>A(20)</code> an. Ein Feld darf mehrere Indizes haben: <code>DIM B(3,4)</code>. Benutzen Sie ein Feld ohne <code>DIM</code>, legt BASIC es mit den Plätzen 0 bis 10 an. Felder gibt es von allen drei Arten: <code>A(5)</code>, <code>A%(5)</code>, <code>A$(5)</code>.</p>
+
+  <h3>Rechenzeichen</h3>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>+</code></td><td>Addition, bei Zeichenketten: aneinanderhängen</td></tr>
+      <tr><td><code>-</code></td><td>Subtraktion, vor einer Zahl: Minuszeichen</td></tr>
+      <tr><td><code>*</code></td><td>Multiplikation</td></tr>
+      <tr><td><code>/</code></td><td>Division</td></tr>
+      <tr><td><code>^</code></td><td>Potenz: <code>2^8</code> ist 256</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Vergleiche</h3>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>=</code></td><td>gleich</td></tr>
+      <tr><td><code>&lt;&gt;</code></td><td>ungleich</td></tr>
+      <tr><td><code>&lt;</code></td><td>kleiner als</td></tr>
+      <tr><td><code>&gt;</code></td><td>größer als</td></tr>
+      <tr><td><code>&lt;=</code></td><td>kleiner oder gleich</td></tr>
+      <tr><td><code>&gt;=</code></td><td>größer oder gleich</td></tr>
+    </tbody>
+  </table>
+  <p>Ein Vergleich ergibt −1, wenn er stimmt, und 0, wenn nicht. <code>PRINT 3&lt;5</code> schreibt <code>-1</code>. Zeichenketten vergleicht BASIC Zeichen für Zeichen nach ihrem Code. <code>"ABC"&lt;"ABD"</code> stimmt.</p>
+
+  <h3>Logische Operatoren</h3>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>AND</code></td><td>beide Bedingungen stimmen</td></tr>
+      <tr><td><code>OR</code></td><td>mindestens eine Bedingung stimmt</td></tr>
+      <tr><td><code>NOT</code></td><td>kehrt eine Bedingung um</td></tr>
+    </tbody>
+  </table>
+  <p>Eigentlich arbeiten die drei mit den einzelnen Bits einer ganzen Zahl von −32768 bis 32767. Deshalb geht auch <code>PRINT 12 AND 10</code> und ergibt 8. Mit Vergleichen (−1 und 0) verhalten sie sich wie „und“, „oder“ und „nicht“.</p>
+
+  <h3>Reihenfolge</h3>
+  <p>Wie in der Mathematik gilt Punkt vor Strich. Die ganze Reihenfolge, von oben nach unten:</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>^</code></td><td>Potenz</td></tr>
+      <tr><td><code>-</code></td><td>Minuszeichen vor einer Zahl</td></tr>
+      <tr><td><code>* /</code></td><td>Multiplikation, Division</td></tr>
+      <tr><td><code>+ -</code></td><td>Addition, Subtraktion</td></tr>
+      <tr><td><code>= &lt;&gt; &lt; &gt; &lt;= &gt;=</code></td><td>Vergleiche</td></tr>
+      <tr><td><code>NOT</code></td><td></td></tr>
+      <tr><td><code>AND</code></td><td></td></tr>
+      <tr><td><code>OR</code></td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Klammern ändern die Reihenfolge: <code>2+3*4</code> ist 14, <code>(2+3)*4</code> ist 20.</p>
+
+  <!-- ============================================================ -->
+  <h2>Kommandos</h2>
+  <p>Diese Befehle tippen Sie meist ohne Zeilennummer ein. Dann führt der Computer sie sofort aus. Man nennt das den <strong>Direktmodus</strong>.</p>
+
+  <h3>CONT</h3>
+  <p class="syntax">CONT</p>
+  <p>Setzt ein Programm fort, das Sie mit <kbd>Pause</kbd> oder <kbd>Strg</kbd>+<kbd>C</kbd> angehalten haben oder das bei <code>STOP</code> stehen geblieben ist. Es läuft genau an der Stelle weiter, an der es aufgehört hat. In der Pause dürfen Sie Variablen ansehen und ändern, etwa mit <code>PRINT A</code>. Ändern Sie aber das Programm selbst, geht <code>CONT</code> nicht mehr, und es kommt <code>?CAN'T CONTINUE ERROR</code>.</p>
+
+  <h3>DELETE</h3>
+  <p class="syntax">DELETE "<var>Name</var>"</p>
+  <p>Löscht eine Datei auf der Diskette. Vorher fragt der Computer <code>DELETE? (Y/N)</code>. Nur <kbd>Y</kbd> löscht die Datei, danach steht <code>DELETED</code>. Jede andere Taste lässt sie stehen. Fehlt die Datei, steht <code>FILE NOT FOUND</code>. Wie die Diskette angeschlossen wird, erklärt Kapitel 6.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>DELETE "test"</code></td><td>löscht die Datei test</td></tr></tbody>
+  </table>
+
+  <h3>DIR</h3>
+  <p class="syntax">DIR</p>
+  <p>Zeigt das Verzeichnis der Diskette: für jede Datei die Größe in Bytes und den Namen. Auf der Anzeige erscheinen drei Dateien, dann <code>MORE - PRESS A KEY</code>, und die LED leuchtet. Mit einer Taste geht es weiter. Am Ende steht <code>END OF DIRECTORY</code>. <kbd>Pause</kbd> bricht die Liste ab.</p>
+
+  <h3>LIST</h3>
+  <p class="syntax">LIST [<var>von</var>] [-[<var>bis</var>]]</p>
+  <p>Zeigt das Programm im Speicher. Ohne Zahl kommt das ganze Programm, mit Zahlen nur ein Teil. Auf der Anzeige hält <code>LIST</code> nach drei Zeilen an, zeigt <code>MORE - PRESS A KEY</code> und lässt die LED leuchten. Eine Taste zeigt die nächsten Zeilen. <kbd>Pause</kbd> bricht ab. Auf dem seriellen Terminal läuft die Liste ohne Halt durch.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>LIST</code></td><td>das ganze Programm</td></tr>
+      <tr><td><code>LIST 100</code></td><td>nur Zeile 100</td></tr>
+      <tr><td><code>LIST 100-200</code></td><td>Zeilen 100 bis 200</td></tr>
+      <tr><td><code>LIST -200</code></td><td>vom Anfang bis Zeile 200</td></tr>
+      <tr><td><code>LIST 100-</code></td><td>ab Zeile 100 bis zum Ende</td></tr>
+    </tbody>
+  </table>
+
+  <h3>LOAD</h3>
+  <p class="syntax">LOAD "<var>Name</var>"</p>
+  <p>Lädt ein Programm von der Diskette. Das alte Programm im Speicher wird dabei ersetzt. Während des Ladens zeigt ein Balken den Fortschritt, am Ende steht <code>LOADED</code>. Der Name hat höchstens 16 Zeichen. Ohne Endung sucht der Computer zuerst <var>Name</var><code>.prg</code>, dann <var>Name</var><code>.bas</code>. Eine <code>.prg</code>-Datei enthält Maschinensprache (siehe Kapitel 7), eine <code>.bas</code>-Datei ein BASIC-Programm als Text. Groß- und Kleinschreibung zählt beim Namen, denn die Dateien liegen auf dem PC.</p>
+  <p>Fehlt die Datei, bleibt das alte Programm stehen, und es kommt <code>FILE NOT FOUND</code>. Ohne angeschlossene Diskette meldet der Computer <code>NO DISK</code>.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOAD "galgen"</code></td><td>lädt galgen.bas</td></tr></tbody>
+  </table>
+
+  <h3>NEW</h3>
+  <p class="syntax">NEW</p>
+  <p>Löscht das Programm und alle Variablen. Speichern Sie ein Programm, das Sie noch brauchen, vorher mit <code>SAVE</code>. Ein gelöschtes Programm lässt sich nicht zurückholen.</p>
+
+  <h3>RUN</h3>
+  <p class="syntax">RUN [<var>Zeile</var>]</p>
+  <p>Startet das Programm im Speicher. Vorher setzt <code>RUN</code> alle Variablen auf 0 oder leer. Ohne Zahl beginnt das Programm bei der kleinsten Zeilennummer, mit Zahl bei dieser Zeile.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>RUN</code></td><td>startet am Anfang</td></tr>
+      <tr><td><code>RUN 500</code></td><td>startet bei Zeile 500</td></tr>
+    </tbody>
+  </table>
+
+  <h3>SAVE</h3>
+  <p class="syntax">SAVE "<var>Name</var>"</p>
+  <p>Speichert das Programm auf der Diskette. Die Datei ist reiner Text, eine Zeile pro Programmzeile, genau wie <code>LIST</code> sie zeigt. Sie können sie deshalb auch am PC lesen und ändern. Der Balken zeigt den Fortschritt, am Ende steht <code>SAVED</code>. Eine Datei mit demselben Namen wird überschrieben. Ist kein Programm im Speicher, steht <code>NO PROGRAM</code>.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>SAVE "raten"</code></td><td>speichert als raten.bas</td></tr></tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2>Befehle</h2>
+  <p>Die folgenden Befehle stehen meist in Programmzeilen. Die meisten gehen aber auch im Direktmodus. Mehrere Befehle in einer Zeile trennen Sie mit einem Doppelpunkt.</p>
+
+  <h3>CLEAR</h3>
+  <p class="syntax">CLEAR</p>
+  <p>Löscht alle Variablen und Felder. Das Programm bleibt erhalten. <code>RUN</code> macht das automatisch.</p>
+
+  <h3>CLS</h3>
+  <p class="syntax">CLS [#<var>Gerät</var>]</p>
+  <p>Löscht die Anzeige und setzt den Cursor nach links oben. Mit <code>#1</code> ist immer das LCD gemeint, mit <code>#2</code> das serielle Terminal (siehe Kapitel 6). Ohne Angabe gilt das Gerät, an dem Sie gerade arbeiten. Dasselbe gilt für <code>LOCATE</code>, <code>CURSOR</code>, <code>PRINT</code> und <code>INPUT</code>.</p>
+
+  <h3>CURSOR</h3>
+  <p class="syntax">CURSOR [#<var>Gerät</var>] ON | OFF<br>CURSOR [#<var>Gerät</var>] BLINK ON | OFF</p>
+  <p><code>CURSOR ON</code> und <code>CURSOR OFF</code> schalten den Unterstrich-Cursor ein und aus. <code>CURSOR BLINK ON</code> lässt zusätzlich das Zeichen an der Cursorstelle blinken, <code>CURSOR BLINK OFF</code> hört damit auf. Unterstrich und Blinken sind unabhängig voneinander. In Spielen schaltet man den Cursor meist aus, damit er nicht über die Anzeige springt. Nach dem Programm schalten Sie ihn mit <code>CURSOR ON</code> wieder ein.</p>
+
+  <h3>DATA</h3>
+  <p class="syntax">DATA <var>Wert</var>, <var>Wert</var>, …</p>
+  <p>Legt eine Liste von Werten im Programm ab. <code>READ</code> liest sie der Reihe nach. Die Werte können Zahlen oder Texte sein. Texte brauchen nur dann Anführungszeichen, wenn sie ein Komma, einen Doppelpunkt oder Leerzeichen am Anfang oder Ende enthalten. <code>DATA</code>-Zeilen dürfen irgendwo im Programm stehen. Der Computer überspringt sie beim Ausführen.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 DATA 12,14.5,"HALLO, DU",MAUS</code></td><td></td></tr></tbody>
+  </table>
+
+  <h3>DEF FN</h3>
+  <p class="syntax">DEF FN<var>Name</var>(<var>Variable</var>) = <var>Ausdruck</var></p>
+  <p>Legt eine eigene Rechenfunktion fest. Der Name ist ein Variablenname aus ein oder zwei Zeichen, davor steht <code>FN</code>. Die Variable in Klammern ist ein Platzhalter. Beim Aufruf setzt BASIC dort die Zahl ein, die Sie übergeben. Eine Funktion braucht genau eine Zahl und liefert eine Zahl. <code>DEF FN</code> geht nur in einem Programm, nicht im Direktmodus.</p>
+<pre class="listing">10 DEF FNQ(X)=X*X
+20 PRINT FNQ(7)</pre>
+  <p>schreibt <code>49</code>.</p>
+
+  <h3>DIM</h3>
+  <p class="syntax">DIM <var>Name</var>(<var>Größe</var>[, <var>Größe</var> …]) [, …]</p>
+  <p>Legt ein Feld an. Die Größe ist der höchste Index. <code>DIM</code> darf für jedes Feld nur einmal ausgeführt werden. Ein zweites Mal meldet <code>?REDIM'D ARRAY ERROR</code>. Ein Index außerhalb der Größe ergibt <code>?BAD SUBSCRIPT ERROR</code>. Mehrere Felder trennen Sie mit Kommas.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>DIM A(50)</code></td><td>51 Zahlen, A(0) bis A(50)</td></tr>
+      <tr><td><code>DIM W$(20),F%(3,3)</code></td><td>21 Texte und 4×4 ganze Zahlen</td></tr>
+    </tbody>
+  </table>
+
+  <h3>DISPLAY</h3>
+  <p class="syntax">DISPLAY ON | OFF</p>
+  <p>Schaltet die Anzeige dunkel und wieder an. Der Text bleibt dabei gespeichert und ist nach <code>DISPLAY ON</code> sofort wieder da. So lässt sich eine Anzeige im Hintergrund aufbauen und dann auf einen Schlag zeigen.</p>
+
+  <h3>EFFECT</h3>
+  <p class="syntax">EFFECT <var>Nummer</var></p>
+  <p>Spielt einen eingebauten Klangeffekt. Er läuft auf Stimme 3 und im Hintergrund, das Programm läuft also sofort weiter. Die Stimmen 1 und 2 spielen ungestört weiter.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>EFFECT 1</code></td><td>Schuss</td></tr>
+      <tr><td><code>EFFECT 2</code></td><td>Explosion</td></tr>
+      <tr><td><code>EFFECT 3</code></td><td>Laser</td></tr>
+      <tr><td><code>EFFECT 4</code></td><td>Sprung</td></tr>
+      <tr><td><code>EFFECT 5</code></td><td>Münze</td></tr>
+      <tr><td><code>EFFECT 6</code></td><td>Extra</td></tr>
+      <tr><td><code>EFFECT 7</code></td><td>Fehler</td></tr>
+      <tr><td><code>EFFECT 8</code></td><td>Sirene</td></tr>
+      <tr><td><code>EFFECT 9</code></td><td>fallende Bombe</td></tr>
+    </tbody>
+  </table>
+
+  <h3>END</h3>
+  <p class="syntax">END</p>
+  <p>Beendet das Programm, ohne Meldung. <code>END</code> muss nicht am Schluss stehen. Man braucht es vor allem, damit ein Programm nicht in die Unterprogramme dahinter hineinläuft.</p>
+
+  <h3>ENVELOPE</h3>
+  <p class="syntax">ENVELOPE <var>Instrument</var>, <var>Attack</var>, <var>Decay</var>, <var>Sustain</var>, <var>Release</var></p>
+  <p>Stellt die Hüllkurve eines Instruments ein, also wie ein Ton lauter und leiser wird. Instrument 0 bis 7, jede Stufe 0 bis 15. <strong>Attack</strong> ist das Anschwellen, <strong>Decay</strong> das Abfallen auf die Haltelautstärke <strong>Sustain</strong>, <strong>Release</strong> das Ausklingen am Ende. Der nächste Ton mit diesem Instrument benutzt die neue Hüllkurve. Die Wellenform bleibt dabei unverändert.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>ENVELOPE 4,0,9,0,0</code></td><td>Instrument 4 wird ein kurzes Zupfen</td></tr></tbody>
+  </table>
+
+  <h3>FOR … TO … STEP</h3>
+  <p class="syntax">FOR <var>Variable</var> = <var>Anfang</var> TO <var>Ende</var> [STEP <var>Schritt</var>]</p>
+  <p>Beginnt eine Zählschleife. Die Variable bekommt zuerst den Anfangswert. Dann laufen die Befehle bis zum passenden <code>NEXT</code>. Dort wird der Schritt addiert. Ist die Variable danach noch nicht über das Ende hinaus, springt BASIC zurück hinter das <code>FOR</code>. Ohne <code>STEP</code> ist der Schritt 1. Mit einem negativen Schritt zählt die Schleife rückwärts. Die Schleife läuft immer mindestens einmal durch.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>FOR I=1 TO 10</code></td><td>1, 2, 3 … 10</td></tr>
+      <tr><td><code>FOR I=0 TO 1 STEP 0.25</code></td><td>0, 0.25, 0.5, 0.75, 1</td></tr>
+      <tr><td><code>FOR I=10 TO 1 STEP -3</code></td><td>10, 7, 4, 1</td></tr>
+    </tbody>
+  </table>
+
+  <h3>GOSUB</h3>
+  <p class="syntax">GOSUB <var>Zeile</var></p>
+  <p>Springt in ein Unterprogramm, das bei der angegebenen Zeile beginnt. Trifft BASIC dort auf <code>RETURN</code>, geht es hinter dem <code>GOSUB</code> weiter. Unterprogramme dürfen selbst wieder <code>GOSUB</code> benutzen.</p>
+<pre class="listing">10 GOSUB 100:GOSUB 100:END
+100 PRINT "HALLO":RETURN</pre>
+
+  <h3>GOTO</h3>
+  <p class="syntax">GOTO <var>Zeile</var></p>
+  <p>Springt zu einer Zeile und macht dort weiter. Gibt es die Zeile nicht, meldet BASIC <code>?UNDEF'D STATEMENT ERROR</code>. Statt <code>GOTO</code> dürfen Sie auch <code>GO TO</code> schreiben. Im Direktmodus startet <code>GOTO</code> das Programm bei dieser Zeile, ohne die Variablen zu löschen.</p>
+
+  <h3>IF … THEN</h3>
+  <p class="syntax">IF <var>Bedingung</var> THEN <var>Befehle</var><br>IF <var>Bedingung</var> THEN <var>Zeile</var><br>IF <var>Bedingung</var> GOTO <var>Zeile</var></p>
+  <p>Prüft eine Bedingung. Stimmt sie, führt BASIC die Befehle hinter <code>THEN</code> aus oder springt zur angegebenen Zeile. Stimmt sie nicht, geht es in der <strong>nächsten Zeile</strong> weiter. Alle Befehle hinter <code>THEN</code> in derselben Zeile gehören also zur Bedingung. Als Bedingung zählt jede Zahl: 0 heißt „stimmt nicht“, alles andere „stimmt“.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>IF A&gt;10 THEN PRINT "ZU GROSS":A=10</code></td><td></td></tr>
+      <tr><td><code>IF K=27 THEN 900</code></td><td>springt zu Zeile 900</td></tr>
+      <tr><td><code>IF A$="J" AND P&gt;0 GOTO 50</code></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h3>INPUT</h3>
+  <p class="syntax">INPUT [#<var>Gerät</var>,] ["<var>Text</var>";] <var>Variable</var>, …</p>
+  <p>Wartet auf eine Eingabe über die Tastatur. Der Text erscheint als Frage, dahinter ein Fragezeichen. Was Sie bis <kbd>Enter</kbd> tippen, landet in der Variablen. Bei mehreren Variablen trennen Sie die Eingaben mit Kommas. Tippen Sie zu wenige, fragt der Computer mit <code>??</code> nach dem Rest. Tippen Sie Buchstaben, wo eine Zahl erwartet wird, kommt <code>?REDO FROM START</code>, und Sie geben alles noch einmal ein. <code>INPUT</code> geht nur in einem Programm.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>INPUT "DEIN NAME";N$</code></td><td>fragt nach einem Text</td></tr>
+      <tr><td><code>INPUT X,Y</code></td><td>zwei Zahlen, zum Beispiel <code>3,4</code></td></tr>
+      <tr><td><code>INPUT #1,A$</code></td><td>liest immer von der Tastatur</td></tr>
+    </tbody>
+  </table>
+
+  <h3>LED</h3>
+  <p class="syntax">LED ON | OFF</p>
+  <p>Schaltet die LED oben rechts ein oder aus. Nach dem Einschalten leuchtet sie eine Sekunde lang von selbst. Der erste <code>LED</code>-Befehl übernimmt sie danach ganz.</p>
+
+  <h3>LET</h3>
+  <p class="syntax">[LET] <var>Variable</var> = <var>Ausdruck</var></p>
+  <p>Gibt einer Variablen einen Wert. Das Wort <code>LET</code> dürfen Sie weglassen, <code>LET A=5</code> und <code>A=5</code> tun dasselbe. Zahlen und Texte dürfen Sie nicht mischen. <code>A="X"</code> ergibt <code>?TYPE MISMATCH ERROR</code>.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>A=A+1</code></td><td>zählt A um eins hoch</td></tr>
+      <tr><td><code>N$="OTTO"</code></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h3>LOCATE</h3>
+  <p class="syntax">LOCATE [#<var>Gerät</var>,] <var>Zeile</var>, <var>Spalte</var></p>
+  <p>Setzt den Cursor. Das nächste <code>PRINT</code> schreibt an diese Stelle. Auf dem LCD geht die Zeile von 0 bis 3 und die Spalte von 0 bis 39. Auf dem seriellen Terminal gelten die Grenzen von <code>TERM</code>.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOCATE 3,35:PRINT "ENDE";</code></td><td>schreibt rechts unten</td></tr></tbody>
+  </table>
+
+  <h3>NEXT</h3>
+  <p class="syntax">NEXT [<var>Variable</var>] [, <var>Variable</var> …]</p>
+  <p>Schließt eine <code>FOR</code>-Schleife ab. Die Variable dürfen Sie weglassen, dann gehört <code>NEXT</code> zur innersten Schleife. <code>NEXT J,I</code> schließt zwei verschachtelte Schleifen auf einmal. Passt die Variable zu keinem <code>FOR</code>, meldet BASIC <code>?NEXT WITHOUT FOR ERROR</code>.</p>
+
+  <h3>ON</h3>
+  <p class="syntax">ON <var>Ausdruck</var> GOTO <var>Zeile</var>, <var>Zeile</var>, …<br>ON <var>Ausdruck</var> GOSUB <var>Zeile</var>, <var>Zeile</var>, …</p>
+  <p>Ein Verteiler. Ist der Ausdruck 1, springt BASIC zur ersten Zeile der Liste, bei 2 zur zweiten und so weiter. Nachkommastellen fallen weg. Ist der Wert 0 oder größer als die Liste lang, geht es einfach mit dem nächsten Befehl weiter.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>ON W GOSUB 100,200,300</code></td><td>W=2 ruft Zeile 200 auf</td></tr></tbody>
+  </table>
+
+  <h3>PLAY</h3>
+  <p class="syntax">PLAY <var>Platz</var> [ON | OFF] [, …]</p>
+  <p>Spielt eine Melodie, die Sie vorher mit <code>TUNE</code> abgelegt haben. Platz 1 bis 3 ist zugleich die Stimme. Die Melodie läuft im Hintergrund, das Programm geht sofort weiter. Mit <code>ON</code> wiederholt sie sich ohne Ende. <code>PLAY</code> <var>Platz</var> <code>OFF</code> hält eine Stimme an, <code>PLAY 0</code> alle drei.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>PLAY 1</code></td><td>Platz 1 einmal spielen</td></tr>
+      <tr><td><code>PLAY 1 ON,2</code></td><td>Platz 1 wiederholen, Platz 2 einmal</td></tr>
+      <tr><td><code>PLAY 2 OFF</code></td><td>nur Stimme 2 anhalten</td></tr>
+      <tr><td><code>PLAY 0</code></td><td>alle anhalten</td></tr>
+    </tbody>
+  </table>
+
+  <h3>POKE</h3>
+  <p class="syntax">POKE <var>Adresse</var>, <var>Wert</var></p>
+  <p>Schreibt ein Byte in den Speicher. Die Adresse geht von 0 bis 65535, der Wert von 0 bis 255. Vorsicht: Ein <code>POKE</code> an die falsche Stelle kann BASIC durcheinanderbringen. Dann hilft nur ein Reset. Der Computer nimmt dabei keinen Schaden, das Programm im Speicher ist danach aber meist verloren. Welche Adressen wofür da sind, zeigt Anhang C.</p>
+
+  <h3>PRINT</h3>
+  <p class="syntax">PRINT [#<var>Gerät</var>,] [<var>Ausdruck</var>] [; | ,] …</p>
+  <p>Schreibt Zahlen und Texte auf die Anzeige. Statt <code>PRINT</code> dürfen Sie <code>?</code> tippen. Was zwischen den Ausdrücken steht, bestimmt den Abstand:</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>;</code></td><td>schreibt direkt dahinter weiter</td></tr>
+      <tr><td><code>,</code></td><td>springt zur nächsten Spalte 0, 10, 20 oder 30</td></tr>
+      <tr><td>nichts am Ende</td><td>nach der Ausgabe in die nächste Zeile</td></tr>
+    </tbody>
+  </table>
+  <p>Zahlen bekommen vorn ein Leerzeichen, wenn sie positiv sind, und hinten immer eines. Eine Zeile, die länger als 40 Zeichen ist, geht auf der Anzeige in der nächsten Zeile weiter. <code>TAB</code> und <code>SPC</code> helfen beim Ausrichten (siehe Funktionen).</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>PRINT "SUMME:";A+B</code></td><td></td></tr>
+      <tr><td><code>PRINT "A","B","C"</code></td><td>drei Spalten</td></tr>
+      <tr><td><code>PRINT #2,"AN DEN PC"</code></td><td>schreibt auf das serielle Terminal</td></tr>
+    </tbody>
+  </table>
+
+  <h3>QUIT</h3>
+  <p class="syntax">QUIT</p>
+  <p>Beendet das serielle BASIC-Terminal (Kapitel 6). Die Leitung geht zurück an den Monitor, und BASIC benutzt wieder Tastatur und LCD. Das Programm im Speicher bleibt erhalten. <code>serial-basic.sh</code> sendet <code>QUIT</code> von selbst, wenn Sie das Terminal verlassen. Ohne serielles Terminal ist <code>QUIT</code> ein <code>?SYNTAX ERROR</code>.</p>
+
+  <h3>READ</h3>
+  <p class="syntax">READ <var>Variable</var>, …</p>
+  <p>Liest den nächsten Wert aus den <code>DATA</code>-Zeilen in eine Variable. Jedes <code>READ</code> rückt in der Liste weiter. Sind alle Werte gelesen, meldet BASIC <code>?OUT OF DATA ERROR</code>. Die Art der Variable muss zum Wert passen: Ein Text lässt sich nicht in eine Zahlenvariable lesen.</p>
+<pre class="listing">10 FOR I=1 TO 3:READ N$:PRINT N$:NEXT
+20 DATA ANNA,BERT,CARLA</pre>
+
+  <h3>REM</h3>
+  <p class="syntax">REM <var>Text</var></p>
+  <p>Eine Bemerkung für Menschen. BASIC überspringt alles hinter <code>REM</code> bis zum Ende der Zeile, auch Doppelpunkte und Befehle. Bemerkungen kosten Speicher, machen ein Programm aber viel verständlicher.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 REM *** GALGENRATEN ***</code></td><td></td></tr></tbody>
+  </table>
+
+  <h3>RESTORE</h3>
+  <p class="syntax">RESTORE</p>
+  <p>Setzt das Lesen der <code>DATA</code>-Zeilen zurück. Das nächste <code>READ</code> liest wieder den ersten Wert im Programm.</p>
+
+  <h3>RETURN</h3>
+  <p class="syntax">RETURN</p>
+  <p>Beendet ein Unterprogramm. BASIC macht hinter dem <code>GOSUB</code> weiter, das es aufgerufen hat. Ein <code>RETURN</code> ohne <code>GOSUB</code> ergibt <code>?RETURN WITHOUT GOSUB ERROR</code>. Das passiert oft, wenn vor den Unterprogrammen das <code>END</code> fehlt.</p>
+
+  <h3>SLEEP</h3>
+  <p class="syntax">SLEEP <var>Sekunden</var></p>
+  <p>Wartet eine Zeit lang. Auch Bruchteile gehen: <code>SLEEP 0.1</code> wartet eine Zehntelsekunde. Melodien und Effekte spielen während des Wartens weiter. <kbd>Pause</kbd> bricht das Warten ab.</p>
+
+  <h3>SOUND</h3>
+  <p class="syntax">SOUND <var>Stimme</var>, <var>Frequenz</var>, <var>Dauer</var> [, <var>Instrument</var>]</p>
+  <p>Spielt einen Ton auf Stimme 1, 2 oder 3. Der Ton läuft im Hintergrund, das Programm geht sofort weiter. Die Frequenz ist die Zahl, die der SID-Chip erwartet, von 0 bis 65535. Sie ist etwa 16,78-mal die Frequenz in Hertz. Das eingestrichene C (261,6 Hz) ist 4389. Die Dauer zählt in Sechzehnteln, 1 bis 255, und hängt von <code>TEMPO</code> ab. Das Instrument (0 bis 7) wählt Wellenform und Hüllkurve. Ohne Instrument behält die Stimme ihre Klangfarbe. Die Frequenzen einer ganzen Tonleiter stehen in Kapitel 5.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>SOUND 1,4389,8,1</code></td><td>ein C auf dem Klavier, eine Sekunde lang</td></tr></tbody>
+  </table>
+
+  <h3>STOP</h3>
+  <p class="syntax">STOP</p>
+  <p>Hält das Programm an und meldet <code>BREAK IN</code> mit der Zeilennummer, so wie die Taste <kbd>Pause</kbd>. Mit <code>CONT</code> läuft es weiter. <code>STOP</code> hilft bei der Fehlersuche: Sie halten das Programm an einer bestimmten Stelle an und sehen sich die Variablen an.</p>
+
+  <h3>SYS</h3>
+  <p class="syntax">SYS <var>Adresse</var></p>
+  <p>Startet ein Maschinenprogramm an der Adresse (0 bis 65535). Endet es mit dem Befehl <code>RTS</code>, geht es im BASIC-Programm weiter. Mehr dazu in Kapitel 7.</p>
+
+  <h3>TEMPO</h3>
+  <p class="syntax">TEMPO <var>n</var></p>
+  <p>Legt fest, wie viele Sechzehntel pro Sekunde vergehen, von 1 bis 50. Nach dem Einschalten ist es 8. Das Tempo gilt für die Dauer bei <code>SOUND</code> und für die Notenlängen bei <code>TUNE</code>, nicht für <code>EFFECT</code>.</p>
+
+  <h3>TERM</h3>
+  <p class="syntax">TERM [<var>Spalten</var> [, <var>Zeilen</var>]]</p>
+  <p>Gibt die Größe des seriellen Terminals an. Nach dem Start sind das 80 Spalten und 24 Zeilen. Danach richten sich <code>PRINT</code>, <code>LOCATE</code> und das Umbrechen langer Zeilen. Ohne Zahlen schreibt <code>TERM</code> die aktuelle Größe hin. Das Terminalfenster am PC muss mindestens so groß sein.</p>
+
+  <h3>TUNE</h3>
+  <p class="syntax">TUNE <var>Platz</var>, "<var>Noten</var>"</p>
+  <p>Legt eine Melodie auf Platz 1, 2 oder 3 ab. <code>PLAY</code> spielt sie dann. Die Noten sind ein Text mit höchstens 47 Zeichen. Leerzeichen werden übersprungen, groß oder klein ist egal.</p>
+  <table class="beispiele">
+    <tbody>
+      <tr><td><code>C D E F G A B</code></td><td>Noten, <code>B</code> ist das deutsche H</td></tr>
+      <tr><td><code>C#</code></td><td>eine Note um einen Halbton höher</td></tr>
+      <tr><td><code>C5</code></td><td>Note mit Oktave 0 bis 7</td></tr>
+      <tr><td><code>O3</code></td><td>Oktave für die folgenden Noten</td></tr>
+      <tr><td><code>L8</code></td><td>Länge in Sechzehnteln, 1 bis 8</td></tr>
+      <tr><td><code>I1</code></td><td>Instrument 0 bis 7</td></tr>
+      <tr><td><code>R2</code></td><td>Pause, hier zwei Sechzehntel lang</td></tr>
+    </tbody>
+  </table>
+  <p>Am Anfang gelten Oktave 4, Länge 4 und Instrument 0. Eine Angabe gilt, bis eine neue kommt.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>TUNE 1,"L4CDEFL8GG"</code></td><td>Anfang von „Alle meine Entchen“</td></tr></tbody>
+  </table>
+
+  <h3>VOL</h3>
+  <p class="syntax">VOL <var>Stufe</var></p>
+  <p>Stellt die Gesamtlautstärke aller drei Stimmen ein, von 0 (stumm) bis 15 (laut). Nach dem Einschalten ist sie 15. Wie laut der Lautsprecher insgesamt ist, bestimmt der Drehregler am Gerät.</p>
+
+  <h3>WAIT</h3>
+  <p class="syntax">WAIT <var>Adresse</var>, <var>Maske</var> [, <var>Umkehr</var>]</p>
+  <p>Wartet, bis an einer Speicheradresse bestimmte Bits gesetzt sind. BASIC liest das Byte immer wieder, verknüpft es mit <var>Umkehr</var> per XOR und dann mit <var>Maske</var> per AND. Sobald das Ergebnis nicht 0 ist, geht es weiter. Das ist ein Befehl für Fortgeschrittene, der mit der Hardware arbeitet. Wartet er ewig, hilft <kbd>Pause</kbd>.</p>
+
+  <h3>WAVE</h3>
+  <p class="syntax">WAVE <var>Stimme</var>, <var>Form</var> [, <var>Pulsbreite</var>]</p>
+  <p>Ändert die Wellenform einer Stimme sofort, auch mitten in einem Ton. Form 0 ist Dreieck, 1 Sägezahn, 2 Puls, 3 Rauschen. Die Pulsbreite (0 bis 4095) hört man nur bei Form 2. 2048 ergibt einen gleichmäßigen Rechteckton. Der nächste Ton mit Instrumentnummer stellt wieder die Wellenform des Instruments ein.</p>
+
+  <!-- ============================================================ -->
+  <h2>Funktionen</h2>
+  <p>Eine Funktion liefert einen Wert. Sie steht deshalb nie allein, sondern immer in einem Ausdruck, zum Beispiel hinter <code>PRINT</code> oder rechts vom Gleichheitszeichen. Die Werte, mit denen sie rechnet, stehen in Klammern.</p>
+
+  <h3>Rechenfunktionen</h3>
+  <table class="funktionen">
+    <tbody>
+      <tr><td><code>ABS(<var>x</var>)</code></td><td>Betrag: <var>x</var> ohne Vorzeichen. <code>ABS(-7)</code> ist 7.</td></tr>
+      <tr><td><code>ATN(<var>x</var>)</code></td><td>Arkustangens von <var>x</var>, im Bogenmaß.</td></tr>
+      <tr><td><code>COS(<var>x</var>)</code></td><td>Kosinus. <var>x</var> ist im Bogenmaß, ein Vollkreis ist 2π, etwa 6.283.</td></tr>
+      <tr><td><code>EXP(<var>x</var>)</code></td><td><var>e</var> (2.71828…) hoch <var>x</var>.</td></tr>
+      <tr><td><code>FN<var>Name</var>(<var>x</var>)</code></td><td>Eine eigene Funktion, festgelegt mit <code>DEF FN</code>.</td></tr>
+      <tr><td><code>INT(<var>x</var>)</code></td><td>Größte ganze Zahl, die nicht größer als <var>x</var> ist. <code>INT(3.7)</code> ist 3, <code>INT(-3.7)</code> ist −4.</td></tr>
+      <tr><td><code>LOG(<var>x</var>)</code></td><td>Natürlicher Logarithmus. <var>x</var> muss größer als 0 sein. Den Zehnerlogarithmus erhalten Sie mit <code>LOG(<var>x</var>)/LOG(10)</code>.</td></tr>
+      <tr><td><code>RND(<var>x</var>)</code></td><td>Zufallszahl zwischen 0 und 1 (ohne die 1). Bei positivem <var>x</var> kommt die nächste Zahl. Ein negatives <var>x</var> legt einen Startwert fest, <var>x</var>=0 wiederholt die letzte Zahl. Eine ganze Zufallszahl von 1 bis 6: <code>INT(RND(1)*6)+1</code>.</td></tr>
+      <tr><td><code>SGN(<var>x</var>)</code></td><td>Vorzeichen: −1, wenn <var>x</var> negativ ist, 0 bei 0, sonst 1.</td></tr>
+      <tr><td><code>SIN(<var>x</var>)</code></td><td>Sinus, <var>x</var> im Bogenmaß.</td></tr>
+      <tr><td><code>SQR(<var>x</var>)</code></td><td>Quadratwurzel. <var>x</var> darf nicht negativ sein.</td></tr>
+      <tr><td><code>TAN(<var>x</var>)</code></td><td>Tangens, <var>x</var> im Bogenmaß.</td></tr>
+      <tr><td><code>USR(<var>x</var>)</code></td><td>Ruft ein Maschinenprogramm auf und gibt ihm <var>x</var> mit. Die Startadresse steht in den Speicherstellen 11 (niedriges Byte) und 12 (hohes Byte). Siehe Kapitel 7.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Textfunktionen</h3>
+  <table class="funktionen">
+    <tbody>
+      <tr><td><code>ASC(<var>t$</var>)</code></td><td>Zeichencode des ersten Zeichens. <code>ASC("A")</code> ist 65. Die Codes stehen in Anhang D.</td></tr>
+      <tr><td><code>CHR$(<var>n</var>)</code></td><td>Das Zeichen mit dem Code <var>n</var> (0 bis 255). <code>CHR$(65)</code> ist <code>"A"</code>.</td></tr>
+      <tr><td><code>LEFT$(<var>t$</var>,<var>n</var>)</code></td><td>Die ersten <var>n</var> Zeichen. <code>LEFT$("HAUSTIER",4)</code> ist <code>"HAUS"</code>.</td></tr>
+      <tr><td><code>LEN(<var>t$</var>)</code></td><td>Anzahl der Zeichen. <code>LEN("OTTO")</code> ist 4.</td></tr>
+      <tr><td><code>MID$(<var>t$</var>,<var>a</var>[,<var>n</var>])</code></td><td><var>n</var> Zeichen ab dem <var>a</var>-ten Zeichen. Das erste Zeichen ist Nummer 1. Ohne <var>n</var> geht es bis zum Ende. <code>MID$("HAUSTIER",5,3)</code> ist <code>"TIE"</code>.</td></tr>
+      <tr><td><code>RIGHT$(<var>t$</var>,<var>n</var>)</code></td><td>Die letzten <var>n</var> Zeichen. <code>RIGHT$("HAUSTIER",4)</code> ist <code>"TIER"</code>.</td></tr>
+      <tr><td><code>STR$(<var>x</var>)</code></td><td>Die Zahl als Text, genau so, wie <code>PRINT</code> sie schreiben würde. Positive Zahlen beginnen mit einem Leerzeichen: <code>STR$(42)</code> ist <code>" 42"</code>.</td></tr>
+      <tr><td><code>VAL(<var>t$</var>)</code></td><td>Die Zahl am Anfang des Textes. <code>VAL("12.5KG")</code> ist 12.5. Beginnt der Text nicht mit einer Zahl, ist das Ergebnis 0.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Weitere Funktionen</h3>
+  <table class="funktionen">
+    <tbody>
+      <tr><td><code>FRE(0)</code></td><td>Wie viele Bytes Speicher noch frei sind. Die Zahl in Klammern spielt keine Rolle.</td></tr>
+      <tr><td><code>KEY(0)</code></td><td>Der Code der Taste, die gerade gedrückt ist, oder 0. <code>KEY</code> wartet nicht. Die Pfeiltasten liefern 17 bis 20, die übrigen Codes stehen in Kapitel 4 und Anhang E.</td></tr>
+      <tr><td><code>PEEK(<var>a</var>)</code></td><td>Das Byte an der Speicheradresse <var>a</var> (0 bis 65535), eine Zahl von 0 bis 255.</td></tr>
+      <tr><td><code>POS(0)</code></td><td>Die Spalte, in der der Cursor gerade steht. Die erste Spalte ist 0.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Ausgabefunktionen</h3>
+  <p>Diese beiden gehen nur innerhalb von <code>PRINT</code>.</p>
+  <table class="funktionen">
+    <tbody>
+      <tr><td><code>SPC(<var>n</var>)</code></td><td>Schreibt <var>n</var> Leerzeichen.</td></tr>
+      <tr><td><code>TAB(<var>n</var>)</code></td><td>Rückt bis Spalte <var>n</var> vor. Steht der Cursor schon weiter rechts, passiert nichts.</td></tr>
+    </tbody>
+  </table>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT "NAME";TAB(20);"PUNKTE"</code></td><td>PUNKTE steht in Spalte 20</td></tr></tbody>
+  </table>
+
+  <h3>Nicht in diesem BASIC</h3>
+  <p>Wer BASIC vom C64 kennt, vermisst vielleicht ein paar Befehle. <code>GET</code> gibt es nicht, dafür nimmt man <code>KEY(0)</code>. <code>CLR</code> heißt hier <code>CLEAR</code>. <code>OPEN</code>, <code>CLOSE</code>, <code>CMD</code> und <code>VERIFY</code> fehlen ebenfalls. <code>TI</code> und <code>ST</code> sind hier ganz gewöhnliche Variablen ohne besondere Bedeutung. Die Diskette erreichen Sie über <code>LOAD</code>, <code>SAVE</code>, <code>DIR</code> und <code>DELETE</code>.</p>
+</section>
+</main>
+</body>
+</html>

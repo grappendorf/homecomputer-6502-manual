@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 13</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="13" data-titel="Wie es weitergeht" data-kurztitel="Wie es weitergeht">
+  <p>Der Computer läuft. Dieses Kapitel fasst zusammen, was Sie gebaut haben, zeigt, wie aus dem Steckbrett-Aufbau das fertige Gerät wurde, und gibt Anregungen, Hilfen und Quellen für den nächsten Schritt.</p>
+
+  <h2>Das Gesamtbild</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/de/blockschaltbild.svg" alt="Blockschaltbild: Prozessor, Takt und Reset, Adress- und Datenbus, ROM, RAM, Adressdekoder und die vier IO-Bausteine mit ihren Peripheriegeräten">
+    <figcaption>Blockschaltbild des HomeComputer 6502</figcaption>
+  </figure>
+  <p>Der Prozessor 6502 spricht über den Adressbus (16 Leitungen) und den Datenbus (8 Leitungen) mit allen Bausteinen. Takt und Reset bekommt er aus den Schaltungen der ersten beiden Kapitel. Der Adressdekoder wählt aus, welcher Baustein bei einem Zugriff antwortet: das ROM, das RAM oder einer der vier IO-Bausteine. Die IO-Bausteine verbinden den Computer mit der Außenwelt: die ACIA mit dem PC, das erste VIA mit Display und LED, beide VIAs mit der Tastatur und der SID mit dem Lautsprecher. Die Interrupt-Leitungen von ACIA und VIAs sind zusammengeschaltet und führen zum Prozessor.</p>
+
+  <h2>Die Bausteine</h2>
+  <table class="zusammen">
+    <thead><tr><th>Bez.</th><th>Baustein</th><th>Aufgabe</th><th>Kap.</th></tr></thead>
+    <tbody>
+      <tr><td>Q1</td><td>Quarz 1&nbsp;MHz</td><td>Taktgeber, schwingt zusammen mit dem 74LS04</td><td>1</td></tr>
+      <tr><td>IC1</td><td>74LS04</td><td>Taktoszillator und Inverter für das Reset-Signal</td><td>1, 2</td></tr>
+      <tr><td>IC2</td><td>NE555</td><td>Reset-Impuls beim Einschalten und per Taster</td><td>2</td></tr>
+      <tr><td>IC3</td><td>6502</td><td>Prozessor</td><td>3</td></tr>
+      <tr><td>IC4</td><td>AT28C256</td><td>ROM mit dem Programm, 32&nbsp;KB</td><td>4</td></tr>
+      <tr><td>IC5</td><td>6551</td><td>ACIA, serielle Schnittstelle</td><td>5</td></tr>
+      <tr><td>IC6</td><td>74LS00</td><td>NAND-Gatter für das Chip-Select des RAMs</td><td>6</td></tr>
+      <tr><td>IC7</td><td>74LS30</td><td>8-fach-NAND für den IO-Bereich</td><td>6</td></tr>
+      <tr><td>IC8</td><td>61256</td><td>RAM, 32&nbsp;KB</td><td>6</td></tr>
+      <tr><td>IC9</td><td>6522</td><td>VIA 1: Display, LED, Tastaturzeilen 8 bis 13</td><td>8</td></tr>
+      <tr><td>IC10</td><td>74LS137</td><td>Dekoder für die IO-Bausteine</td><td>8</td></tr>
+      <tr><td>IC11</td><td>6522</td><td>VIA 2: Tastaturzeilen 0 bis 7 und Spalten</td><td>10</td></tr>
+      <tr><td>IC12</td><td>SID 8580</td><td>Klang</td><td>12</td></tr>
+      <tr><td>T1</td><td>2N2222</td><td>Ausgangsstufe des SID</td><td>12</td></tr>
+    </tbody>
+  </table>
+  <p>Dazu kommen Widerstände, Kondensatoren (an jedem IC ein Entkoppelkondensator von 100&nbsp;nF), zwei Quarze (Oszillator und 1,8432&nbsp;MHz für die ACIA), LED, Taster, Trimmer und Stiftleisten. Die vollständige Stückliste des fertigen Geräts liegt als Tabelle im Hardware-Repository des Projekts.</p>
+
+  <h2>Speicherplan und IO-Adressen</h2>
+  <table class="zusammen">
+    <thead><tr><th>Adressen</th><th>Inhalt</th></tr></thead>
+    <tbody>
+      <tr><td>$0000 bis $00FF</td><td>RAM, Zeropage</td></tr>
+      <tr><td>$0100 bis $01FF</td><td>RAM, Stapel</td></tr>
+      <tr><td>$0200 bis $7EFF</td><td>RAM</td></tr>
+      <tr><td>$7F00 bis $7FFF</td><td>IO (siehe unten)</td></tr>
+      <tr><td>$8000 bis $FFFF</td><td>ROM, am Ende die Vektoren $FFFA bis $FFFF</td></tr>
+    </tbody>
+  </table>
+  <table class="zusammen">
+    <thead><tr><th>IO-Block</th><th>Adressen</th><th>Baustein</th><th>Register</th></tr></thead>
+    <tbody>
+      <tr><td>Y0</td><td>$7F00 bis $7F1F</td><td>ACIA</td><td>4 (Daten, Status, Command, Control)</td></tr>
+      <tr><td>Y1</td><td>$7F20 bis $7F3F</td><td>VIA 1</td><td>16</td></tr>
+      <tr><td>Y2</td><td>$7F40 bis $7F5F</td><td>VIA 2</td><td>16</td></tr>
+      <tr><td>Y3</td><td>$7F60 bis $7F7F</td><td>SID</td><td>29</td></tr>
+      <tr><td>Y4 bis Y7</td><td>$7F80 bis $7FFF</td><td>frei</td><td>–</td></tr>
+    </tbody>
+  </table>
+  <p>Benutzen Sie in Programmen nur die Basisadressen ($7F00, $7F20, $7F40 und $7F60). Die Register wiederholen sich innerhalb ihres Blocks, diese Spiegel sollte man nicht verwenden.</p>
+
+  <h2>Vom Steckbrett zum fertigen Gerät</h2>
+  <p>Das Steckbrett eignet sich zum Verstehen und Ausprobieren. Für ein Gerät, das man benutzen will, kommt die Schaltung auf eine Platine. Die Platine des Computers misst 160 × 100&nbsp;mm und ist voll belegt. Wer sie selbst fertigt, muss etwa 200 Durchkontaktierungen von Hand löten. Schaltpläne und Platinenentwurf liegen im Hardware-Repository, als Eagle-Dateien und als KiCad-Projekt, dazu die Gerber-Dateien für die Fertigung.</p>
+  <p>Zwei Dinge sind gegenüber dem Steckbrett neu:</p>
+  <ul>
+    <li><strong>Die 9&nbsp;V für den SID</strong> erzeugt ein kleines Aufwärtswandler-Modul von 5 auf 9&nbsp;V auf der Platine. Auf dem Steckbrett genügte eine externe Quelle.</li>
+    <li><strong>Der Akku:</strong> Eine LiPo-Zelle mit Lademodul und Aufwärtswandler versorgt den Computer mit 5&nbsp;V. So wird er tragbar.</li>
+  </ul>
+  <p>Das Gehäuse ist 3D-gedruckt und besteht aus einem Oberteil und einem Unterteil. Das Oberteil trägt Display, Tastatur und Lautsprecher, im Unterteil sitzen die Platinen und der Akku. Die Entwürfe liegen als STL-Dateien im Hardware-Repository. Den fertigen Computer in Betrieb nehmen Sie mit dem Bedienungshandbuch.</p>
+
+  <h2>Weiter mit der Software</h2>
+  <ul>
+    <li><strong>In C schreiben.</strong> Die Werkzeuge cc65 enthalten einen C-Compiler. Dafür braucht man einen eigenen Startcode, der den Stapel, das RAM und die Zeropage einrichtet, und die Systembibliothek von cc65.</li>
+    <li><strong>Der Monitor.</strong> Das Programm aus Kapitel 7 lässt sich ausbauen: ein Assembler und ein Disassembler, die Anzeige der Prozessorregister, Haltepunkte, Einzelschritt, Laden und Speichern von Programmen über die serielle Schnittstelle.</li>
+    <li><strong>BASIC.</strong> Microsoft BASIC läuft auf diesem Computer. Wie man es benutzt, steht im Bedienungshandbuch.</li>
+    <li><strong>Ohne Hardware testen.</strong> Das Firmware-Repository des Projekts enthält eine Erweiterung für den Emulator MAME, die den Computer nachbildet: Prozessor, ROM, RAM, ACIA, VIAs, LCD und Tastatur. Man kann Programme damit ausprobieren, bevor man den EEPROM brennt.</li>
+    <li><strong>Interrupts nutzen.</strong> Die ACIA mit Empfangs-Interrupt, einen System-Takt aus dem Timer des VIA, Musik mit dem Timer des zweiten VIA: Dafür ist die Schaltung schon da.</li>
+  </ul>
+
+  <h2>Erweiterungsideen</h2>
+  <p>Die Platine ist voll, und die Portleitungen der VIAs sind belegt. Für Erweiterungen gibt es aber Wege:</p>
+  <ul>
+    <li><strong>SD-Karte.</strong> Ersetzt man die 4-Bit-Anbindung des Displays durch einen kleinen I²C-Adapter, werden mindestens vier Portleitungen frei. Das reicht für einen SD-Kartenleser. Mit I²C lassen sich außerdem weitere Bausteine anschließen, etwa eine Echtzeituhr. Das Programm für das I²C-Protokoll schreibt man in Software.</li>
+    <li><strong>Tastatur mit Zählerbaustein.</strong> Ein Dezimalzähler (Johnson-Zähler) kann die Zeilen der Tastatur durchschalten, so dass nicht jede Zeile eine eigene Portleitung braucht.</li>
+    <li><strong>Erweiterungsstecker.</strong> Viele Heimcomputer der Siebziger und Achtziger hatten einen Stecker, der Adress-, Daten- und Steuerleitungen nach außen führt. Der HomeComputer hat keinen. Man kann ihn nachrüsten, indem man eine Zusatzplatine zwischen den Sockel und den Prozessor steckt: Sie trägt Stiftleisten nach unten und einen neuen Sockel für den Prozessor nach oben und gibt so Zugriff auf alle Signale.</li>
+    <li><strong>Weitere IO-Bausteine.</strong> Vom Dekoder 74LS137 sind vier Ausgänge (Y4 bis Y7) noch frei. Über sie lassen sich vier weitere Bausteine anschließen.</li>
+    <li><strong>Grafik.</strong> Für eine Videoausgabe müsste man einen Grafikbaustein und eine größere Platine einplanen.</li>
+  </ul>
+
+  <h2>Wenn etwas nicht läuft</h2>
+  <p>Fehlersuche ist bei Hardware und Software der unangenehmste Teil, wenn man nicht weiß, was gerade schiefgeht. Diese Reihenfolge hat sich bewährt:</p>
+  <ol class="schritte">
+    <li><div><strong>Versorgung:</strong> Messen Sie an jedem IC +5&nbsp;V zwischen VCC und GND. Beim SID zusätzlich die 9&nbsp;V.</div></li>
+    <li><div><strong>Takt:</strong> Sehen Sie 1&nbsp;MHz am Prozessor (Pin&nbsp;37)? Läuft PHI2 an Pin&nbsp;39?</div></li>
+    <li><div><strong>Reset:</strong> Bleibt /RESET nach dem Einschalten kurz auf Low und geht dann auf High?</div></li>
+    <li><div><strong>Adressbus:</strong> Laufen die Adressleitungen? Wenn A0 bis A2 nicht schwingen, steht der Prozessor.</div></li>
+    <li><div><strong>Chip-Select:</strong> In jedem Takt darf genau ein Baustein gewählt sein. Zwei gewählte Bausteine treiben gleichzeitig den Datenbus und stören einander.</div></li>
+    <li><div><strong>Datenbus:</strong> Ziehen Sie verdächtige Bausteine nacheinander ab (bei ausgeschalteter Spannung) und prüfen Sie, ob sich das Verhalten ändert.</div></li>
+    <li><div><strong>Der letzte Schritt:</strong> Verdächtigen Sie zuerst die Stufe, die Sie zuletzt gebaut haben, und dort die Drähte. Auf dem Steckbrett sind Wackelkontakte und vertauschte Drähte die häufigste Ursache.</div></li>
+    <li><div><strong>Einfache Programme:</strong> Ein Programm, das nur eine Schleife läuft, oder der Monitor aus Kapitel 7 zeigen, ob die Hardware den Prozessor erreicht, bevor man BASIC verdächtigt.</div></li>
+  </ol>
+  <p>Gute Werkzeuge helfen: ein Multimeter, ein Oszilloskop und besonders ein Logikanalysator mit mindestens 16 Kanälen, an dem man die Adress- und Datenleitungen gleichzeitig sieht.</p>
+
+  <h2>Wichtige Begriffe</h2>
+  <table class="zusammen">
+    <thead><tr><th>Begriff</th><th>Bedeutung</th></tr></thead>
+    <tbody>
+      <tr><td>Bus</td><td>Leitungen, die mehrere Bausteine gemeinsam benutzen: Adressbus, Datenbus und Steuerleitungen</td></tr>
+      <tr><td>Chip-Select</td><td>Eingang eines Bausteins, der ihn auswählt. Meist bei Low aktiv und mit einem Schrägstrich geschrieben, zum Beispiel /CS_ROM</td></tr>
+      <tr><td>Adressdekodierung</td><td>Die Logik, die aus Adressleitungen die Chip-Select-Signale erzeugt</td></tr>
+      <tr><td>φ2 (PHI2)</td><td>Ausgang des 6502, der die zweite Hälfte jedes Takts anzeigt, in der die Daten gültig sind</td></tr>
+      <tr><td>Vektor</td><td>Adresse am Ende des Speichers, an die der Prozessor bei Reset, NMI und IRQ springt ($FFFA bis $FFFF)</td></tr>
+      <tr><td>IRQ, NMI</td><td>Interrupt-Eingänge des Prozessors, der erste sperrbar, der zweite nicht</td></tr>
+      <tr><td>Open Collector</td><td>Ausgang, der eine Leitung nur nach unten zieht, so dass sich mehrere Ausgänge zusammenschalten lassen (wired OR)</td></tr>
+      <tr><td>Pull-up</td><td>Widerstand nach +5&nbsp;V, der eine Leitung im Ruhezustand auf High hält</td></tr>
+      <tr><td>VIA</td><td>Versatile Interface Adapter 6522: Ein- und Ausgabeports mit Timern</td></tr>
+      <tr><td>ACIA</td><td>Asynchronous Communications Interface Adapter 6551: serielle Schnittstelle</td></tr>
+      <tr><td>Monitor</td><td>Kleines Programm im ROM, das Speicher anzeigt, ändert und Programme startet</td></tr>
+      <tr><td>Scancode</td><td>Nummer einer Taste nach Zeile und Spalte der Tastaturmatrix</td></tr>
+      <tr><td>Prellen</td><td>Kurzes Hin- und Herschalten eines mechanischen Kontakts beim Drücken</td></tr>
+      <tr><td>ADSR</td><td>Hüllkurve eines Tons aus Attack, Decay, Sustain und Release</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Literatur und Quellen</h2>
+  <p><strong>Bücher</strong></p>
+  <ul>
+    <li>Rodnay Zaks: <em>Programming the 6502</em></li>
+    <li>Lance A. Leventhal: <em>6502 Assembly Language Programming</em></li>
+    <li>MOS Technology: <em>MCS6500 Microcomputer Family Programming Manual</em> und <em>Hardware Manual</em></li>
+    <li>Commodore: <em>Commodore 64 Programmer's Reference Guide</em> (der SID und die Tastatur aus Sicht des C64)</li>
+    <li>Noam Nisan, Shimon Schocken: <em>The Elements of Computing Systems</em></li>
+    <li>Charles Petzold: <em>Code</em> (wie ein Computer aus Schaltern entsteht)</li>
+    <li>Paul Horowitz, Winfield Hill: <em>The Art of Electronics</em></li>
+  </ul>
+  <p><strong>Im Netz</strong></p>
+  <ul>
+    <li>6502.org: Datenblätter, Tutorials, Forum und eine Liste selbstgebauter 6502-Computer, 6502.org</li>
+    <li>Garth Wilson: <em>6502 Primer</em>, wilsonminesco.com/6502primer</li>
+    <li>Ben Eater: Videoserie „Build a 6502 computer“, eater.net/6502</li>
+    <li>Der 6502 im Mikroskop, simuliert Transistor für Transistor: visual6502.org</li>
+    <li>cc65, Compiler, Assembler und Linker für den 6502: cc65.github.io</li>
+    <li>C64-Programmierung, auch zum SID: codebase64.org</li>
+    <li>Der SID im Detail: sid.kubarth.com</li>
+    <li>Dieses Projekt: github.com/grappendorf/homecomputer-6502 und grappendorf.net</li>
+  </ul>
+  <p><strong>Datenblätter</strong> der verwendeten Bausteine: MOS 6502, Rockwell R6522 und R6551, MOS 6581 und 8580, Atmel AT28C256, Hitachi HD44780, NE555 und die 74LS-Bausteine von Texas Instruments. Sie finden sich im Netz und im Hardware-Repository des Projekts.</p>
+</section>
+</main>
+</body>
+</html>

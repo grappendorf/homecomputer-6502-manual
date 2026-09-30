@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appendix F – Technical Specifications</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang" data-buchstabe="F" data-kurztitel="Appendix F · Technical Specifications">
+  <h1><span class="buchstabe">F</span>Technical Specifications</h1>
+  <table>
+    <thead><tr><th>Feature</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Processor</td><td>MOS 6502, 1 MHz</td></tr>
+      <tr><td>Memory</td><td>32 KB RAM</td></tr>
+      <tr><td>Permanent storage</td><td>32 KB EEPROM</td></tr>
+      <tr><td>Display</td><td>LCD, 4 lines × 40 characters</td></tr>
+      <tr><td>Keyboard</td><td>German notebook keyboard, 89 keys</td></tr>
+      <tr><td>Sound</td><td>SID 8580, three voices</td></tr>
+      <tr><td>Interface</td><td>Serial via USB, 19200 baud, 8N1</td></tr>
+      <tr><td>Input/output</td><td>2 × VIA 6522</td></tr>
+      <tr><td>Power supply</td><td>3.7 V, 3200 mAh LiPo battery, or USB; internally 5 V, plus 9 V for the SID</td></tr>
+      <tr><td>Dimensions</td><td>30 cm × 20 cm × 4.5 cm</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The Schematic</h2>
+  <p>The following pages contain the complete schematic of the HomeComputer 6502. It was redrawn in KiCad 10 from the original Eagle schematic and is released under the CERN Open Hardware Licence v1.2. Turn the manual clockwise to read it.</p>
+  <table>
+    <thead><tr><th>Sheet</th><th>Contents</th><th>What is shown</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Overview</td><td>The five sub-diagrams and how they connect</td></tr>
+      <tr><td>2</td><td>Power supply and reset</td><td>Voltage input, reset circuit with NE555 and reset button</td></tr>
+      <tr><td>3</td><td>Address decoder</td><td>Selects RAM, ROM, or an input/output chip based on the address</td></tr>
+      <tr><td>4</td><td>Processor and memory</td><td>6502, 32 KB RAM, 32 KB EEPROM, 1 MHz clock, NMI connection</td></tr>
+      <tr><td>5</td><td>VIAs, display, and keyboard</td><td>The two 6522s, connection of the LCD and keyboard matrix, LED</td></tr>
+      <tr><td>6</td><td>Serial interface and sound</td><td>ACIA 6551 with baud-rate crystal, SID 8580 with output stage and 9 V supply</td></tr>
+    </tbody>
+  </table>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-1.svg" alt="Schematic sheet 1: Overview">
+      <figcaption>Schematic, sheet 1 of 6: Overview</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-2.svg" alt="Schematic sheet 2: Power supply and reset">
+      <figcaption>Schematic, sheet 2 of 6: Power supply and reset</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-3.svg" alt="Schematic sheet 3: Address decoder">
+      <figcaption>Schematic, sheet 3 of 6: Address decoder</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-4.svg" alt="Schematic sheet 4: Processor and memory">
+      <figcaption>Schematic, sheet 4 of 6: Processor and memory</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-5.svg" alt="Schematic sheet 5: VIAs, display, and keyboard">
+      <figcaption>Schematic, sheet 5 of 6: VIAs, display, and keyboard</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-6.svg" alt="Schematic sheet 6: Serial interface and sound">
+      <figcaption>Schematic, sheet 6 of 6: Serial interface and sound</figcaption>
+    </figure>
+  </section>
+</section>
+</main>
+</body>
+</html>

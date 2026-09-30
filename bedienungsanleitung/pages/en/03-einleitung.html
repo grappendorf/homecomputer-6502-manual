@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Introduction</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="einleitung" data-kurztitel="Introduction">
+  <h1>Introduction</h1>
+  <p>Welcome to the HomeComputer 6502! In front of you is a home-built computer whose heart is an old friend: the 6502 processor, the same chip that powered the Apple II and, in a modified form, the Commodore 64.</p>
+  <p>It was built in 2014 and 2015 almost entirely from components that were already available in the early eighties. Instead of a television set, it has a built-in display, and a battery makes it portable. That makes it a blend of the Commodore 64 and the first portable computers like the Epson HX-20.</p>
+  <p>After you switch it on, Microsoft BASIC is waiting for you – almost like in the old days. This manual shows you, step by step, how to do calculations, program, play games and make music with it.</p>
+
+  <h2>About this manual</h2>
+  <p>Chapters 1 and 2 get you up and running: switching on the device, getting to know the keyboard and display, and doing calculations in direct mode. Chapters 3 through 5 introduce BASIC, from your first program to arrays and games, and after that the SID sound chip. Chapters 6 and 7 are for advanced users. There you connect the computer to a PC, use the monitor and the disk drive, and get started with machine language. Appendices A through F are for reference: commands, error messages, memory, character set, keyboard and technical data.</p>
+
+  <h2>Notation</h2>
+  <p>Keys appear in the text like this: <kbd>Return</kbd>, <kbd>Shift</kbd>, <kbd>Esc</kbd>. Commands and expressions appear like this: <code>PRINT 2+2</code>.</p>
+  <p>What you type appears as a listing:</p>
+<pre class="listing">10 PRINT "HELLO"
+20 GOTO 10
+RUN</pre>
+  <p>What the display shows appears in an LCD box with four lines of 40 characters each:</p>
+  <figure class="lcd">
+<pre>6502 HOMECOMPUTER BASIC V1.1
+COPYRIGHT 1978 MICROSOFT
+31423 BYTES FREE
+<span class="cursor"> </span></pre>
+    <figcaption>The display after switching on</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>A yellow box contains tips and side notes. You can skip them on a first read, but they will often save you time later.</p>
+  </aside>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Warning</div>
+    <p>An orange box warns about something that can erase your program or damage the device. Always read it before you continue.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

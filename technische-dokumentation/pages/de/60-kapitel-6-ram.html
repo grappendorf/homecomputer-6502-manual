@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 6</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="6" data-titel="Arbeitsspeicher" data-kurztitel="Arbeitsspeicher">
+  <p>Mit den drei Registern A, X und Y kommt man kaum weit. Jetzt bekommt der Computer Arbeitsspeicher. Dafür braucht die Adressdekodierung mehr Logik: Sie muss das RAM vom EEPROM und von der ACIA unterscheiden.</p>
+
+  <h2>Der Speicherplan</h2>
+  <p>Wir nehmen ein statisches RAM mit 32&nbsp;KB in der unteren Hälfte des Adressraums. Die obersten 256 Bytes dieser Hälfte sind aber nicht für RAM da, sondern für die Ein- und Ausgabebausteine. Ihre Register liegen bei $7F00 bis $7FFF. So sieht der Speicherplan aus:</p>
+  <table class="zusammen">
+    <thead><tr><th>Adressen</th><th>Inhalt</th></tr></thead>
+    <tbody>
+      <tr><td>$0000 bis $00FF</td><td>RAM, Zeropage</td></tr>
+      <tr><td>$0100 bis $01FF</td><td>RAM, Stapel</td></tr>
+      <tr><td>$0200 bis $7EFF</td><td>RAM</td></tr>
+      <tr><td>$7F00 bis $7FFF</td><td>Ein-/Ausgabe (IO)</td></tr>
+      <tr><td>$8000 bis $FFFF</td><td>ROM (EEPROM)</td></tr>
+    </tbody>
+  </table>
+  <p>Der Prozessor erwartet Zeropage und Stapel fest in den ersten beiden Seiten ($0000 bis $01FF). Darum gehört dort RAM hin.</p>
+  <p>Drei Chip-Select-Signale steuern die Bausteine. Ein Schrägstrich vor dem Namen bedeutet „aktiv bei Low“, das Zeichen ¬ ist die Negation, ∧ das logische Und:</p>
+  <ul>
+    <li><code>/CS_ROM = ¬A15</code></li>
+    <li><code>/CS_IO = ¬(/CS_ROM ∧ A14 ∧ A13 ∧ A12 ∧ A11 ∧ A10 ∧ A9 ∧ A8)</code></li>
+    <li><code>/CS_RAM = ¬(RAM ∧ φ2)</code> mit <code>RAM = ¬(/CS_ROM ∧ /CS_IO)</code></li>
+  </ul>
+  <p>Das RAM ist also gewählt, wenn weder ROM noch IO gewählt sind, und nur während der zweiten Takthälfte (φ2 High). Bei einem Schreibzugriff ist der Datenbus erst dann gültig. Würde man das RAM schon früher freigeben, könnte es beim Wechsel der Adresse kurz falsch beschrieben werden.</p>
+  <p>Die Werte für einige Adressen:</p>
+  <table class="zusammen">
+    <thead><tr><th>Adresse</th><th>/CS_ROM</th><th>/CS_IO</th><th>/CS_RAM</th><th>Gewählt</th></tr></thead>
+    <tbody>
+      <tr><td>$0200</td><td>1</td><td>1</td><td>0</td><td>RAM</td></tr>
+      <tr><td>$7EFF</td><td>1</td><td>1</td><td>0</td><td>RAM</td></tr>
+      <tr><td>$7F00</td><td>1</td><td>0</td><td>1</td><td>IO (ACIA)</td></tr>
+      <tr><td>$7FFF</td><td>1</td><td>0</td><td>1</td><td>IO</td></tr>
+      <tr><td>$8000</td><td>0</td><td>1</td><td>1</td><td>ROM</td></tr>
+      <tr><td>$FFFC</td><td>0</td><td>1</td><td>1</td><td>ROM</td></tr>
+    </tbody>
+  </table>
+  <p>(Die Spalte /CS_RAM gilt für φ2 gleich High. Bei φ2 gleich Low ist /CS_RAM immer 1.)</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-ram.svg" alt="Schaltplan: Adressdekoder mit 74LS30, 74LS00 und Inverter, SRAM und ACIA">
+    <figcaption>Schaltplan des Adressdekoders und des RAMs</figcaption>
+  </figure>
+  <p>Das Signal /CS_IO erzeugt ein 8-fach-NAND-Gatter 74LS30. Seine acht Eingänge sind A8 bis A14 und /CS_ROM. Der Ausgang ist Low, wenn alle acht High sind, also genau bei $7F00 bis $7FFF.</p>
+  <p>/CS_RAM entsteht aus einem 74LS00 (vier NAND-Gatter) und einem weiteren Inverter des 74LS04. Gatter A verknüpft /CS_ROM und /CS_IO zu /RAM. Der Inverter IC1E macht daraus RAM, und Gatter B verknüpft RAM mit φ2.</p>
+  <p>Das RAM 61256 hat dieselbe Anschlussbelegung wie der EEPROM. /CE und /OE kommen von /CS_RAM, /WE von der Leitung R/W des Prozessors. Die ACIA bekommt /CS_IO statt A15 an /CS1. Sie liegt damit im IO-Bereich bei $7F00 bis $7F03 und wiederholt sich dort alle vier Adressen.</p>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC6</td><td>vier NAND-Gatter, DIP-14</td><td>74LS00</td></tr>
+      <tr><td>IC7</td><td>8-fach-NAND, DIP-14</td><td>74LS30</td></tr>
+      <tr><td>IC8</td><td>statisches RAM 32k × 8, DIP-28</td><td>61256</td></tr>
+      <tr><td>C10, C11, C12</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+  <p>Dazu zwei weitere Steckbretter (oder Platz auf den vorhandenen). Das 61256 steht für eine Familie von 32k-×-8-RAMs, etwa 62256. Sie haben alle dieselbe Belegung.</p>
+
+  <h2>Aufbau</h2>
+  <p>Bauen Sie zuerst die IO-Dekodierung, stellen Sie die Programmadressen um und prüfen Sie, ob „Hello World!“ noch läuft. Erst dann folgt das RAM.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-dekoder.svg" alt="Steckbrett 5 mit 74LS30 und 74LS00 und Drähten mit Signalnamen">
+    <figcaption>Der Adressdekoder auf Steckbrett 5</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Führen Sie +5&nbsp;V und GND zu einem neuen Steckbrett und verbinden Sie dort die oberen Schienen mit den unteren.</div></li>
+    <li><div>Stecken Sie IC7 (74LS30) mit Pin&nbsp;1 in Loch 5e und IC6 (74LS00) mit Pin&nbsp;1 in Loch 16e, jeweils Kerbe links.</div></li>
+    <li><div>Versorgen Sie beide: IC7 Pin&nbsp;14 (5j) an +5&nbsp;V und Pin&nbsp;7 (11a) an GND, IC6 Pin&nbsp;14 (16j) an +5&nbsp;V und Pin&nbsp;7 (22a) an GND. Setzen Sie C10 (Spalte 13) und C11 (Spalte 25) zwischen die oberen Schienen.</div></li>
+    <li><div>Verbinden Sie A8 bis A14 mit IC7 und /CS_ROM (Pin&nbsp;2 von IC1) mit Pin&nbsp;12. Die Tabelle zeigt die Pins.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (Pin)</th><th>74LS30 (Pin)</th></tr></thead>
+    <tbody>
+      <tr><td>A8</td><td>17</td><td>11</td></tr>
+      <tr><td>A9</td><td>18</td><td>6</td></tr>
+      <tr><td>A10</td><td>19</td><td>5</td></tr>
+      <tr><td>A11</td><td>20</td><td>4</td></tr>
+      <tr><td>A12</td><td>22</td><td>3</td></tr>
+      <tr><td>A13</td><td>23</td><td>2</td></tr>
+      <tr><td>A14</td><td>24</td><td>1</td></tr>
+      <tr><td>/CS_ROM</td><td>IC1, Pin 2</td><td>12</td></tr>
+    </tbody>
+  </table>
+  <ol class="schritte" start="5">
+    <li><div>Der Ausgang von IC7, Pin&nbsp;8 (Loch 11j), ist /CS_IO. Ziehen Sie den Draht von A15 an Pin&nbsp;3 der ACIA ab und führen Sie stattdessen /CS_IO an diesen Pin.</div></li>
+  </ol>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-acia-io.svg" alt="Steckbrett 4 mit der ACIA, /CS1 an /CS_IO">
+    <figcaption>Die ACIA mit Chip-Select von /CS_IO</figcaption>
+  </figure>
+  <p>Jetzt liegt die ACIA bei $7F00. Ändern Sie im Hello-World-Programm aus Kapitel 5 die vier Adressen und übersetzen Sie es neu:</p>
+  <pre class="listing">ACIA_DATA    = $7f00
+ACIA_STATUS  = $7f01
+ACIA_COMMAND = $7f02
+ACIA_CONTROL = $7f03</pre>
+  <p>Schreiben Sie den EEPROM neu. Erscheint „Hello World!“ wieder im Terminal, funktioniert die IO-Dekodierung.</p>
+  <p>Nun das RAM. Zuerst die restliche Logik auf Steckbrett 5 und am 74LS04:</p>
+  <ol class="schritte" start="6">
+    <li><div>Verbinden Sie /CS_ROM mit Pin&nbsp;1 von IC6 und /CS_IO mit Pin&nbsp;2. Pin&nbsp;3 von IC6 ist das Signal /RAM. Führen Sie es zu Pin&nbsp;11 von IC1 (Loch 8j auf Steckbrett 1).</div></li>
+  </ol>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-inverter-ram.svg" alt="Ausschnitt von Steckbrett 1 mit zwei zusätzlichen Drähten an Pin 11 und Pin 10">
+    <figcaption>Der zweite Inverter (Ausschnitt von Steckbrett 1)</figcaption>
+  </figure>
+  <ol class="schritte" start="7">
+    <li><div>Pin&nbsp;10 von IC1 (Loch 9j) ist RAM. Führen Sie es zu Pin&nbsp;4 von IC6.</div></li>
+    <li><div>Verbinden Sie PHI2 (Pin&nbsp;39 des 6502) mit Pin&nbsp;5 von IC6. Pin&nbsp;6 von IC6 ist /CS_RAM.</div></li>
+  </ol>
+  <p>Und das RAM auf einem weiteren Steckbrett:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-sram.svg" alt="Steckbrett 6 mit dem SRAM 61256">
+    <figcaption>Das RAM auf Steckbrett 6</figcaption>
+  </figure>
+  <ol class="schritte" start="9">
+    <li><div>Stecken Sie IC8 über die Rinne, Kerbe links, Pin&nbsp;1 in Loch 5d (breites IC, Reihen d und h). Versorgen Sie ihn wie den EEPROM: Pin&nbsp;28 (5j) an +5&nbsp;V, Pin&nbsp;14 (18a) an GND, C12 zwischen die oberen Schienen.</div></li>
+    <li><div>/CE (Pin&nbsp;20) und /OE (Pin&nbsp;22) kommen an /CS_RAM, /WE (Pin&nbsp;27) an die Leitung R/W des Prozessors.</div></li>
+    <li><div>Verbinden Sie Adress- und Datenleitungen wie beim EEPROM mit den Anschlüssen gleichen Namens. Die Pins sind dieselben wie dort.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (Pin)</th><th>61256 (Pin)</th></tr></thead>
+    <tbody>
+      <tr><td>A0 – A7</td><td>9, 10, 11, 12, 13, 14, 15, 16</td><td>10, 9, 8, 7, 6, 5, 4, 3</td></tr>
+      <tr><td>A8 – A14</td><td>17, 18, 19, 20, 22, 23, 24</td><td>25, 24, 21, 23, 2, 26, 1</td></tr>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>11, 12, 13, 15, 16, 17, 18, 19</td></tr>
+      <tr><td>R/W</td><td>34</td><td>27 (/WE)</td></tr>
+      <tr><td>/CS_RAM</td><td>IC6, Pin 6</td><td>20 (/CE), 22 (/OE)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Ein Testprogramm</h2>
+  <p>Das Programm erweitert „Hello World!“: Es kopiert den Text zuerst ins RAM und sendet ihn dann von dort. Kommt er unverändert an, arbeiten RAM und Adressdekodierung. Die Marke <code>string_data</code> liegt im RAM, der Abschnitt <code>DATA</code>.</p>
+  <pre class="listing breit">        .setcpu "6502"
+
+ACIA_DATA    = $7f00
+ACIA_STATUS  = $7f01
+ACIA_COMMAND = $7f02
+ACIA_CONTROL = $7f03
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .data
+string_data:
+        .res    16              <span class="kommentar">; 16 Bytes im RAM</span>
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:
+init_acia:
+        lda #%00001011          <span class="kommentar">; keine Parität, kein Echo, keine Interrupts</span>
+        sta ACIA_COMMAND
+        lda #%00011111          <span class="kommentar">; 1 Stoppbit, 8 Datenbits, 19200 Baud</span>
+        sta ACIA_CONTROL
+
+        ldx #$ff                <span class="kommentar">; Text vom ROM ins RAM kopieren</span>
+copy_string:
+        inx
+        lda text,x
+        sta string_data,x
+        bne copy_string
+
+write:  ldx #0
+next_char:
+wait_txd_empty:
+        lda ACIA_STATUS
+        and #$10
+        beq wait_txd_empty
+        lda string_data,x       <span class="kommentar">; Zeichen jetzt aus dem RAM</span>
+        beq read
+        sta ACIA_DATA
+        inx
+        jmp next_char
+
+read:
+wait_rxd_full:
+        lda ACIA_STATUS
+        and #$08
+        beq wait_rxd_full
+        lda ACIA_DATA
+        jmp write
+
+text:   .byte "Hello World!", $0d, $0a, $00</pre>
+  <p>Dazu braucht der Linker eine erweiterte Konfiguration. Sie beschreibt das RAM als Bereich für den Abschnitt <code>DATA</code> und die ersten 256 Bytes als <code>ZEROPAGE</code>. Mit <code>file=""</code> sagen wir dem Linker, dass diese Bereiche nicht in die Ausgabedatei gehören, sonst landet das RAM in der ROM-Datei:</p>
+  <pre class="listing">MEMORY
+{
+  ZP:  start=$0000, size=$0100, type=rw, define=yes, file="";
+  RAM: start=$0200, size=$7d00, type=rw, define=yes, file="";
+  ROM: start=$8000, size=$8000, type=ro, define=yes, fill=yes, file=%O;
+}
+SEGMENTS
+{
+  ZEROPAGE: load=ZP,  type=zp, define=yes;
+  DATA:     load=RAM, type=rw, define=yes;
+  CODE:     load=ROM, type=ro;
+  VECTORS:  load=ROM, type=ro, offset=$7ffa;
+}</pre>
+  <pre class="listing">$ ca65 -o ramtest.o ramtest.s
+$ ld65 -C ram.cfg -o ramtest.bin ramtest.o
+$ minipro -p AT28C256 -w ramtest.bin</pre>
+  <p>Erscheint „Hello World!“ im Terminal, dann lief alles über das RAM.</p>
+
+  <h2>Messen</h2>
+  <p>Das Bild zeigt die Chip-Select-Signale bei einem Lesezugriff auf $7F01 (Status der ACIA) und einem Schreibzugriff auf $0200 (RAM). Die Kurven sind aus den Gleichungen gerechnet. In jedem Takt ist genau ein Baustein gewählt: ROM beim Holen der Befehle, IO beim Lesen des Status, RAM beim Schreiben. /CS_RAM wird nur in der zweiten Takthälfte Low.</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/logik-dekoder.svg" alt="Logikanalysator-Bild: Chip-Select-Signale bei Zugriffen auf ROM, IO und RAM">
+    <figcaption>Chip-Select-Signale bei Zugriffen auf ROM, IO und RAM, schematisch</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Läuft das Programm nicht? Prüfen Sie erst mit dem alten Programm aus Kapitel 5, ob die ACIA bei $7F00 antwortet. Dann hängt der Fehler im RAM-Teil: bei /CS_RAM (Pin&nbsp;6 von IC6), der Verdrahtung von IC1E oder den Adress- und Datenleitungen zum 61256.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 3 – Getting Started with BASIC</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="3" data-titel="Getting Started with BASIC" data-kurztitel="Getting Started with BASIC">
+  <p>So far you have been giving the computer individual commands, and it executed them immediately. In this chapter you will write your first programs. A program is a list of commands that the computer remembers and then works through in order, as many times as you like.</p>
+  <p>The language for this is called BASIC. The HomeComputer 6502 has Microsoft BASIC version 1.1 built in permanently. It is ready to use as soon as you switch the computer on.</p>
+
+  <h2>Your First Program</h2>
+  <p>Type in the following two lines and press <kbd>Return</kbd> after each line:</p>
+<pre class="listing">10 PRINT "HELLO"
+20 GOTO 10</pre>
+  <p>This time nothing happens after <kbd>Return</kbd>. That is exactly right. Because the lines begin with a number, the computer does not execute them, but stores them instead. The number at the beginning is the <strong>line number</strong>. It determines the order in which the lines appear in the program. Numbers from 0 to 63999 are allowed.</p>
+  <p>Now start the program with the command <code>RUN</code>:</p>
+<pre class="listing">RUN</pre>
+  <figure class="lcd">
+<pre>HELLO
+HELLO
+HELLO
+HELLO</pre>
+    <figcaption>The program runs and runs</figcaption>
+  </figure>
+  <p>Line 10 writes <code>HELLO</code> on the display. Line 20 says: “Continue at line 10.” The computer jumps back, writes <code>HELLO</code> again, jumps back again, and so on, without end. This is called an <strong>infinite loop</strong>.</p>
+
+  <h3>Stopping a Program</h3>
+  <p>Press <kbd>Pause</kbd> or <kbd>Ctrl</kbd> + <kbd>C</kbd>. The program stops, and the computer reports which line it was in:</p>
+  <figure class="lcd">
+<pre>HELLO
+
+BREAK IN  20
+<span class="cursor"> </span></pre>
+    <figcaption>Stopped in line 20</figcaption>
+  </figure>
+  <p>With <code>CONT</code> (short for <em>continue</em>) the program resumes at the same spot. With <code>RUN</code> it starts again from the beginning.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>When a program has finished or was stopped, the computer does not print a message such as <code>READY.</code> The cursor simply sits on the next line, and you can keep typing.</p>
+  </aside>
+
+  <h3>Upper or Lower Case?</h3>
+  <p>The keyboard types lowercase letters. You get capital letters while you hold down <kbd>Shift</kbd>. For longer texts, press <kbd>Caps Lock</kbd> once briefly: then all letters come out in capitals until you press <kbd>Caps Lock</kbd> again. If you hold <kbd>Shift</kbd> while <kbd>Caps Lock</kbd> is on, you get a lowercase letter. After switching the computer on, <kbd>Caps Lock</kbd> is always off.</p>
+  <p>For BASIC this is no problem. You may type commands and variable names in lowercase. When storing them, the computer converts them to capitals, and that is how <code>LIST</code> shows them too. Only text between quotation marks stays exactly as you typed it. <code>print "Hello"</code> becomes <code>PRINT "HELLO"</code> in the program.</p>
+  <p>The listings in this manual appear the way <code>LIST</code> shows them: commands in capitals, and text usually in capitals as well. You type such texts with <kbd>Shift</kbd> held down or with <kbd>Caps Lock</kbd>, or you write them in lowercase – whatever you prefer. In the LCD boxes, your input is shown in lowercase, just as it appears on the display.</p>
+  <p>Instead of <code>PRINT</code> you can also simply write <code>?</code>.</p>
+
+  <h2>Viewing and Changing Programs</h2>
+  <p>The command <code>LIST</code> shows the program currently in memory:</p>
+<pre class="listing">LIST
+10 PRINT "HELLO"
+20 GOTO 10</pre>
+  <p>With longer programs you can also view just a portion:</p>
+  <table>
+    <thead><tr><th>Input</th><th>shows</th></tr></thead>
+    <tbody>
+      <tr><td><code>LIST</code></td><td>the entire program</td></tr>
+      <tr><td><code>LIST 30</code></td><td>only line 30</td></tr>
+      <tr><td><code>LIST 30-</code></td><td>from line 30 to the end</td></tr>
+      <tr><td><code>LIST -30</code></td><td>from the beginning to line 30</td></tr>
+      <tr><td><code>LIST 100-200</code></td><td>lines 100 through 200</td></tr>
+    </tbody>
+  </table>
+  <p>The display has only four lines. If the program is longer, <code>LIST</code> stops after three lines and prints <code>MORE - PRESS A KEY</code>. The LED in the top right corner lights up. Press any key to continue. With <kbd>Pause</kbd> or <kbd>Ctrl</kbd> + <kbd>C</kbd> you cancel.</p>
+
+  <h3>Replacing, Deleting, and Inserting Lines</h3>
+  <ul>
+    <li><strong>Replace:</strong> Type a line again with the same number. The old line is overwritten.</li>
+    <li><strong>Delete:</strong> Type just the line number and press <kbd>Return</kbd>.</li>
+    <li><strong>Insert:</strong> Pick a number that lies between two existing ones. <code>15 PRINT "WORLD"</code> becomes a new line between 10 and 20.</li>
+  </ul>
+  <p>That is why programs are numbered in steps of ten: 10, 20, 30. This leaves room for lines you think of later.</p>
+
+  <h3>Recalling a Line</h3>
+  <p>You do not have to retype an entire line to change it. Press <kbd>↑</kbd> on an empty input line. The computer recalls the last program line onto the display. Each further <kbd>↑</kbd> recalls the line before it, <kbd>↓</kbd> the line after it. If you first type a line number and then press <kbd>↑</kbd>, it recalls exactly that line.</p>
+  <p>With <kbd>←</kbd> and <kbd>→</kbd> you move the cursor within the line. The backspace key deletes the character before the cursor, <kbd>Del</kbd> the character under the cursor. <kbd>Home</kbd> and <kbd>End</kbd> jump to the beginning and the end. <kbd>Esc</kbd> discards the entire line. With <kbd>Return</kbd> you accept the changed line. If you change the line number in the process, a copy is created under the new number. The old line remains.</p>
+  <p>A line can be up to 120 characters long. On the display it wraps to the next line after 40 characters.</p>
+
+  <h3>Starting Over</h3>
+  <p><code>NEW</code> deletes the entire program and all variables. There is no confirmation prompt. How to save a program to diskette beforehand is described in Chapter 6.</p>
+
+  <h3>Several Commands on One Line</h3>
+  <p>Several commands fit on one line, separated by a colon. With <code>REM</code> (short for <em>remark</em>) you write a comment. The computer ignores everything after <code>REM</code>, including a colon.</p>
+<pre class="listing">10 REM MY SECOND PROGRAM
+20 PRINT "HELLO":PRINT "WORLD"</pre>
+
+  <h2>Variables</h2>
+  <p>A variable is a name under which the computer remembers a value. You assign it a value with the equals sign:</p>
+<pre class="listing">10 A=5
+20 B=A*2
+30 PRINT A;B</pre>
+  <figure class="lcd">
+<pre>run
+ 5  10</pre>
+    <figcaption>A is 5, B is twice as large</figcaption>
+  </figure>
+  <p>Here the equals sign does not mean “is equal to” but “gets the value”. That is why <code>A=A+1</code> also makes sense: A gets the old value of A plus one. In the old days you wrote <code>LET A=A+1</code> for this. That still works, but the <code>LET</code> can be left out.</p>
+
+  <h3>Three Kinds of Variables</h3>
+  <table>
+    <thead><tr><th>Example</th><th>holds</th><th>Range</th></tr></thead>
+    <tbody>
+      <tr><td><code>A</code>, <code>X1</code>, <code>ZZ</code></td><td>number with a decimal point</td><td>about 9 significant digits</td></tr>
+      <tr><td><code>A%</code>, <code>N%</code></td><td>whole number (integer)</td><td>−32768 to 32767</td></tr>
+      <tr><td><code>A$</code>, <code>NA$</code></td><td>text (string)</td><td>up to 255 characters</td></tr>
+    </tbody>
+  </table>
+  <p>Text always stands between quotation marks: <code>N$="ANNA"</code>. You join two texts with <code>+</code>: <code>PRINT "SNOW"+"MAN"</code> prints <code>SNOWMAN</code>. If you assign a number with a decimal point to an integer variable, everything after the decimal point is dropped: after <code>A%=7.9</code>, <code>A%</code> equals 7.</p>
+  <p>A variable you have not yet assigned anything is 0 or empty. <code>RUN</code> and <code>NEW</code> reset all variables to 0 or empty.</p>
+
+  <h3>Good Names</h3>
+  <p>A name begins with a letter. Letters and digits may follow. However, the computer distinguishes names only by their <strong>first two characters</strong>. To it, <code>NAME$</code> and <code>NAP$</code> are the same variable <code>NA$</code>:</p>
+<pre class="listing">NAME$="ANNA":NAP$="X":PRINT NAME$
+X</pre>
+  <p>Also, a name must not contain a BASIC command. <code>TOTAL</code> contains <code>TO</code>, <code>FORM</code> contains <code>FOR</code>. Both lead to <code>?SYNTAX ERROR</code>. The safest choice is short names of one or two characters.</p>
+
+  <h3>Output with PRINT</h3>
+  <p><code>PRINT</code> can output several things at once. What stands between them determines the spacing:</p>
+  <ul>
+    <li>A <strong>semicolon</strong> <code>;</code> continues printing right after.</li>
+    <li>A <strong>comma</strong> <code>,</code> jumps to the next column. The columns are 10 characters wide.</li>
+    <li>If a <code>;</code> or <code>,</code> stands at the end, the cursor stays on the line. The next <code>PRINT</code> continues there.</li>
+  </ul>
+  <p><code>PRINT</code> puts a space in front of every number; for negative numbers the minus sign goes there. A space also follows every number. That is why numbers never sit directly next to each other.</p>
+  <figure class="lcd">
+<pre>print 5;10;-3
+ 5  10 -3
+print 5,10
+ 5         10</pre>
+    <figcaption>Semicolon and comma</figcaption>
+  </figure>
+
+  <h2>Loops with FOR … NEXT</h2>
+  <p>With <code>GOTO</code> you have already built a loop, although one without an end. If something should happen exactly five times, use <code>FOR</code> and <code>NEXT</code>:</p>
+<pre class="listing">10 FOR I=1 TO 5
+20 PRINT I;
+30 NEXT I
+40 PRINT "DONE"</pre>
+  <figure class="lcd">
+<pre>run
+ 1  2  3  4  5 DONE</pre>
+    <figcaption>The loop counts from 1 to 5</figcaption>
+  </figure>
+  <p><code>FOR</code> sets the variable I to 1. Everything up to <code>NEXT</code> is executed. <code>NEXT I</code> increases I by one and jumps back as long as I is not greater than 5. After that, execution continues with the line after <code>NEXT</code>.</p>
+
+  <h3>Different Steps</h3>
+  <p>With <code>STEP</code> you determine by how much the variable increases each time. A negative step counts backwards:</p>
+<pre class="listing">FOR I=0 TO 20 STEP 5:PRINT I;:NEXT
+ 0  5  10  15  20
+FOR I=10 TO 0 STEP -5:PRINT I;:NEXT
+ 10  5  0</pre>
+  <p>As you can see, the name after <code>NEXT</code> may also be left out. Then <code>NEXT</code> belongs to the loop that was started last.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>A <code>FOR</code> loop always runs at least once. <code>FOR I=5 TO 1</code> executes the body once with I=5, even though 5 is already greater than 1.</p>
+  </aside>
+
+  <h3>Loops Inside Loops</h3>
+  <p>Loops can be nested. The inner loop must end before the outer one:</p>
+<pre class="listing">10 FOR I=1 TO 3
+20 FOR J=1 TO 3
+30 PRINT I*J;
+40 NEXT J
+50 PRINT
+60 NEXT I</pre>
+  <figure class="lcd">
+<pre>run
+ 1  2  3
+ 2  4  6
+ 3  6  9</pre>
+    <figcaption>A small multiplication table</figcaption>
+  </figure>
+  <p>The plain <code>PRINT</code> in line 50 only ends the line on the display.</p>
+
+  <h2>Input with INPUT</h2>
+  <p>So far everything was already in the program. With <code>INPUT</code> the program asks you while it runs:</p>
+<pre class="listing">10 INPUT "YOUR NAME";N$
+20 PRINT "HELLO ";N$</pre>
+  <figure class="lcd">
+<pre>run
+YOUR NAME? Anna
+HELLO Anna
+<span class="cursor"> </span></pre>
+    <figcaption>The program waits for your answer</figcaption>
+  </figure>
+  <p><code>INPUT</code> prints the text between the quotation marks, appends a question mark, and waits. What you type ends up in the variable after <kbd>Return</kbd>. The text and the semicolon may be omitted. Then only the question mark appears.</p>
+  <p>An <code>INPUT</code> can also ask for several values at once. Separate them with a comma as you type. If you enter too few, the computer asks for the rest with <code>??</code>:</p>
+<pre class="listing">10 INPUT "TWO NUMBERS";A,B
+20 PRINT "SUM:";A+B</pre>
+  <figure class="lcd">
+<pre>run
+TWO NUMBERS? 5
+?? 7
+SUM: 12</pre>
+    <figcaption>The second value is asked for</figcaption>
+  </figure>
+  <p>If the program expects a number and you type letters, the computer answers with <code>?REDO FROM START</code> and asks again. The program then continues normally.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p><code>INPUT</code> works only in a program. Typed in directly, the computer reports <code>?ILLEGAL DIRECT ERROR</code>.</p>
+  </aside>
+
+  <h2>Decisions with IF … THEN</h2>
+  <p>A program only becomes truly useful when it reacts to input. For that there are <code>IF</code> and <code>THEN</code>:</p>
+<pre class="listing">10 INPUT "HOW OLD ARE YOU";A
+20 IF A&lt;18 THEN PRINT "NOT AN ADULT YET"
+30 IF A&gt;=18 THEN PRINT "AN ADULT"</pre>
+  <p>If the condition after <code>IF</code> is true, the computer executes what follows <code>THEN</code>. If it is false, it skips the <strong>entire rest of the line</strong>, including everything after a colon. You can take advantage of that:</p>
+<pre class="listing">20 IF A&lt;18 THEN PRINT "TOO YOUNG":GOTO 10</pre>
+  <p>Here the program jumps back to line 10 only if A is less than 18.</p>
+
+  <h3>Comparisons</h3>
+  <table>
+    <thead><tr><th>Symbol</th><th>means</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>=</code></td><td>equal to</td><td><code>IF A=0 THEN …</code></td></tr>
+      <tr><td><code>&lt;&gt;</code></td><td>not equal to</td><td><code>IF A$&lt;&gt;"Y" THEN …</code></td></tr>
+      <tr><td><code>&lt;</code></td><td>less than</td><td><code>IF A&lt;10 THEN …</code></td></tr>
+      <tr><td><code>&gt;</code></td><td>greater than</td><td><code>IF A&gt;B THEN …</code></td></tr>
+      <tr><td><code>&lt;=</code></td><td>less than or equal to</td><td><code>IF A&lt;=100 THEN …</code></td></tr>
+      <tr><td><code>&gt;=</code></td><td>greater than or equal to</td><td><code>IF A&gt;=18 THEN …</code></td></tr>
+    </tbody>
+  </table>
+  <p>Text can be compared the same way: <code>IF A$="Y" THEN …</code>. With <code>&lt;</code> and <code>&gt;</code> the order in the alphabet applies; <code>"ABC"</code> is less than <code>"ABD"</code>.</p>
+  <p>You combine several conditions with <code>AND</code> (both must be true) and <code>OR</code> (one must be true). <code>NOT</code> reverses a condition:</p>
+<pre class="listing">IF X&gt;1 AND X&lt;5 THEN PRINT "IN BETWEEN"</pre>
+
+  <h3>THEN with a Line Number</h3>
+  <p>If only a line number follows <code>THEN</code>, the computer jumps there. <code>IF A=0 THEN 100</code> is the same as <code>IF A=0 THEN GOTO 100</code> or <code>IF A=0 GOTO 100</code>.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">For the Curious</div>
+    <p>To the computer, a comparison is a calculation. True yields −1, false yields 0. Try <code>PRINT 5&gt;3, 3&gt;5</code>. <code>IF</code> only checks whether the value is 0. That is why <code>IF 7 THEN …</code> executes the command and <code>IF 0 THEN …</code> does not.</p>
+  </aside>
+
+  <h2>A Guessing Game</h2>
+  <p>Now you have everything together for a real game. The computer thinks of a number between 1 and 100, and you guess:</p>
+<pre class="listing">10 REM GUESSING GAME
+20 Z=INT(RND(1)*100)+1
+30 V=0
+40 PRINT "I AM THINKING OF A NUMBER FROM 1 TO 100."
+50 INPUT "YOUR GUESS";T
+60 V=V+1
+70 IF T&lt;Z THEN PRINT "TOO SMALL.":GOTO 50
+80 IF T&gt;Z THEN PRINT "TOO BIG.":GOTO 50
+90 PRINT "CORRECT! YOU NEEDED";V;"GUESSES."
+100 INPUT "AGAIN (Y/N)";A$
+110 IF A$="Y" OR A$="y" THEN 20
+120 END</pre>
+  <figure class="lcd">
+<pre>YOUR GUESS? 15
+CORRECT! YOU NEEDED 5 GUESSES.
+AGAIN (Y/N)? n
+<span class="cursor"> </span></pre>
+    <figcaption>You won</figcaption>
+  </figure>
+  <p>You can also find the program in the firmware project as <code>examples/ratespiel.bas</code>. If the disk drive from Chapter 6 is connected, load it with <code>LOAD "ratespiel"</code>.</p>
+  <p>Here is how the program works:</p>
+  <ul>
+    <li><strong>Line 20</strong> generates the secret number Z. <code>RND(1)</code> returns a random number between 0 and 1. Multiplied by 100 and rounded down to a whole number with <code>INT</code>, that gives 0 to 99. Plus one: 1 to 100.</li>
+    <li><strong>Line 30</strong> sets the guess counter to 0.</li>
+    <li><strong>Lines 50 and 60</strong> ask for your guess and count along.</li>
+    <li><strong>Lines 70 and 80</strong> compare your guess with Z. If it is off, you get a hint, and the program asks again at line 50.</li>
+    <li><strong>Line 90</strong> is reached only when the guess was neither too small nor too large.</li>
+    <li><strong>Lines 100 and 110</strong> start a new round on request. Because the keyboard types lowercase, line 110 checks for <code>"Y"</code> and for <code>"y"</code>. <code>END</code> ends the program.</li>
+  </ul>
+  <p>The texts in the program use only simple characters. This way the text looks the same on every display and every terminal.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>After switching on, <code>RND(1)</code> always returns the same sequence of random numbers. The first round therefore always begins with the same number. Chapter 4 shows how to change that.</p>
+  </aside>
+
+  <h2>Error Messages</h2>
+  <p>When the computer does not understand something, it reports an error. The message begins with a question mark. If the error happens in a program, the line number follows:</p>
+<pre class="listing">10 PRINT "A"
+20 PRUNT "B"</pre>
+  <figure class="lcd">
+<pre>run
+A
+
+?SYNTAX ERROR IN  20</pre>
+    <figcaption>A typo in line 20</figcaption>
+  </figure>
+  <p>Don’t worry: an error cannot harm the computer. Recall the line with <kbd>↑</kbd>, correct it, and start the program again. The messages you are most likely to encounter in this chapter:</p>
+  <table>
+    <thead><tr><th>Message</th><th>Cause</th></tr></thead>
+    <tbody>
+      <tr><td><code>?SYNTAX ERROR</code></td><td>typo, a missing quotation mark, or a command inside a variable name</td></tr>
+      <tr><td><code>?UNDEF'D STATEMENT ERROR</code></td><td><code>GOTO</code> or <code>THEN</code> to a line that does not exist</td></tr>
+      <tr><td><code>?NEXT WITHOUT FOR ERROR</code></td><td><code>NEXT</code> without a matching <code>FOR</code>, or loops closed in the wrong order</td></tr>
+      <tr><td><code>?TYPE MISMATCH ERROR</code></td><td>text and number mixed up, for example <code>A$=5</code></td></tr>
+      <tr><td><code>?ILLEGAL QUANTITY ERROR</code></td><td>value too large or too small, for example <code>A%=40000</code></td></tr>
+      <tr><td><code>?ILLEGAL DIRECT ERROR</code></td><td><code>INPUT</code> outside a program</td></tr>
+    </tbody>
+  </table>
+  <p>All error messages can be found in Appendix B.</p>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 1 – Das Gerät in Betrieb nehmen</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="1" data-titel="Das Gerät in Betrieb nehmen" data-kurztitel="Inbetriebnahme">
+  <p>Der HomeComputer 6502 ist ein vollständiger Computer in einem Gehäuse: Tastatur, Anzeige, Lautsprecher und Akku sind eingebaut. Sie brauchen nichts weiter, um loszulegen. In diesem Kapitel lernen Sie das Gerät kennen, schalten es ein und erfahren, was zu tun ist, wenn etwas nicht klappt.</p>
+
+  <h2>Das Gerät im Überblick</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/de/ueberblick.svg" alt="Der HomeComputer 6502 von oben, mit den Nummern 1 bis 4">
+    <figcaption>Der HomeComputer 6502 von oben</figcaption>
+  </figure>
+  <ol class="legende">
+    <li><span class="nr">1</span><div><strong>Anzeige.</strong> Ein LCD mit vier Zeilen zu je 40 Zeichen. Hier erscheint alles, was Sie tippen und was der Computer ausgibt.</div></li>
+    <li><span class="nr">2</span><div><strong>Lautsprecher.</strong> Hinter den beiden Gittern links und rechts sitzt je ein Lautsprecher für den Klangchip SID.</div></li>
+    <li><span class="nr">3</span><div><strong>LED.</strong> Die kleine Lampe leuchtet durch die obere rechte Öffnung des rechten Lautsprechergitters. Programme können sie ein- und ausschalten.</div></li>
+    <li><span class="nr">4</span><div><strong>Tastatur.</strong> Eine deutsche Tastatur mit 89 Tasten. Kapitel 2 stellt sie vor.</div></li>
+  </ol>
+  <p>Im Gehäuse arbeiten ein Prozessor 6502 mit 1 MHz, 32 KB Arbeitsspeicher und 32 KB Festspeicher mit Microsoft BASIC. Dazu kommen der Klangchip SID 8580, eine serielle Schnittstelle und ein Akku. Alle technischen Daten stehen in Anhang&nbsp;F.</p>
+
+  <h2>Die Rückseite</h2>
+  <p>Alle Anschlüsse und Schalter liegen auf der Rückseite, unter der Anzeige. Von hinten gesehen, von links nach rechts:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/de/rueckseite.svg" alt="Die Rückseite mit den Nummern 1 bis 5">
+    <figcaption>Die Rückseite, von hinten gesehen</figcaption>
+  </figure>
+  <ol class="legende">
+    <li><span class="nr">1</span><div><strong>Lautstärke.</strong> Hinter der runden Öffnung sitzt der Lautstärkeregler. Sie drehen ihn mit einem kleinen Schlitzschraubendreher.</div></li>
+    <li><span class="nr">2</span><div><strong>Ladebuchse (Mini-USB).</strong> Hier laden Sie den Akku.</div></li>
+    <li><span class="nr">3</span><div><strong>Ein/Aus.</strong> Schaltet den Computer ein und aus.</div></li>
+    <li><span class="nr">4</span><div><strong>Akku/USB.</strong> Wählt, woher der Computer seinen Strom nimmt: aus dem Akku oder über die USB-Buchse 5.</div></li>
+    <li><span class="nr">5</span><div><strong>PC-Anschluss (Micro-USB).</strong> Verbindet den Computer mit einem PC. Darüber laufen die serielle Schnittstelle (Kapitel 6) und auf Wunsch die Stromversorgung.</div></li>
+  </ol>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Die beiden USB-Buchsen sehen sich ähnlich. Zum Laden nehmen Sie die linke, größere Mini-USB-Buchse 2. Zum PC geht es über die rechte, kleinere Micro-USB-Buchse 5.</p>
+  </aside>
+
+  <h2>Stromversorgung</h2>
+  <p>Der Computer kann seinen Strom aus zwei Quellen nehmen. Welche es ist, bestimmt Schalter 4:</p>
+  <ul>
+    <li><strong>Akku:</strong> Der eingebaute Lithium-Polymer-Akku versorgt den Computer. So können Sie ihn überall benutzen.</li>
+    <li><strong>USB:</strong> Der Computer bekommt seinen Strom über das USB-Kabel an Buchse 5, zum Beispiel vom PC. Steht der Schalter auf USB und ist kein Kabel eingesteckt, bleibt der Computer aus.</li>
+  </ul>
+  <p>Mit vollem Akku läuft der Computer nach einer Schätzung aus dem Stromverbrauch seiner Bauteile rund vier bis fünf Stunden. Wie lange genau, hängt vom Zustand des Akkus ab und davon, wie viel der Lautsprecher spielt.</p>
+
+  <h3>Den Akku laden</h3>
+  <p>Stecken Sie ein USB-Kabel mit Mini-USB-Stecker in die Ladebuchse 2. Das andere Ende kommt an ein USB-Netzteil oder an einen PC. Außen am Gerät gibt es keine Ladeanzeige.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Achtung</div>
+    <p>Lithium-Polymer-Akkus brauchen etwas Vorsicht. Laden Sie den Akku nur über die Ladebuchse 2, nicht unbeaufsichtigt und nicht auf einer brennbaren Unterlage. Wird das Gerät beim Laden heiß oder riecht es ungewöhnlich, ziehen Sie das Kabel und schalten Sie den Computer aus.</p>
+  </aside>
+
+  <h2>Einschalten</h2>
+  <ol>
+    <li>Stellen Sie Schalter 4 auf <strong>Akku</strong>. Oder stellen Sie ihn auf <strong>USB</strong> und verbinden Sie Buchse 5 mit einem PC oder USB-Netzteil.</li>
+    <li>Schalten Sie Schalter 3 ein.</li>
+  </ol>
+  <p>Die LED leuchtet eine Sekunde lang auf. Gleichzeitig meldet sich BASIC auf der Anzeige:</p>
+  <figure class="lcd">
+<pre>6502 HOMECOMPUTER BASIC V1.1
+COPYRIGHT 1978 MICROSOFT
+31423 BYTES FREE
+<span class="cursor"> </span></pre>
+    <figcaption>Bereit zur Eingabe</figcaption>
+  </figure>
+  <p>Die dritte Zeile sagt, wie viel Speicher für Ihre Programme frei ist: 31423 Zeichen. Der kleine Strich darunter ist der <strong>Cursor</strong>. Er zeigt, wo das nächste Zeichen erscheint, das Sie tippen. Der Computer ist jetzt bereit. Wie es weitergeht, steht in Kapitel 2.</p>
+
+  <h3>Ausschalten</h3>
+  <p>Schalten Sie Schalter 3 aus. Alles, was im Arbeitsspeicher stand, ist dann verloren, auch Ihr Programm. Wollen Sie es behalten, speichern Sie es vorher auf der Diskette am PC. Wie das geht, zeigt Kapitel 6.</p>
+
+  <h3>Neu starten</h3>
+  <p>Hängt der Computer einmal fest, drücken Sie <kbd>Fn</kbd> und <kbd>Win</kbd> gleichzeitig. Das ist ein <strong>Reset</strong>: Der Computer startet neu, als hätten Sie ihn aus- und wieder eingeschaltet. Auch dabei geht das Programm im Speicher verloren. Ein laufendes Programm halten Sie besser erst mit <kbd>Pause</kbd> an. Das löscht nichts.</p>
+
+  <h2>Wenn etwas nicht klappt</h2>
+  <table>
+    <thead><tr><th>Was passiert</th><th>Mögliche Ursache</th><th>Was Sie tun können</th></tr></thead>
+    <tbody>
+      <tr><td>Die Anzeige bleibt dunkel.</td><td>Der Akku ist leer, oder Schalter 4 steht auf USB, aber es steckt kein Kabel in Buchse 5.</td><td>Akku laden, oder Schalter 4 umstellen, oder das USB-Kabel einstecken.</td></tr>
+      <tr><td>Die Anzeige leuchtet, zeigt aber keine Schrift oder nur Kästchen.</td><td>Der Kontrast ist verstellt.</td><td>Der Kontrast wird innen am Regler auf der Platine eingestellt. Wenden Sie sich an den Erbauer.</td></tr>
+      <tr><td>Die Tasten tun nichts.</td><td>Ein Programm läuft noch.</td><td><kbd>Pause</kbd> drücken. Hilft das nicht, mit <kbd>Fn</kbd> + <kbd>Win</kbd> neu starten.</td></tr>
+      <tr><td>Es ist nichts zu hören.</td><td>Die Lautstärke ist zu niedrig.</td><td>Den Regler hinter Öffnung 1 aufdrehen. In BASIC regelt <code>VOL</code> die Lautstärke (Kapitel 5).</td></tr>
+      <tr><td>Der PC findet den Computer nicht.</td><td>Das Kabel steckt in der Ladebuchse.</td><td>Das Kabel in die Micro-USB-Buchse 5 stecken (Kapitel 6).</td></tr>
+    </tbody>
+  </table>
+</section>
+</main>
+</body>
+</html>

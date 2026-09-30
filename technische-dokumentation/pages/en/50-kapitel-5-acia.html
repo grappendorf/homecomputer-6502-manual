@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 5</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="5" data-titel="The Serial Interface" data-kurztitel="Serial interface">
+  <p>The computer needs a way to talk to you. In this chapter it gets a serial interface. For the first time “Hello World!” appears on the screen of a PC.</p>
+
+  <h2>Why an interface?</h2>
+  <p>In the old days you would connect keys and LEDs (or seven-segment displays) to the computer, later a keyboard and an LCD or your television. Hobbyists did not have a second computer for development back then.</p>
+  <p>Today you write the programs on a PC and transfer them to the circuit. With an interface to the PC we can send commands, query memory and registers and later even load programs into the computer. That way we do not have to rewrite the EEPROM for every experiment.</p>
+  <p>For this we use an ACIA 6551 (Asynchronous Communications Interface Adapter). It contains a serial interface and is addressed like a memory. On the PC side a USB-to-serial converter is plugged in.</p>
+
+  <h2>Address decoding</h2>
+  <p>So far the processor sees the EEPROM at all 64K addresses. Now it has to choose between several chips. The technique is called address decoding. We keep it as simple as possible:</p>
+  <ul>
+    <li>The EEPROM is active only when A15 is high: from $8000 to $FFFF. An inverter turns A15 into the signal /CS_ROM, which is active low.</li>
+    <li>The ACIA is active when A15 is low. It therefore appears many times in the lower 32&nbsp;KB.</li>
+    <li>A0 and A1 select one of the four registers of the ACIA.</li>
+  </ul>
+  <table class="zusammen">
+    <thead><tr><th>Address</th><th>Read</th><th>Write</th></tr></thead>
+    <tbody>
+      <tr><td>$0000</td><td>Receive data</td><td>Transmit data</td></tr>
+      <tr><td>$0001</td><td>Status register</td><td>Programmed reset</td></tr>
+      <tr><td>$0002</td><td colspan="2">Command register</td></tr>
+      <tr><td>$0003</td><td colspan="2">Control register</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-acia.svg" alt="Schematic: inverter for A15, chip select of the EEPROM and the ACIA 6551">
+    <figcaption>Schematic of the address decoding and the ACIA</figcaption>
+  </figure>
+  <p>The inverter IC1A (pins&nbsp;1 and 2 of the 74LS04) generates the signal /CS_ROM from A15. It goes to /CE and /OE of the EEPROM, which were tied to GND so far. The ACIA has two chip select inputs: CS0 is tied to +5&nbsp;V, /CS1 gets A15. So it is selected when A15 is low.</p>
+  <p>The remaining connections: the clock PHI2 and the R/W line come from the processor, /RES from the reset circuit. The data lines D0 to D7 are on the data bus, RS0 and RS1 on A0 and A1. A 1.8432&nbsp;MHz crystal Q2 with a 27&nbsp;pF capacitor C8 generates the clock for the baud rate. TxD and RxD lead to the pin header JP1: pin&nbsp;1 GND, pin&nbsp;2 TxD, pin&nbsp;3 RxD.</p>
+  <p>Pay attention to /CTS (pin&nbsp;9): it must be tied to GND, otherwise the ACIA does not transmit. The inputs /DCD and /DSR are tied to GND as well, so the ACIA sees them as “ready”.</p>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC5</td><td>ACIA, DIP-28</td><td>6551</td></tr>
+      <tr><td>Q2</td><td>Crystal</td><td>1.8432&nbsp;MHz</td></tr>
+      <tr><td>C8</td><td>Ceramic capacitor</td><td>27&nbsp;pF</td></tr>
+      <tr><td>C9</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+      <tr><td>JP1</td><td>Pin header, 3 pins</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Plus a USB-to-serial converter (for example a module with the FT232 chip) and a fourth breadboard. You already have the inverter IC1A: it is the free gate of the 74LS04 on breadboard 1.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p>The converter must have 5&nbsp;V TTL levels. A device with RS-232 levels (±12&nbsp;V) would destroy the ACIA. A pure 3.3&nbsp;V converter does not fit the 5&nbsp;V of the circuit. Set a switchable converter to 5&nbsp;V.</p>
+  </aside>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>Use a classic NMOS 6551 (Rockwell, MOS, Synertek). With the newer CMOS successor W65C51 the “transmitter empty” status bit is known not to be reliable, and the program of this chapter then does not work.</p>
+  </aside>
+
+  <h2>Assembly</h2>
+  <p>First the inverter. After chapter 4 gates A to C of the 74LS04 are free. Use gate A on breadboard 1:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-inverter.svg" alt="Detail of breadboard 1 with two wires at pin 1 and pin 2 of the 74LS04">
+    <figcaption>The inverter for A15 (detail of breadboard 1)</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Run A15 from pin&nbsp;25 of the 6502 to pin&nbsp;1 of IC1 (hole 5a on breadboard 1).</div></li>
+    <li><div>The output, pin&nbsp;2 of IC1 (hole 6a), is the signal /CS_ROM.</div></li>
+  </ol>
+  <p>Then the EEPROM:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-eeprom-cs.svg" alt="Breadboard 3 with the EEPROM, /CE and /OE at /CS_ROM">
+    <figcaption>The EEPROM with chip select from /CS_ROM</figcaption>
+  </figure>
+  <ol class="schritte" start="3">
+    <li><div>Pull off the two wires that connected /OE (hole 11j) and /CE (hole 13j) to GND. Run /CS_ROM from pin&nbsp;2 of IC1 to these two holes instead. /WE stays at +5&nbsp;V.</div></li>
+  </ol>
+  <p>Finally the ACIA on a new breadboard:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-acia.svg" alt="Breadboard 4 with the ACIA 6551, crystal, pin header and wires with signal names">
+    <figcaption>The ACIA on breadboard 4</figcaption>
+  </figure>
+  <ol class="schritte" start="4">
+    <li><div>Insert IC5 across the channel, notch left, pin&nbsp;1 in hole 5d (wide IC, rows d and h).</div></li>
+    <li><div>Power: pin&nbsp;15 (hole 18j) to +5&nbsp;V, pin&nbsp;1 (5a) to GND and pin&nbsp;2 (6a, CS0) to +5&nbsp;V. Place C9 between the upper rails.</div></li>
+    <li><div>Tie /CTS (pin&nbsp;9, hole 13a), /DSR (pin&nbsp;17, hole 16j) and /DCD (pin&nbsp;16, hole 17j) to GND.</div></li>
+    <li><div>Insert the crystal Q2 between pin&nbsp;6 and pin&nbsp;7 (holes 10c and 11c) and C8 from hole 11b to GND.</div></li>
+    <li><div>Insert the pin header JP1 into holes 21d to 23d. Connect pin&nbsp;1 (21a) to GND, pin&nbsp;2 to TxD (from hole 14c to 22c) and pin&nbsp;3 to RxD (from 16b to 23b).</div></li>
+    <li><div>Connect the remaining connections with wires of the same name. The table shows the pins.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (pin)</th><th>6551 (pin)</th></tr></thead>
+    <tbody>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>18, 19, 20, 21, 22, 23, 24, 25</td></tr>
+      <tr><td>A0, A1</td><td>9, 10</td><td>13, 14</td></tr>
+      <tr><td>R/W</td><td>34</td><td>28</td></tr>
+      <tr><td>PHI2</td><td>39</td><td>27</td></tr>
+      <tr><td>A15</td><td>25</td><td>3 (/CS1)</td></tr>
+      <tr><td>/RESET</td><td>Breadboard 1, hole 11j</td><td>4</td></tr>
+    </tbody>
+  </table>
+  <p>The USB-to-serial converter is connected crossed: GND to GND, TxD of the ACIA to RxD of the converter, RxD of the ACIA to TxD of the converter.</p>
+
+  <h2>Measuring</h2>
+  <p>Before you send text, check that everything still works after the changes. A short program writes a byte into the command register of the ACIA:</p>
+  <pre class="listing">        lda #%00001011
+        sta $02                 ; ACIA_COMMAND</pre>
+  <p>The picture shows the accesses. A <code>STA</code> instruction with a zero page address takes three clocks: fetch the opcode, fetch the address, write the value. Only in the last clock the processor writes, and R/W is low there. During the writes to $0002 and $0003 A15 is low, /CS_ROM is high (the EEPROM is silent), and the ACIA takes the value from the data bus.</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/logik-acia.svg" alt="Logic analyzer picture: two write accesses to the ACIA">
+    <figcaption>Two write accesses to the ACIA, schematic</figcaption>
+  </figure>
+
+  <h2>Hello World!</h2>
+  <p>Now the first real program. At <code>init_acia</code> we set the ACIA to 8N1 at 19200 baud: eight data bits, no parity, one stop bit. At <code>write</code> the text is sent character by character. Before each character the program waits until the transmit data register is empty (bit 4 of the status register). At <code>read</code> it waits for a received character (bit 3) and then starts over.</p>
+  <pre class="listing breit">        .setcpu "6502"
+
+ACIA_DATA    = $0000
+ACIA_STATUS  = $0001
+ACIA_COMMAND = $0002
+ACIA_CONTROL = $0003
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:
+init_acia:
+        lda #%00001011          <span class="kommentar">; no parity, no echo, no interrupts</span>
+        sta ACIA_COMMAND
+        lda #%00011111          <span class="kommentar">; 1 stop bit, 8 data bits, 19200 baud</span>
+        sta ACIA_CONTROL
+
+write:  ldx #0
+next_char:
+wait_txd_empty:
+        lda ACIA_STATUS
+        and #$10                <span class="kommentar">; transmitter ready?</span>
+        beq wait_txd_empty
+        lda text,x
+        beq read                <span class="kommentar">; end of text</span>
+        sta ACIA_DATA
+        inx
+        jmp next_char
+
+read:
+wait_rxd_full:
+        lda ACIA_STATUS
+        and #$08                <span class="kommentar">; character received?</span>
+        beq wait_rxd_full
+        lda ACIA_DATA
+        jmp write
+
+text:   .byte "Hello World!", $0d, $0a, $00</pre>
+  <p>The two register values in detail:</p>
+  <table class="zusammen">
+    <thead><tr><th>Register</th><th>Value</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Command</td><td><code>%00001011</code></td><td>no parity, no echo, interrupts off, transmitter and receiver on</td></tr>
+      <tr><td>Control</td><td><code>%00011111</code></td><td>1 stop bit, 8 data bits, internal baud rate generator, 19200 baud</td></tr>
+    </tbody>
+  </table>
+  <p>Assemble as in chapter 4 (<code>first.cfg</code> can stay) and rewrite the EEPROM. Connect the converter, start a terminal program on the PC and switch the computer on:</p>
+  <pre class="listing">$ picocom -b 19200 /dev/ttyUSB0
+Terminal ready
+Hello World!</pre>
+  <p>Press a key and the message appears once more.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>Nothing arrives? Check one after the other: does the clock run at pin&nbsp;27 of the ACIA (PHI2)? Is /CTS (pin&nbsp;9) at GND? Are TxD and RxD crossed at the converter and is the baud rate on the PC 19200? Does the crystal oscillate at pins&nbsp;6 and 7?</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

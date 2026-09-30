@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 1 – Setting Up the Computer</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="1" data-titel="Setting Up the Computer" data-kurztitel="Setup">
+  <p>The HomeComputer 6502 is a complete computer in a single case: keyboard, display, speakers and battery are all built in. You need nothing else to get started. In this chapter you will get to know the computer, switch it on, and learn what to do when something does not work.</p>
+
+  <h2>The Computer at a Glance</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/en/ueberblick.svg" alt="The HomeComputer 6502 from above, with the numbers 1 to 4">
+    <figcaption>The HomeComputer 6502 from above</figcaption>
+  </figure>
+  <ol class="legende">
+    <li><span class="nr">1</span><div><strong>Display.</strong> An LCD with four lines of 40 characters each. Everything you type and everything the computer outputs appears here.</div></li>
+    <li><span class="nr">2</span><div><strong>Speakers.</strong> Behind the two grilles on the left and right sits one speaker each for the SID sound chip.</div></li>
+    <li><span class="nr">3</span><div><strong>LED.</strong> The small lamp shines through the upper right opening of the right speaker grille. Programs can switch it on and off.</div></li>
+    <li><span class="nr">4</span><div><strong>Keyboard.</strong> A German keyboard with 89 keys. Chapter 2 introduces it.</div></li>
+  </ol>
+  <p>Inside the case work a 6502 processor at 1 MHz, 32 KB of RAM and 32 KB of ROM with Microsoft BASIC. Added to these are the SID 8580 sound chip, a serial interface and a battery. All technical specifications are listed in Appendix&nbsp;F.</p>
+
+  <h2>The Back</h2>
+  <p>All connectors and switches are on the back, below the display. Seen from behind, from left to right:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/en/rueckseite.svg" alt="The back with the numbers 1 to 5">
+    <figcaption>The back, seen from behind</figcaption>
+  </figure>
+  <ol class="legende">
+    <li><span class="nr">1</span><div><strong>Volume.</strong> Behind the round opening sits the volume control. You turn it with a small slotted screwdriver.</div></li>
+    <li><span class="nr">2</span><div><strong>Charging socket (Mini-USB).</strong> This is where you charge the battery.</div></li>
+    <li><span class="nr">3</span><div><strong>On/Off.</strong> Switches the computer on and off.</div></li>
+    <li><span class="nr">4</span><div><strong>Battery/USB.</strong> Selects where the computer draws its power from: the battery or the USB socket 5.</div></li>
+    <li><span class="nr">5</span><div><strong>PC connection (Micro-USB).</strong> Connects the computer to a PC. The serial interface runs through it (Chapter 6), and optionally the power supply as well.</div></li>
+  </ol>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>The two USB sockets look similar. For charging, use the left, larger Mini-USB socket 2. The PC connects through the right, smaller Micro-USB socket 5.</p>
+  </aside>
+
+  <h2>Power Supply</h2>
+  <p>The computer can draw its power from two sources. Switch 4 decides which one:</p>
+  <ul>
+    <li><strong>Battery:</strong> The built-in lithium-polymer battery powers the computer. This lets you use it anywhere.</li>
+    <li><strong>USB:</strong> The computer gets its power through the USB cable at socket 5, for example from a PC. If the switch is set to USB and no cable is plugged in, the computer stays off.</li>
+  </ul>
+  <p>With a full battery, the computer runs for an estimated four to five hours, based on the power consumption of its components. How long exactly depends on the condition of the battery and on how much the speakers play.</p>
+
+  <h3>Charging the Battery</h3>
+  <p>Plug a USB cable with a Mini-USB plug into the charging socket 2. Put the other end into a USB power adapter or a PC. There is no charging indicator on the outside of the computer.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p>Lithium-polymer batteries require some care. Charge the battery only through the charging socket 2, never unattended and never on a flammable surface. If the computer gets hot while charging or smells unusual, unplug the cable and switch the computer off.</p>
+  </aside>
+
+  <h2>Switching On</h2>
+  <ol>
+    <li>Set switch 4 to <strong>Battery</strong>. Or set it to <strong>USB</strong> and connect socket 5 to a PC or USB power adapter.</li>
+    <li>Switch switch 3 on.</li>
+  </ol>
+  <p>The LED lights up for one second. At the same time BASIC announces itself on the display:</p>
+  <figure class="lcd">
+<pre>6502 HOMECOMPUTER BASIC V1.1
+COPYRIGHT 1978 MICROSOFT
+31423 BYTES FREE
+<span class="cursor"> </span></pre>
+    <figcaption>Ready for input</figcaption>
+  </figure>
+  <p>The third line tells you how much memory is free for your programs: 31423 characters. The small dash below it is the <strong>cursor</strong>. It shows where the next character you type will appear. The computer is now ready. Chapter 2 tells you how to continue.</p>
+
+  <h3>Switching Off</h3>
+  <p>Switch switch 3 off. Everything that was in memory is then lost, including your program. If you want to keep it, save it beforehand to the disk on the PC. Chapter 6 shows you how.</p>
+
+  <h3>Restarting</h3>
+  <p>If the computer ever hangs, press <kbd>Fn</kbd> and <kbd>Win</kbd> at the same time. This is a <strong>reset</strong>: the computer restarts as if you had switched it off and on again. The program in memory is lost in this case too. Better stop a running program first with <kbd>Pause</kbd>. That deletes nothing.</p>
+
+  <h2>When Something Does Not Work</h2>
+  <table>
+    <thead><tr><th>What happens</th><th>Possible cause</th><th>What you can do</th></tr></thead>
+    <tbody>
+      <tr><td>The display stays dark.</td><td>The battery is empty, or switch 4 is set to USB but no cable is plugged into socket 5.</td><td>Charge the battery, or change switch 4, or plug in the USB cable.</td></tr>
+      <tr><td>The display lights up but shows no text, or only boxes.</td><td>The contrast is out of adjustment.</td><td>The contrast is set internally with a control on the circuit board. Contact the builder.</td></tr>
+      <tr><td>The keys do nothing.</td><td>A program is still running.</td><td>Press <kbd>Pause</kbd>. If that does not help, restart with <kbd>Fn</kbd> + <kbd>Win</kbd>.</td></tr>
+      <tr><td>There is no sound.</td><td>The volume is too low.</td><td>Turn up the control behind opening 1. In BASIC, <code>VOL</code> sets the volume (Chapter 5).</td></tr>
+      <tr><td>The PC does not find the computer.</td><td>The cable is plugged into the charging socket.</td><td>Plug the cable into the Micro-USB socket 5 (Chapter 6).</td></tr>
+    </tbody>
+  </table>
+</section>
+</main>
+</body>
+</html>

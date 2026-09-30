@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Einleitung</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="einleitung" data-kurztitel="Einleitung">
+  <h1>Einleitung</h1>
+  <p>Dieses Handbuch zeigt, wie der HomeComputer 6502 entsteht: Schritt für Schritt, vom ersten Taktsignal bis zum fertigen Gerät. Es ist technische Dokumentation und Bauanleitung in einem. Wie man den fertigen Computer bedient, steht im Bedienungshandbuch.</p>
+  <p>Es ist kein Lehrbuch über den Prozessor 6502. Es ist eher ein Baubericht. Jedes Kapitel fügt der Schaltung ein Stück hinzu, zeigt den Schaltplan, sagt, welche Bauteile Sie brauchen, und führt Sie durch den Aufbau auf dem Steckbrett. Danach messen Sie nach, ob das neue Stück tut, was es soll. So wächst aus einem einzelnen Taktgeber ein vollständiger Computer.</p>
+
+  <h2>Warum so viel Aufwand?</h2>
+  <p>Der 6502 ist kein Mikrocontroller wie ein Atmel AVR im Arduino. Er enthält weder Arbeitsspeicher noch Festspeicher noch Ein- und Ausgabe. All das muss als eigener Baustein dazukommen, bevor aus dem Prozessor ein brauchbarer Computer wird. Genau das macht den Reiz aus: Sie sehen, wie die Teile zusammenspielen.</p>
+  <p>Das Vorbild ist der Commodore&nbsp;64, gebaut aus Bauteilen, die es auch damals gab. Zwei Dinge sind einfacher gelöst: Statt eines Videosignals gibt es eine eingebaute LCD-Anzeige, und statt dynamischem RAM arbeitet statisches RAM, das sich ohne Auffrischung betreiben lässt. Dank der Anzeige passt ein Akku ins Gerät, und der Computer wird tragbar.</p>
+  <p>Die Werkzeuge sind dagegen von heute: Oszilloskop, Logikanalysator, Platinen-Software und ein 3D-Drucker. Früher wurde von Hand verdrahtet und der Maschinencode mit Bleistift und Papier erzeugt. Heute schreiben Sie das Programm auf einem Linux-Rechner und übersetzen es dort. Der Aufwand ist trotzdem beträchtlich, aber nur ein Bruchteil dessen, was damals nötig war.</p>
+
+  <h2>Der Weg</h2>
+  <p>Die Kapitel folgen der Reihenfolge, in der der Computer gewachsen ist. Die Kapitel 1 bis 12 bauen den Computer Stufe für Stufe auf. Kapitel 13 gibt einen Ausblick.</p>
+  <table class="zusammen">
+    <thead><tr><th>Kapitel</th><th>Thema</th><th>Der Computer kann danach</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Takterzeugung</td><td>einen gleichmäßigen Takt erzeugen</td></tr>
+      <tr><td>2</td><td>Reset-Schaltung</td><td>beim Einschalten sauber starten</td></tr>
+      <tr><td>3</td><td>Der Prozessor</td><td>Befehle abarbeiten, noch ohne Programm</td></tr>
+      <tr><td>4</td><td>EEPROM und erstes Programm</td><td>ein eigenes Programm ausführen</td></tr>
+      <tr><td>5</td><td>ACIA, serielle Schnittstelle</td><td>„Hello World!“ zum PC senden</td></tr>
+      <tr><td>6</td><td>RAM</td><td>Daten im Arbeitsspeicher halten</td></tr>
+      <tr><td>7</td><td>Monitorprogramm</td><td>Speicher ansehen und ändern</td></tr>
+      <tr><td>8</td><td>VIA, Ports und Timer</td><td>eine LED blinken lassen</td></tr>
+      <tr><td>9</td><td>LCD-Anzeige</td><td>Text anzeigen</td></tr>
+      <tr><td>10</td><td>Tastatur</td><td>Eingaben lesen</td></tr>
+      <tr><td>11</td><td>Interrupts</td><td>auf Ereignisse reagieren</td></tr>
+      <tr><td>12</td><td>SID, Klang</td><td>Töne und Musik machen</td></tr>
+      <tr><td>13</td><td>Wie es weitergeht</td><td>weiter ausbauen: Platine, Gehäuse, Software, Erweiterungen</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Was Sie brauchen</h2>
+  <ul>
+    <li>Steckbretter mit je etwa 830 Kontakten. Die Zeichnungen verteilen die Schaltung ab Kapitel 3 auf mehrere Bretter, bis Kapitel 12 sind es dreizehn. Mit größeren Brettern kommen Sie mit weniger aus.</li>
+    <li>Schaltdraht oder fertige Steckbrücken,</li>
+    <li>ein stabilisiertes 5-Volt-Netzteil, zum Beispiel ein USB-Netzteil mit aufgetrenntem Kabel oder ein Labornetzteil,</li>
+    <li>ein Multimeter,</li>
+    <li>ein Oszilloskop oder einen Logikanalysator. Er ist nicht zwingend nötig, aber sehr hilfreich.</li>
+  </ul>
+  <p>Die Bauteile stehen am Anfang jedes Kapitels. Einen Lötkolben brauchen Sie erst, wenn aus dem Steckbrett-Aufbau eine Platine wird.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Achtung</div>
+    <p>Arbeiten Sie nur mit 5&nbsp;V aus einem stabilisierten Netzteil, nie am Netz. Kontrollieren Sie Polung und Verdrahtung, bevor Sie die Spannung einschalten. Stecken und ziehen Sie ICs nur bei ausgeschalteter Spannung.</p>
+  </aside>
+
+  <h2>So lesen Sie die Kapitel</h2>
+  <p>Jedes Kapitel hat dieselben Teile: Wozu der neue Schaltungsteil da ist, der Schaltplan, die Bauteile, der Aufbau und die Messung.</p>
+  <p>Die Zeichnungen zeigen das Steckbrett von oben. Es sind Zeichnungen, keine Fotos. Die Lage der Bauteile ist ein Vorschlag, entscheidend ist die Verdrahtung. Schaltplan und Steckbrett-Zeichnung eines Kapitels wurden beim Erzeugen automatisch verglichen. Beide beschreiben dieselbe Schaltung.</p>
+  <ul>
+    <li><strong>Löcher</strong> nennen wir nach Spalte und Reihe. „5b“ ist Spalte 5, Reihe b.</li>
+    <li><strong>Verbunden</strong> sind die fünf Löcher einer Spalte in der oberen Hälfte (Reihen f bis j) und die fünf in der unteren Hälfte (Reihen a bis e). Die Mittelrinne trennt beide Hälften. ICs stecken über der Rinne, dadurch hat jedes Beinchen seine eigene Spalte. Kleine ICs sitzen in den Reihen e und f. Breite ICs wie der 6502 und die 28-poligen Bausteine sind sechs Löcher breit (600 mil) und sitzen in den Reihen d und h.</li>
+    <li><strong>Stromschienen</strong> laufen oben und unten der ganzen Länge nach durch. In den Zeichnungen führt die rote Linie +5&nbsp;V und die blaue Linie GND (Masse). Ihr Steckbrett kann anders beschriftet sein. Prüfen Sie das nach.</li>
+    <li><strong>Oszilloskopbilder</strong> sind schematisch gezeichnet und gelten für jedes Oszilloskop. Die Kurven sind gerechnet, nicht gemessen. Ihre Anzeige zeigt zusätzlich Rauschen und etwas mehr Überschwingen.</li>
+    <li><strong>Drahtfarben:</strong> rot für +5&nbsp;V, schwarz für GND, gelb, grün und blau für Signale.</li>
+  </ul>
+
+  <h2>Weiterführende Quellen</h2>
+  <p>Wie ein 6502 mit Speicher und Ein-/Ausgabe zusammenarbeitet, steht in vielen Büchern und Artikeln. Zum Einstieg:</p>
+  <ul>
+    <li>Rodnay Zaks: <em>Programming the 6502</em></li>
+    <li>Garth Wilson: <em>6502 Primer</em>, wilsonminesco.com/6502primer</li>
+    <li>Chris Ward: <em>6502 computer</em>, chrisward.org.uk/6502</li>
+    <li>6502.org: Liste selbstgebauter 6502-Computer, 6502.org/homebuilt</li>
+    <li>Commodore 64 Service Manual (Schaltplan eines Computers mit dem Prozessor 6510), archive.org</li>
+    <li>Noam Nisan, Shimon Schocken: <em>The Elements of Computing Systems</em></li>
+  </ul>
+  <p>Schaltpläne, Platinen und Quelltexte dieses Projekts liegen auf github.com/grappendorf/homecomputer-6502.</p>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 5</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="5" data-titel="Die serielle Schnittstelle" data-kurztitel="Serielle Schnittstelle">
+  <p>Der Computer braucht einen Weg, mit Ihnen zu reden. In diesem Kapitel bekommt er eine serielle Schnittstelle. Zum ersten Mal erscheint „Hello World!“ auf dem Bildschirm eines PCs.</p>
+
+  <h2>Warum eine Schnittstelle?</h2>
+  <p>Früher hängte man Tasten und Leuchtdioden (oder Siebensegmentanzeigen) an den Computer, später eine Tastatur und eine LCD-Anzeige oder den Fernseher. Einen zweiten Rechner zum Entwickeln hatten Bastler damals nicht.</p>
+  <p>Heute schreibt man die Programme auf einem PC und überträgt sie in die Schaltung. Mit einer Schnittstelle zum PC können wir Befehle senden, Speicher und Register abfragen und später auch Programme in den Computer laden. So müssen wir den EEPROM nicht bei jedem Versuch neu beschreiben.</p>
+  <p>Dafür nehmen wir einen ACIA 6551 (Asynchronous Communications Interface Adapter). Er enthält eine serielle Schnittstelle und wird wie ein Speicher angesprochen. Am PC steckt ein USB-Seriell-Wandler.</p>
+
+  <h2>Die Adressdekodierung</h2>
+  <p>Bisher sieht der Prozessor den EEPROM an allen 64K Adressen. Jetzt muss er zwischen mehreren Bausteinen wählen. Das Verfahren heißt Adressdekodierung. Wir machen es so einfach wie möglich:</p>
+  <ul>
+    <li>Der EEPROM ist nur aktiv, wenn A15 High ist: von $8000 bis $FFFF. Ein Inverter macht aus A15 das Signal /CS_ROM, das bei Low aktiv ist.</li>
+    <li>Die ACIA ist aktiv, wenn A15 Low ist. Sie erscheint daher viele Male in den unteren 32&nbsp;KB.</li>
+    <li>A0 und A1 wählen eines von vier Registern der ACIA.</li>
+  </ul>
+  <table class="zusammen">
+    <thead><tr><th>Adresse</th><th>Lesen</th><th>Schreiben</th></tr></thead>
+    <tbody>
+      <tr><td>$0000</td><td>Empfangsdaten</td><td>Sendedaten</td></tr>
+      <tr><td>$0001</td><td>Statusregister</td><td>Programmierter Reset</td></tr>
+      <tr><td>$0002</td><td colspan="2">Befehlsregister (Command)</td></tr>
+      <tr><td>$0003</td><td colspan="2">Steuerregister (Control)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-acia.svg" alt="Schaltplan: Inverter für A15, Chip-Select des EEPROMs und die ACIA 6551">
+    <figcaption>Schaltplan der Adressdekodierung und der ACIA</figcaption>
+  </figure>
+  <p>Der Inverter IC1A (Pin&nbsp;1 und 2 des 74LS04) erzeugt aus A15 das Signal /CS_ROM. Es geht an /CE und /OE des EEPROMs, die bisher an GND lagen. Die ACIA hat zwei Chip-Select-Eingänge: CS0 liegt fest an +5&nbsp;V, /CS1 bekommt A15. Sie ist also ausgewählt, wenn A15 Low ist.</p>
+  <p>Die restlichen Anschlüsse: Der Takt PHI2 und die Leitung R/W kommen vom Prozessor, /RES vom Reset. Die Datenleitungen D0 bis D7 liegen am Datenbus, RS0 und RS1 an A0 und A1. Ein 1,8432-MHz-Quarz Q2 mit einem 27-pF-Kondensator C8 erzeugt den Takt für die Baudrate. Die Anschlüsse TxD und RxD führen zur Stiftleiste JP1, und zwar so: Pin&nbsp;1 GND, Pin&nbsp;2 TxD, Pin&nbsp;3 RxD.</p>
+  <p>Achten Sie auf /CTS (Pin&nbsp;9): Es muss auf GND liegen, sonst sendet die ACIA nichts. Die Eingänge /DCD und /DSR liegen ebenfalls an GND, damit die ACIA sie als „bereit“ sieht.</p>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC5</td><td>ACIA, DIP-28</td><td>6551</td></tr>
+      <tr><td>Q2</td><td>Quarz</td><td>1,8432&nbsp;MHz</td></tr>
+      <tr><td>C8</td><td>Keramikkondensator</td><td>27&nbsp;pF</td></tr>
+      <tr><td>C9</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+      <tr><td>JP1</td><td>Stiftleiste, 3-polig</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Dazu ein USB-Seriell-Wandler (zum Beispiel ein Modul mit dem Chip FT232) und ein viertes Steckbrett. Den Inverter IC1A haben Sie schon: Er ist das freie Gatter des 74LS04 auf Steckbrett 1.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Achtung</div>
+    <p>Der Wandler muss 5-V-TTL-Pegel haben. Ein Gerät mit RS-232-Pegeln (±12&nbsp;V) würde die ACIA zerstören. Ein reiner 3,3-V-Wandler passt nicht zu den 5&nbsp;V der Schaltung. Stellen Sie einen umschaltbaren Wandler auf 5&nbsp;V.</p>
+  </aside>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Verwenden Sie einen klassischen NMOS-6551 (Rockwell, MOS, Synertek). Beim neueren CMOS-Nachfolger W65C51 meldet das Statusbit „Sender leer“ bekanntermaßen nicht zuverlässig, dann funktioniert das Programm dieses Kapitels nicht.</p>
+  </aside>
+
+  <h2>Aufbau</h2>
+  <p>Zuerst der Inverter. Nach Kapitel 4 sind die Gatter A bis C des 74LS04 frei. Verwenden Sie Gatter A auf Steckbrett 1:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-inverter.svg" alt="Ausschnitt von Steckbrett 1 mit zwei Drähten an Pin 1 und Pin 2 des 74LS04">
+    <figcaption>Der Inverter für A15 (Ausschnitt von Steckbrett 1)</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Führen Sie A15 von Pin&nbsp;25 des 6502 an Pin&nbsp;1 von IC1 (Loch 5a auf Steckbrett 1).</div></li>
+    <li><div>Der Ausgang, Pin&nbsp;2 von IC1 (Loch 6a), ist das Signal /CS_ROM.</div></li>
+  </ol>
+  <p>Dann der EEPROM:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-eeprom-cs.svg" alt="Steckbrett 3 mit dem EEPROM, /CE und /OE an /CS_ROM">
+    <figcaption>Der EEPROM mit Chip-Select von /CS_ROM</figcaption>
+  </figure>
+  <ol class="schritte" start="3">
+    <li><div>Ziehen Sie die beiden Drähte ab, die /OE (Loch 11j) und /CE (Loch 13j) mit GND verbunden haben. Führen Sie stattdessen /CS_ROM von Pin&nbsp;2 des IC1 an diese beiden Löcher. /WE bleibt an +5&nbsp;V.</div></li>
+  </ol>
+  <p>Zuletzt die ACIA auf einem neuen Steckbrett:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-acia.svg" alt="Steckbrett 4 mit der ACIA 6551, Quarz, Stiftleiste und Drähten mit Signalnamen">
+    <figcaption>Die ACIA auf Steckbrett 4</figcaption>
+  </figure>
+  <ol class="schritte" start="4">
+    <li><div>Stecken Sie IC5 über die Rinne, Kerbe links, Pin&nbsp;1 in Loch 5d (breites IC, Reihen d und h).</div></li>
+    <li><div>Versorgung: Pin&nbsp;15 (Loch 18j) an +5&nbsp;V, Pin&nbsp;1 (5a) an GND und Pin&nbsp;2 (6a, CS0) an +5&nbsp;V. Setzen Sie C9 zwischen die oberen Schienen.</div></li>
+    <li><div>Legen Sie /CTS (Pin&nbsp;9, Loch 13a), /DSR (Pin&nbsp;17, Loch 16j) und /DCD (Pin&nbsp;16, Loch 17j) an GND.</div></li>
+    <li><div>Stecken Sie den Quarz Q2 zwischen Pin&nbsp;6 und Pin&nbsp;7 (Löcher 10c und 11c) und C8 von Loch 11b an GND.</div></li>
+    <li><div>Stecken Sie die Stiftleiste JP1 in die Löcher 21d bis 23d. Verbinden Sie Pin&nbsp;1 (21a) mit GND, Pin&nbsp;2 mit TxD (von Loch 14c nach 22c) und Pin&nbsp;3 mit RxD (von 16b nach 23b).</div></li>
+    <li><div>Verbinden Sie die übrigen Anschlüsse mit Drähten gleichen Namens. Die Tabelle zeigt die Pins.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (Pin)</th><th>6551 (Pin)</th></tr></thead>
+    <tbody>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>18, 19, 20, 21, 22, 23, 24, 25</td></tr>
+      <tr><td>A0, A1</td><td>9, 10</td><td>13, 14</td></tr>
+      <tr><td>R/W</td><td>34</td><td>28</td></tr>
+      <tr><td>PHI2</td><td>39</td><td>27</td></tr>
+      <tr><td>A15</td><td>25</td><td>3 (/CS1)</td></tr>
+      <tr><td>/RESET</td><td>Steckbrett 1, Loch 11j</td><td>4</td></tr>
+    </tbody>
+  </table>
+  <p>Der USB-Seriell-Wandler wird gekreuzt angeschlossen: GND an GND, TxD der ACIA an RxD des Wandlers, RxD der ACIA an TxD des Wandlers.</p>
+
+  <h2>Messen</h2>
+  <p>Bevor Sie Text senden, prüfen Sie, ob nach den Änderungen noch alles läuft. Ein kurzes Programm schreibt ein Byte in das Befehlsregister der ACIA:</p>
+  <pre class="listing">        lda #%00001011
+        sta $02                 ; ACIA_COMMAND</pre>
+  <p>Das Bild zeigt die Zugriffe. Ein Befehl <code>STA</code> mit Zeropage-Adresse braucht drei Takte: Opcode holen, Adresse holen, Wert schreiben. Nur im letzten Takt schreibt der Prozessor, dort ist R/W Low. Bei den Schreibzugriffen auf $0002 und $0003 ist A15 Low, /CS_ROM ist High (der EEPROM schweigt), und die ACIA übernimmt den Wert vom Datenbus.</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/logik-acia.svg" alt="Logikanalysator-Bild: zwei Schreibzugriffe auf die ACIA">
+    <figcaption>Zwei Schreibzugriffe auf die ACIA, schematisch</figcaption>
+  </figure>
+
+  <h2>Hello World!</h2>
+  <p>Jetzt das erste richtige Programm. Bei <code>init_acia</code> stellen wir die ACIA auf 8N1 mit 19200 Baud ein: acht Datenbits, keine Parität, ein Stoppbit. Bei <code>write</code> wird der Text Zeichen für Zeichen gesendet. Vor jedem Zeichen wartet das Programm, bis das Sendedatenregister leer ist (Bit 4 des Statusregisters). Bei <code>read</code> wartet es auf ein empfangenes Zeichen (Bit 3) und beginnt dann von vorn.</p>
+  <pre class="listing breit">        .setcpu "6502"
+
+ACIA_DATA    = $0000
+ACIA_STATUS  = $0001
+ACIA_COMMAND = $0002
+ACIA_CONTROL = $0003
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:
+init_acia:
+        lda #%00001011          <span class="kommentar">; keine Parität, kein Echo, keine Interrupts</span>
+        sta ACIA_COMMAND
+        lda #%00011111          <span class="kommentar">; 1 Stoppbit, 8 Datenbits, 19200 Baud</span>
+        sta ACIA_CONTROL
+
+write:  ldx #0
+next_char:
+wait_txd_empty:
+        lda ACIA_STATUS
+        and #$10                <span class="kommentar">; Sender bereit?</span>
+        beq wait_txd_empty
+        lda text,x
+        beq read                <span class="kommentar">; Ende des Textes</span>
+        sta ACIA_DATA
+        inx
+        jmp next_char
+
+read:
+wait_rxd_full:
+        lda ACIA_STATUS
+        and #$08                <span class="kommentar">; Zeichen empfangen?</span>
+        beq wait_rxd_full
+        lda ACIA_DATA
+        jmp write
+
+text:   .byte "Hello World!", $0d, $0a, $00</pre>
+  <p>Die beiden Registerwerte im Einzelnen:</p>
+  <table class="zusammen">
+    <thead><tr><th>Register</th><th>Wert</th><th>Bedeutung</th></tr></thead>
+    <tbody>
+      <tr><td>Command</td><td><code>%00001011</code></td><td>keine Parität, kein Echo, Interrupts aus, Sender und Empfänger ein</td></tr>
+      <tr><td>Control</td><td><code>%00011111</code></td><td>1 Stoppbit, 8 Datenbits, interner Baudratengenerator, 19200 Baud</td></tr>
+    </tbody>
+  </table>
+  <p>Übersetzen Sie wie in Kapitel 4 (<code>erste.cfg</code> kann bleiben) und schreiben Sie den EEPROM neu. Schließen Sie den Wandler an, starten Sie auf dem PC ein Terminalprogramm und schalten Sie den Computer ein:</p>
+  <pre class="listing">$ picocom -b 19200 /dev/ttyUSB0
+Terminal ready
+Hello World!</pre>
+  <p>Drücken Sie eine Taste, und die Meldung erscheint noch einmal.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Kommt nichts an? Prüfen Sie nacheinander: Läuft der Takt an Pin&nbsp;27 der ACIA (PHI2)? Liegt /CTS (Pin&nbsp;9) auf GND? Sind TxD und RxD am Wandler gekreuzt und ist die Baudrate am PC 19200? Schwingt der Quarz an Pin&nbsp;6 und 7?</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

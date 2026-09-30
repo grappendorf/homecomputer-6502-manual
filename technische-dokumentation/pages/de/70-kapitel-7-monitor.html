@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 7</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="7" data-titel="Das Monitorprogramm" data-kurztitel="Monitorprogramm">
+  <p>Ab jetzt wird der Computer zum Werkzeug für sich selbst. Ein kleines Programm im ROM nimmt Befehle vom PC entgegen und lässt Sie Speicher ansehen, ändern und Programme starten. Dieses Kapitel braucht keine neue Hardware.</p>
+
+  <h2>Was ein Monitor tut</h2>
+  <p>Ein Monitor ist ein Überwachungsprogramm: Es sitzt im ROM, wartet auf Befehle und führt sie aus. Unser erster Monitor kennt nur drei. Von hier aus kann man ihn zu einem vollen Werkzeug ausbauen, mit Assembler, Disassembler, Registeranzeige, Haltepunkten, Einzelschritt und dem Laden und Speichern von Programmen.</p>
+  <table class="zusammen">
+    <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>m &lt;Adresse&gt;</code></td><td>16 Bytes ab der Adresse als Hexzahlen und als Zeichen anzeigen</td></tr>
+      <tr><td><code>w &lt;Adresse&gt; &lt;Byte&gt;</code></td><td>das Byte an die Adresse schreiben</td></tr>
+      <tr><td><code>j &lt;Adresse&gt;</code></td><td>zur Adresse springen. Ein <code>RTS</code> kehrt in den Monitor zurück.</td></tr>
+    </tbody>
+  </table>
+  <p>Adressen und Bytes geben Sie in Hexadezimal ein, mit großen oder kleinen Buchstaben und ohne Dollarzeichen.</p>
+
+  <h2>Eine Sitzung</h2>
+  <p>Nach dem Einschalten meldet sich der Monitor im Terminal. Beim Einschalten enthält das RAM zufällige Werte, bei Ihnen sieht es also anders aus:</p>
+  <figure class="terminal">
+<pre>Welcome to the 6502 monitor program!
+> <span class="eingabe">m 4000</span>
+4000  FF C0 F7 82 FF 10 FF 02  00 BF 21 BF 00 AF 00 FF   |..........!.....|
+> <span class="eingabe">w 4000 a5</span>
+4000:A5
+> <span class="eingabe">m 4000</span>
+4000  A5 C0 F7 82 FF 10 FF 02  00 BF 21 BF 00 AF 00 FF   |..........!.....|
+> <span class="eingabe">x</span>
+Unknown command
+> </pre>
+    <figcaption>Anzeige und Ändern von Speicher</figcaption>
+  </figure>
+  <p>Die Anzeige hat vorn die Adresse, dann 16 Bytes in zwei Gruppen zu acht und rechts die Zeichen zwischen senkrechten Strichen. Nicht druckbare Bytes erscheinen als Punkt. Auf <code>w</code> antwortet der Monitor mit dem Wert, den er danach aus dem Speicher zurückliest. Wäre die Adresse nicht beschreibbar, etwa im ROM, sähen Sie dort noch den alten Wert.</p>
+  <p>Mit <code>w</code> und <code>j</code> lässt sich ein Programm Byte für Byte eintippen und starten. Dieses hier gibt einen Stern aus:</p>
+  <ul>
+    <li><code>A9 2A</code> ist <code>LDA #'*'</code>,</li>
+    <li><code>8D 00 7F</code> ist <code>STA $7F00</code> und schickt das Zeichen an die ACIA,</li>
+    <li><code>60</code> ist <code>RTS</code> und kehrt in den Monitor zurück.</li>
+  </ul>
+  <figure class="terminal">
+<pre>> <span class="eingabe">w 0300 a9</span>
+0300:A9
+> <span class="eingabe">w 0301 2a</span>
+0301:2A
+> <span class="eingabe">w 0302 8d</span>
+0302:8D
+> <span class="eingabe">w 0303 00</span>
+0303:00
+> <span class="eingabe">w 0304 7f</span>
+0304:7F
+> <span class="eingabe">w 0305 60</span>
+0305:60
+> <span class="eingabe">j 0300</span>
+*> </pre>
+    <figcaption>Ein Programm im RAM eintippen und starten</figcaption>
+  </figure>
+
+  <h2>Aufbau des Programms</h2>
+  <p>Das Programm ist in kleine Unterprogramme zerlegt. Eine Optimierung auf Platz oder Geschwindigkeit sucht man darin vergebens. Es kam darauf an, dass der Code lesbar und leicht zu ändern bleibt.</p>
+  <ul>
+    <li><strong>Hauptschleife:</strong> Sie gibt den Prompt <code>&gt;</code> aus, liest eine Zeile ein und verzweigt nach dem ersten Buchstaben zu einem der drei Befehle.</li>
+    <li><strong>Befehle:</strong> <code>cmd_memory</code>, <code>cmd_write</code> und <code>cmd_jump</code>. Unbekannte Befehle und fehlende Zahlen führen zur Meldung „Unknown command“.</li>
+    <li><strong>Eingabe lesen:</strong> <code>gets</code> liest Zeichen bis zum Zeilenende (Return), erlaubt die Rücktaste und überhört Steuerzeichen. <code>parse_hex</code> wandelt eine Hexzahl der Zeile in einen 16-Bit-Wert.</li>
+    <li><strong>Ausgabe:</strong> <code>puts</code> gibt einen Text aus, <code>puthex</code> ein Byte als zwei Hexziffern.</li>
+    <li><strong>ACIA:</strong> <code>putc</code> und <code>getc</code> senden und empfangen je ein Zeichen und warten dabei auf das Statusbit.</li>
+  </ul>
+  <p>Der Sprung mit <code>j</code> braucht einen kleinen Trick: Der 6502 kennt kein <code>JSR</code> über einen Zeiger. Darum ruft <code>cmd_jump</code> per <code>JSR</code> die Marke <code>call</code> auf, und dort steht <code>JMP (val)</code>. Das <code>RTS</code> des angesprungenen Programms kehrt dann hinter das <code>JSR</code> zurück.</p>
+  <p>Die Variablen liegen im RAM. Die Zeropage nimmt die Zeiger auf, die Eingabezeile steht ab $0200, und der Stapel wächst wie immer von $01FF abwärts.</p>
+
+  <h2>Das Programm</h2>
+  <p>Zuerst die Konfiguration. Neu ist der Abschnitt <code>BSS</code> für Variablen ohne Anfangswert. Er liegt im RAM und kommt nicht in die ROM-Datei:</p>
+  <pre class="listing">MEMORY
+{
+  ZP:  start=$0000, size=$0100, type=rw, define=yes, file="";
+  RAM: start=$0200, size=$7d00, type=rw, define=yes, file="";
+  ROM: start=$8000, size=$8000, type=ro, define=yes, fill=yes, file=%O;
+}
+SEGMENTS
+{
+  ZEROPAGE: load=ZP,  type=zp,  define=yes;
+  BSS:      load=RAM, type=bss, define=yes;
+  CODE:     load=ROM, type=ro;
+  VECTORS:  load=ROM, type=ro, offset=$7ffa;
+}</pre>
+  <p>Dann die Hauptschleife:</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+ACIA_DATA    = $7f00
+ACIA_STATUS  = $7f01
+ACIA_COMMAND = $7f02
+ACIA_CONTROL = $7f03
+
+BUFLEN = 80
+
+        .zeropage
+ptr:    .res 2                  <span class="kommentar">; Zeiger für Texte und Speicherzugriffe</span>
+val:    .res 2                  <span class="kommentar">; Wert aus parse_hex</span>
+tmp:    .res 1                  <span class="kommentar">; Hilfsvariable</span>
+
+        .bss
+buffer: .res BUFLEN + 1         <span class="kommentar">; Eingabezeile</span>
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff                <span class="kommentar">; Stapel initialisieren</span>
+        txs
+        jsr acia_init
+        lda #&lt<span class="kommentar">;msg_welcome</span>
+        ldx #&gt<span class="kommentar">;msg_welcome</span>
+        jsr puts
+
+loop:   lda #&lt<span class="kommentar">;prompt</span>
+        ldx #&gt<span class="kommentar">;prompt</span>
+        jsr puts
+        jsr gets                <span class="kommentar">; Zeile einlesen</span>
+        lda buffer
+        beq loop                <span class="kommentar">; leere Zeile: nichts tun</span>
+        cmp #'m'
+        bne @check_w
+        jsr cmd_memory
+        jmp loop
+@check_w:
+        cmp #'w'
+        bne @check_j
+        jsr cmd_write
+        jmp loop
+@check_j:
+        cmp #'j'
+        bne @unknown
+        jsr cmd_jump
+        jmp loop
+@unknown:
+        jsr error
+        jmp loop</pre>
+  <p>Die drei Befehle:</p>
+  <pre class="listing breit lang"><span class="kommentar">; Fehlermeldung ausgeben</span>
+error:  lda #&lt<span class="kommentar">;msg_unknown</span>
+        ldx #&gt<span class="kommentar">;msg_unknown</span>
+        jmp puts
+
+<span class="kommentar">; m &lt;Adresse&gt;: 16 Bytes anzeigen</span>
+cmd_memory:
+        ldy #1
+        jsr parse_hex
+        bcs @error
+        lda val
+        sta ptr
+        lda val+1
+        sta ptr+1
+        lda ptr+1               <span class="kommentar">; Adresse ausgeben</span>
+        jsr puthex
+        lda ptr
+        jsr puthex
+        jsr space
+        jsr space
+        ldy #0
+@hex:   lda (ptr),y
+        jsr puthex
+        jsr space
+        cpy #7
+        bne @next
+        jsr space               <span class="kommentar">; Lücke zwischen den beiden Hälften</span>
+@next:  iny
+        cpy #16
+        bne @hex
+        jsr space
+        jsr space
+        lda #'|'
+        jsr putc
+        ldy #0
+@ascii: lda (ptr),y
+        cmp #' '
+        bcc @dot                <span class="kommentar">; nur druckbare Zeichen, sonst Punkt</span>
+        cmp #$7f
+        bcc @put
+@dot:   lda #'.'
+@put:   jsr putc
+        iny
+        cpy #16
+        bne @ascii
+        lda #'|'
+        jsr putc
+        jmp newline
+@error: jmp error
+
+<span class="kommentar">; w &lt;Adresse&gt; &lt;Byte&gt;: Byte schreiben</span>
+cmd_write:
+        ldy #1
+        jsr parse_hex
+        bcs @error
+        lda val
+        sta ptr
+        lda val+1
+        sta ptr+1
+        jsr parse_hex           <span class="kommentar">; zweiter Wert: das Byte</span>
+        bcs @error
+        lda val
+        ldy #0
+        sta (ptr),y             <span class="kommentar">; Byte speichern</span>
+        lda ptr+1
+        jsr puthex
+        lda ptr
+        jsr puthex
+        lda #':'
+        jsr putc
+        lda (ptr),y             <span class="kommentar">; zur Kontrolle zurücklesen</span>
+        jsr puthex
+        jmp newline
+@error: jmp error
+
+<span class="kommentar">; j &lt;Adresse&gt;: Programm aufrufen, RTS kehrt zurück</span>
+cmd_jump:
+        ldy #1
+        jsr parse_hex
+        bcs @error
+        jsr call
+        rts
+@error: jmp error
+call:   jmp (val)               <span class="kommentar">; JSR hierher, JMP zum Ziel: RTS des Ziels kehrt zu cmd_jump zurück</span></pre>
+  <p>Die Eingabe: Hexzahlen lesen und ausgeben.</p>
+  <pre class="listing breit lang"><span class="kommentar">; Liest eine Hexzahl ab Position Y der Eingabe nach val. Carry gesetzt: keine Zahl.</span>
+parse_hex:
+        lda #0
+        sta val
+        sta val+1
+@skip:  lda buffer,y
+        cmp #' '
+        bne @first
+        iny
+        bne @skip
+@first: jsr hexdigit
+        bcs @none
+@digit: sta tmp
+        asl val                 <span class="kommentar">; val = val * 16</span>
+        rol val+1
+        asl val
+        rol val+1
+        asl val
+        rol val+1
+        asl val
+        rol val+1
+        lda val
+        ora tmp
+        sta val
+        iny
+        lda buffer,y
+        jsr hexdigit
+        bcc @digit
+        clc
+        rts
+@none:  sec
+        rts
+
+<span class="kommentar">; A = Zeichen -&gt; A = Wert 0..15, Carry gesetzt: keine Hexziffer</span>
+hexdigit:
+        cmp #'0'
+        bcc @no
+        cmp #'9' + 1
+        bcc @decimal
+        ora #$20                <span class="kommentar">; in Kleinbuchstaben wandeln</span>
+        cmp #'a'
+        bcc @no
+        cmp #'f' + 1
+        bcs @no
+        sec
+        sbc #'a' - 10
+        clc
+        rts
+@decimal:
+        sec
+        sbc #'0'
+        clc
+        rts
+@no:    sec
+        rts
+
+<span class="kommentar">; A als zwei Hexziffern ausgeben</span>
+puthex: pha
+        lsr
+        lsr
+        lsr
+        lsr
+        jsr @nibble
+        pla
+        and #$0f
+@nibble:
+        cmp #10
+        bcc @digit
+        adc #'A' - 10 - 1       <span class="kommentar">; Carry ist gesetzt: +1</span>
+        jmp putc
+@digit: ora #'0'
+        jmp putc
+
+space:  lda #' '
+        jmp putc
+
+newline:
+        lda #$0d
+        jsr putc
+        lda #$0a
+        jmp putc</pre>
+  <p>Zeile lesen und Text ausgeben. Zum Schluss die Zeichen-Ein- und -Ausgabe über die ACIA und die Texte:</p>
+  <pre class="listing breit lang"><span class="kommentar">; Text ausgeben, Adresse in A (niedrig) und X (hoch)</span>
+puts:   sta ptr
+        stx ptr+1
+        ldy #0
+@loop:  lda (ptr),y
+        beq @done
+        jsr putc
+        iny
+        bne @loop
+@done:  rts
+
+<span class="kommentar">; Zeile in buffer lesen, Rücktaste erlaubt</span>
+gets:   ldx #0
+@loop:  jsr getc
+        cmp #$0d
+        beq @done
+        cmp #$08
+        beq @back
+        cmp #$7f
+        beq @back
+        cmp #' '
+        bcc @loop               <span class="kommentar">; Steuerzeichen ignorieren</span>
+        cpx #BUFLEN
+        bcs @loop
+        sta buffer,x
+        inx
+        jsr putc                <span class="kommentar">; Zeichen zurücksenden</span>
+        jmp @loop
+@back:  cpx #0
+        beq @loop
+        dex
+        lda #$08
+        jsr putc
+        lda #' '
+        jsr putc
+        lda #$08
+        jsr putc
+        jmp @loop
+@done:  lda #0
+        sta buffer,x
+        jmp newline</pre>
+  <pre class="listing breit lang"><span class="kommentar">; ACIA: Ausgabe und Eingabe eines Zeichens</span>
+acia_init:
+        lda #%00001011
+        sta ACIA_COMMAND
+        lda #%00011111
+        sta ACIA_CONTROL
+        rts
+
+putc:   pha
+@wait:  lda ACIA_STATUS
+        and #$10
+        beq @wait
+        pla
+        sta ACIA_DATA
+        rts
+
+getc:   lda ACIA_STATUS
+        and #$08
+        beq getc
+        lda ACIA_DATA
+        rts
+
+prompt:      .byte "&gt<span class="kommentar">; ", $00</span>
+msg_welcome: .byte $0d, $0a, "Welcome to the 6502 monitor program!", $0d, $0a, $00
+msg_unknown: .byte "Unknown command", $0d, $0a, $00</pre>
+
+  <h2>Übersetzen und starten</h2>
+  <pre class="listing">$ ca65 -o monitor.o monitor.s
+$ ld65 -C monitor.cfg -o monitor.bin monitor.o
+$ minipro -p AT28C256 -w monitor.bin</pre>
+  <p>Schließen Sie den Wandler an, starten Sie das Terminalprogramm mit <code>picocom -b 19200 /dev/ttyUSB0</code> und schalten Sie den Computer ein. Der Monitor meldet sich mit dem Prompt.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Das Programm sendet am Zeilenende Return und Zeilenvorschub. Von Ihrem Terminal erwartet es nur Return. Kommt zusätzlich ein Zeilenvorschub, wird er überhört. Springen Sie mit <code>j</code> nur auf Adressen, an denen wirklich ein Programm liegt. Sonst stürzt der Computer ab, und Sie müssen ihn zurücksetzen.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

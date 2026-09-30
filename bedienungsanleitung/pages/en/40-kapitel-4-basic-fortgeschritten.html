@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 4 – Advanced BASIC</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="4" data-titel="Advanced BASIC" data-kurztitel="Advanced BASIC">
+  <p>With variables, loops, <code>IF</code> and <code>INPUT</code>, you can already do a lot. This chapter adds the tools that keep larger programs manageable: arrays for many values, subroutines, data stored inside the program, your own functions, and randomness. After that, you will learn how to control the display precisely, read the keyboard directly, and switch the LED. At the end there is a game that brings it all together.</p>
+
+  <h2>Arrays with DIM</h2>
+  <p>Suppose you want to store five scores. You could use five variables: <code>P1</code>, <code>P2</code> and so on. An <strong>array</strong> is easier. It is a single variable with several slots, addressed by a number called the <strong>index</strong>:</p>
+<pre class="listing">10 DIM P(4)
+20 S=0
+30 FOR I=0 TO 4
+40 INPUT "POINTS";P(I)
+50 S=S+P(I)
+60 NEXT I
+70 PRINT "AVERAGE:";S/5
+80 FOR I=0 TO 4
+90 IF P(I)&gt;S/5 THEN PRINT "VALUE";I+1;"IS ABOVE"
+100 NEXT I</pre>
+  <figure class="lcd">
+<pre>POINTS? 2
+AVERAGE: 2.4
+VALUE 2 IS ABOVE
+VALUE 4 IS ABOVE</pre>
+    <figcaption>Five values in one array</figcaption>
+  </figure>
+  <p><code>DIM P(4)</code> creates an array with the slots <code>P(0)</code> through <code>P(4)</code> – five in total. The index may be a variable or an expression. That is exactly what makes arrays so useful: a loop can work through all the slots one after another.</p>
+  <ul>
+    <li>An array used without <code>DIM</code> has slots 0 through 10.</li>
+    <li>An index outside the array causes <code>?BAD SUBSCRIPT ERROR</code>.</li>
+    <li>Each array may be created with <code>DIM</code> only once. A second time gives <code>?REDIM'D ARRAY ERROR</code>. <code>RUN</code> and <code>CLEAR</code> delete all arrays.</li>
+    <li>Arrays exist for all three kinds of variables: <code>DIM N$(20)</code> for text, <code>DIM Z%(100)</code> for integers.</li>
+    <li>An array can also have two indices, like a table with rows and columns: <code>DIM F(2,3)</code>, then <code>F(2,3)=7</code>.</li>
+  </ul>
+
+  <h2>Subroutines</h2>
+  <p>Often a program needs the same statements in several places. Instead of writing them out repeatedly, you put them in a <strong>subroutine</strong>. <code>GOSUB</code> jumps into it, <code>RETURN</code> jumps back to just after the <code>GOSUB</code>:</p>
+<pre class="listing">10 PRINT "START"
+20 GOSUB 100
+30 PRINT "MIDDLE"
+40 GOSUB 100
+50 END
+100 PRINT "--------"
+110 RETURN</pre>
+  <figure class="lcd">
+<pre>START
+--------
+MIDDLE
+--------</pre>
+    <figcaption>The same subroutine, twice</figcaption>
+  </figure>
+  <p>The <code>END</code> in line 50 is important. Without that line, the program would run straight into the subroutine after the second call. At the <code>RETURN</code> it would not know where to go back to, and would report <code>?RETURN WITHOUT GOSUB ERROR</code>. That is why subroutines go at the end, with an <code>END</code> in front of them.</p>
+  <p>A subroutine may itself use <code>GOSUB</code>. Each <code>RETURN</code> goes back to the most recent <code>GOSUB</code>.</p>
+
+  <h3>Dispatching with ON</h3>
+  <p><code>ON</code> uses a number to choose one of several jump targets:</p>
+<pre class="listing">ON W GOSUB 100,200,300</pre>
+  <p>If W equals 1, it goes to line 100. At 2 to line 200, at 3 to line 300. If W is 0 or greater than the number of targets, nothing happens and the program continues with the next statement. Fractional numbers are rounded down. <code>ON W GOTO …</code> works the same way, just without coming back.</p>
+
+  <h2>DATA and READ</h2>
+  <p>Some values are already known when you write the program: a word list, the names of the days of the week, the notes of a melody. You write such values after <code>DATA</code>. <code>READ</code> reads them, in order, into variables:</p>
+<pre class="listing">10 DIM T$(6)
+20 FOR I=0 TO 6:READ T$(I):NEXT I
+30 INPUT "DAY (1-7)";N
+40 IF N&lt;1 OR N&gt;7 THEN 30
+50 PRINT "THAT IS ";T$(N-1)
+60 DATA MONDAY,TUESDAY,WEDNESDAY,THURSDAY
+70 DATA FRIDAY,SATURDAY,SUNDAY</pre>
+  <figure class="lcd">
+<pre>DAY (1-7)? 9
+DAY (1-7)? 3
+THAT IS WEDNESDAY
+<span class="cursor"> </span></pre>
+    <figcaption>Line 40 keeps asking until the input is valid</figcaption>
+  </figure>
+  <p>It does not matter where the <code>DATA</code> lines are. The computer reads them in line-number order, across all <code>DATA</code> lines. A few rules:</p>
+  <ul>
+    <li>Values are separated by commas. If a text contains a comma itself, put it in quotation marks: <code>DATA "CHERRY, SWEET",3</code>.</li>
+    <li>Text after <code>DATA</code> stays exactly as you type it, lowercase or uppercase. If the program will later compare it against uppercase letters, type it with <kbd>Shift</kbd>.</li>
+    <li><code>RESTORE</code> moves the read pointer back to the start. The next <code>READ</code> reads the first value again.</li>
+    <li>When all values have been read, another <code>READ</code> causes <code>?OUT OF DATA ERROR</code>.</li>
+  </ul>
+  <p>If you do not know in advance how many values there are, put an end marker at the end of the list – <code>*</code>, for example – and read until it arrives. The game at the end of this chapter does it that way.</p>
+
+  <h2>Functions</h2>
+  <p>A function takes a value in parentheses and returns a result. You can use it anywhere a number is allowed: <code>PRINT SQR(16)</code>, <code>A=INT(X)</code>. The most important arithmetic functions:</p>
+  <table>
+    <thead><tr><th>Function</th><th>Result</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>INT(x)</code></td><td>largest whole number not greater than x</td><td><code>INT(3.7)</code> = 3, <code>INT(-3.7)</code> = −4</td></tr>
+      <tr><td><code>ABS(x)</code></td><td>absolute value, without sign</td><td><code>ABS(-4)</code> = 4</td></tr>
+      <tr><td><code>SGN(x)</code></td><td>sign: −1, 0 or 1</td><td><code>SGN(-2)</code> = −1</td></tr>
+      <tr><td><code>SQR(x)</code></td><td>square root</td><td><code>SQR(16)</code> = 4</td></tr>
+      <tr><td><code>SIN</code>, <code>COS</code>, <code>TAN</code>, <code>ATN</code></td><td>trigonometric functions, angles in radians</td><td><code>ATN(1)*4</code> = 3.14159266</td></tr>
+      <tr><td><code>EXP(x)</code>, <code>LOG(x)</code></td><td>e to the power of x, natural logarithm</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>You write powers with <code>^</code>: <code>2^10</code> is 1024. There is no separate function for the remainder of a division. You get it with <code>A-INT(A/B)*B</code>. For 17 divided by 5 that is 2.</p>
+
+  <h3>Your own functions with DEF FN</h3>
+  <p>A calculation you need often can be defined as your own function. The name begins with <code>FN</code>, followed by a variable name:</p>
+<pre class="listing">10 DEF FNQ(A)=A*A
+20 PRINT FNQ(7)</pre>
+  <p>This prints 49. The <code>A</code> in the parentheses is just a placeholder. When the function is called, the value you pass takes its place. A function takes exactly one such value. <code>DEF FN</code> works only in a program; typed in directly, the computer reports <code>?ILLEGAL DIRECT ERROR</code>.</p>
+
+  <h2>Random numbers</h2>
+  <p><code>RND(1)</code> returns a random number that is at least 0 and less than 1. For a die, though, you need the whole numbers from 1 to 6. The formula for that is:</p>
+<pre class="listing">INT(RND(1)*6)+1</pre>
+  <p><code>RND(1)*6</code> gives a number from 0 up to just under 6. <code>INT</code> cuts off the fractional part, leaving 0 through 5. Adding one gives 1 through 6. In general, <code>INT(RND(1)*N)+1</code> gives a number from 1 to N. As your own function:</p>
+<pre class="listing">10 DEF FNW(X)=INT(RND(1)*X)+1
+20 FOR I=1 TO 10:PRINT FNW(6);:NEXT I</pre>
+
+  <h3>The seed value</h3>
+  <p>The numbers from <code>RND</code> are not truly random. They are calculated from a <strong>seed value</strong>. After power-on it is always the same, which is why the same numbers always come up. You set a new seed with a negative number in the parentheses: <code>X=RND(-42)</code>. The same seed produces the same sequence. That is handy for testing.</p>
+  <p>For real randomness you need a seed that nobody can predict. A tried-and-true trick: the program counts until you press a key. How long that takes is different every time:</p>
+<pre class="listing">10 PRINT "PRESS ANY KEY."
+20 S=0
+30 S=S+1:IF KEY(0)=0 THEN 30
+40 X=RND(-S)</pre>
+  <p>How <code>KEY</code> works is described later in this chapter. <code>RND(0)</code>, by the way, returns the last random number once again.</p>
+
+  <h2>Strings</h2>
+  <p>You can work with text, too. These functions take strings apart, examine them, and convert them:</p>
+  <table>
+    <thead><tr><th>Function</th><th>Result</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>LEN(a$)</code></td><td>number of characters</td><td><code>LEN("HELLO")</code> = 5</td></tr>
+      <tr><td><code>LEFT$(a$,n)</code></td><td>the first n characters</td><td><code>LEFT$("HELLO",2)</code> = <code>HE</code></td></tr>
+      <tr><td><code>RIGHT$(a$,n)</code></td><td>the last n characters</td><td><code>RIGHT$("HELLO",3)</code> = <code>LLO</code></td></tr>
+      <tr><td><code>MID$(a$,p,n)</code></td><td>n characters starting at position p</td><td><code>MID$("HELLO",2,3)</code> = <code>ELL</code></td></tr>
+      <tr><td><code>MID$(a$,p)</code></td><td>everything from position p on</td><td><code>MID$("HELLO",4)</code> = <code>LO</code></td></tr>
+      <tr><td><code>ASC(a$)</code></td><td>character code of the first character</td><td><code>ASC("A")</code> = 65</td></tr>
+      <tr><td><code>CHR$(n)</code></td><td>the character with code n</td><td><code>CHR$(66)</code> = <code>B</code></td></tr>
+      <tr><td><code>STR$(x)</code></td><td>number as text</td><td><code>STR$(42)</code> = <code>" 42"</code></td></tr>
+      <tr><td><code>VAL(a$)</code></td><td>text as number</td><td><code>VAL("12.5")</code> = 12.5</td></tr>
+    </tbody>
+  </table>
+  <p>Positions in a text count from 1. <code>STR$</code> puts a space in front of positive numbers, just like <code>PRINT</code>. <code>VAL</code> reads the number at the beginning of the text. If there is none, the result is 0. Every letter has a character code: <code>A</code> through <code>Z</code> are 65 through 90, <code>a</code> through <code>z</code> are 97 through 122. You can find the character set in Appendix D.</p>
+  <p>This program writes a word backwards. The loop runs from the end to the beginning and picks out one character at a time with <code>MID$</code>:</p>
+<pre class="listing">10 INPUT "WORD";W$
+20 FOR I=LEN(W$) TO 1 STEP -1
+30 PRINT MID$(W$,I,1);
+40 NEXT I
+50 PRINT</pre>
+  <figure class="lcd">
+<pre>run
+WORD? Computer
+retupmoC
+<span class="cursor"> </span></pre>
+    <figcaption>A word backwards</figcaption>
+  </figure>
+
+  <h2>Controlling the display</h2>
+  <p>So far, <code>PRINT</code> has simply written line after line and the display has scrolled upward. For games and tidy output, however, you want to decide for yourself where things appear. These commands do that:</p>
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLS</code></td><td>clear the display, cursor to top left</td></tr>
+      <tr><td><code>LOCATE z,s</code></td><td>put the cursor at row z (0 to 3) and column s (0 to 39)</td></tr>
+      <tr><td><code>CURSOR OFF</code> / <code>CURSOR ON</code></td><td>turn the underline cursor off and on</td></tr>
+      <tr><td><code>CURSOR BLINK ON</code> / <code>OFF</code></td><td>make the character under the cursor blink</td></tr>
+      <tr><td><code>DISPLAY OFF</code> / <code>DISPLAY ON</code></td><td>darken the display and bring it back. The text is preserved.</td></tr>
+      <tr><td><code>SLEEP s</code></td><td>wait s seconds, fractions included: <code>SLEEP 0.1</code></td></tr>
+    </tbody>
+  </table>
+  <figure class="abbildung">
+    <table>
+      <thead><tr><th></th><th>Column 0</th><th>…</th><th>Column 39</th></tr></thead>
+      <tbody>
+        <tr><td>Row 0</td><td><code>LOCATE 0,0</code></td><td></td><td><code>LOCATE 0,39</code></td></tr>
+        <tr><td>Row 1</td><td><code>LOCATE 1,0</code></td><td></td><td></td></tr>
+        <tr><td>Row 2</td><td><code>LOCATE 2,0</code></td><td></td><td></td></tr>
+        <tr><td>Row 3</td><td><code>LOCATE 3,0</code></td><td></td><td><code>LOCATE 3,39</code></td></tr>
+      </tbody>
+    </table>
+    <figcaption>Rows and columns count from 0</figcaption>
+  </figure>
+  <p>This program counts the seconds, always in the same place:</p>
+<pre class="listing">10 CLS:CURSOR OFF
+20 T=0
+30 LOCATE 1,14:PRINT "SECONDS:";T;
+40 SLEEP 1:T=T+1:GOTO 30</pre>
+  <figure class="lcd">
+<pre>
+              SECONDS: 4
+</pre>
+    <figcaption>The number stays in its place</figcaption>
+  </figure>
+  <p>Note the semicolon at the end of line 30. Without it, <code>PRINT</code> moves the cursor to the next line. In the bottom line, the whole display then scrolls up. When you work with <code>LOCATE</code>, always end <code>PRINT</code> with <code>;</code>.</p>
+  <p>If you stop the program with <kbd>Pause</kbd>, the cursor stays off. Type <code>CURSOR ON</code> and it is back.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Tip</div>
+    <p>Inside <code>PRINT</code> there are also <code>TAB(n)</code> and <code>SPC(n)</code>. <code>TAB(10)</code> advances to column 10, <code>SPC(3)</code> prints three spaces. <code>POS(0)</code> tells you which column the cursor is currently in.</p>
+  </aside>
+
+  <h2>Reading the keyboard</h2>
+  <p><code>INPUT</code> waits until you press <kbd>Return</kbd>. For a game that is too slow. The function <code>KEY(0)</code> instead checks which key is pressed <strong>at this very moment</strong>, without waiting. If none is pressed, it returns 0; otherwise the character code of the key. The number in the parentheses does not matter.</p>
+  <p>This program shows the codes of the keys you press:</p>
+<pre class="listing">10 CLS:CURSOR OFF
+15 IF KEY(0)&lt;&gt;0 THEN 15
+20 K=KEY(0):IF K=0 THEN 20
+30 PRINT K;
+40 IF KEY(0)&lt;&gt;0 THEN 40
+50 GOTO 20</pre>
+  <p>Line 20 waits until a key is pressed. Line 40 waits until it is released again. Without line 40, the program would keep printing the code for as long as you hold the key. Line 15 waits at the start until you have released <kbd>Return</kbd> after <code>RUN</code>. Otherwise the first number would always be 13.</p>
+  <table>
+    <thead><tr><th>Key</th><th>Code</th><th>Key</th><th>Code</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>A</kbd> to <kbd>Z</kbd></td><td>97 to 122</td><td><kbd>←</kbd></td><td>17</td></tr>
+      <tr><td><kbd>Shift</kbd> + <kbd>A</kbd> to <kbd>Z</kbd></td><td>65 to 90</td><td><kbd>→</kbd></td><td>18</td></tr>
+      <tr><td><kbd>0</kbd> to <kbd>9</kbd></td><td>48 to 57</td><td><kbd>↑</kbd></td><td>19</td></tr>
+      <tr><td><kbd>Return</kbd></td><td>13</td><td><kbd>↓</kbd></td><td>20</td></tr>
+      <tr><td><kbd>Space</kbd></td><td>32</td><td><kbd>Home</kbd></td><td>21</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>27</td><td><kbd>End</kbd></td><td>22</td></tr>
+      <tr><td><kbd>Backspace</kbd></td><td>8</td><td><kbd>Del</kbd></td><td>23</td></tr>
+      <tr><td></td><td></td><td><kbd>Ins</kbd></td><td>24</td></tr>
+    </tbody>
+  </table>
+  <p>Because <code>KEY</code> reports for as long as a key is held down, it works well for movement. Here an asterisk wanders across the display with the arrow keys. Hold the key down and it keeps moving. <kbd>Esc</kbd> ends the program:</p>
+<pre class="listing">10 CLS:CURSOR OFF:X=20:Y=1
+20 LOCATE Y,X:PRINT "*";
+30 K=KEY(0):IF K=0 THEN 30
+40 LOCATE Y,X:PRINT " ";
+50 IF K=17 AND X&gt;0 THEN X=X-1
+60 IF K=18 AND X&lt;39 THEN X=X+1
+70 IF K=19 AND Y&gt;0 THEN Y=Y-1
+80 IF K=20 AND Y&lt;3 THEN Y=Y+1
+90 IF K=27 THEN CLS:CURSOR ON:END
+100 SLEEP 0.1:GOTO 20</pre>
+  <p>Line 40 erases the asterisk at its old position before lines 50 through 80 compute the new one. The conditions after <code>AND</code> keep it inside the display. The <code>SLEEP</code> in line 100 slows it down. Without that line, even a brief key press would send it several places at once.</p>
+
+  <h2>The LED</h2>
+  <p>There is an LED at the top right of the unit. After power-on and after a reset it lights up by itself for one second. After that it belongs to you: <code>LED ON</code> turns it on, <code>LED OFF</code> turns it off.</p>
+<pre class="listing">10 LED ON
+20 SLEEP 0.5
+30 LED OFF
+40 SLEEP 0.5
+50 GOTO 10</pre>
+  <p>The program makes the LED flash once per second until you stop it. You can use the LED as a signal – when a game is won, for example, or to show that a long program is still working.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p><code>ON</code> and <code>OFF</code> are BASIC words. A variable therefore may not be named <code>OFF</code>.</p>
+  </aside>
+
+  <h2>A game: Hangman</h2>
+  <p>To finish, here is a larger program that uses almost everything from this chapter and the last one. The computer picks a word. You guess letter by letter. Every letter that is not in the word counts as a miss. After eight misses, you have lost.</p>
+  <figure class="lcd">
+<pre>HANGMAN                    MISSES 2 / 8
+S O U N _
+WRONG: EX
+LETTER?</pre>
+    <figcaption>One more letter is missing</figcaption>
+  </figure>
+  <p>The program is long. Take your time typing it in and check each section with <code>LIST</code>. You can also find it in the firmware project as <code>examples/galgen.bas</code>. If the disk drive from Chapter 6 is connected, load it with <code>LOAD "galgen"</code>. The sections in detail:</p>
+
+  <h3>Preparation</h3>
+<pre class="listing">10 REM HANGMAN
+20 DIM WL$(20),G(25)
+30 DEF FNR(X)=INT(RND(1)*X)
+40 N=0
+50 READ A$:IF A$="*" THEN 80
+60 N=N+1:WL$(N)=A$
+70 GOTO 50
+80 CLS:CURSOR OFF
+90 PRINT "HANGMAN":PRINT
+100 PRINT "PRESS ANY KEY."
+105 IF KEY(0)&lt;&gt;0 THEN 105
+110 S=0
+120 S=S+1:IF KEY(0)=0 THEN 120
+130 X=RND(-S)
+140 IF KEY(0)&lt;&gt;0 THEN 140</pre>
+  <p>Line 20 creates two arrays. <code>WL$</code> is the word list. <code>G</code> has one slot for every letter from A to Z. Later, a 1 sits there when the letter has already been guessed. Line 30 defines a function for random numbers from 0 to X−1. Lines 50 through 70 read the words from the <code>DATA</code> lines until the end marker <code>*</code> arrives. N counts them as it goes. Lines 105 through 140 generate the seed for the random numbers using the key-press trick from above.</p>
+
+  <h3>One round</h3>
+<pre class="listing">200 REM NEW ROUND
+210 W$=WL$(FNR(N)+1):L=LEN(W$)
+220 FOR I=0 TO 25:G(I)=0:NEXT I
+230 F=0:R$="":CLS
+240 GOSUB 500
+250 IF M=0 THEN E=1:GOTO 400
+260 IF F=8 THEN E=2:GOTO 400
+270 LOCATE 3,0:PRINT "LETTER?        ";
+280 GOSUB 600
+290 B=ASC(B$)-65
+300 IF G(B)=1 THEN 280
+310 G(B)=1:T=0
+320 FOR I=1 TO L
+330 IF MID$(W$,I,1)=B$ THEN T=1
+340 NEXT I
+350 IF T=0 THEN F=F+1:R$=R$+B$
+360 GOTO 240</pre>
+  <p>Line 210 picks a random word W$ of length L. Line 220 forgets all guessed letters; line 230 resets the miss count F and the list of wrong letters R$. Then the loop from line 240 to 360 begins: refresh the display, check whether the round is over, fetch a letter.</p>
+  <p>Line 290 turns the letter into a number from 0 (A) to 25 (Z), matching the array G. If the letter has already been guessed, line 300 simply fetches the next one. Lines 320 through 340 check every position of the word. T becomes 1 as soon as the letter occurs anywhere.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Watch out</div>
+    <p>The <code>NEXT I</code> deliberately sits on its own line. If it were in line 330 after the <code>IF</code>, it would only run when the condition is true. With any other letter, the loop would hang.</p>
+  </aside>
+
+  <h3>End of the round</h3>
+<pre class="listing">400 ON E GOSUB 700,800
+410 LOCATE 3,0:PRINT "ANOTHER (Y/N)?";
+420 GOSUB 600
+430 IF B$="Y" THEN 200
+440 IF B$&lt;&gt;"N" THEN 420
+450 CLS:CURSOR ON:END</pre>
+  <p>E is 1 when all letters have been found, and 2 after eight misses. <code>ON E GOSUB</code> jumps to the matching subroutine. After that, the program asks for a new round. Any key other than Y and N is ignored.</p>
+
+  <h3>The subroutines</h3>
+<pre class="listing">500 REM DISPLAY
+510 LOCATE 0,0:PRINT "HANGMAN";
+520 LOCATE 0,27:PRINT "MISSES";F;"/ 8";
+530 LOCATE 1,0:M=0
+540 FOR I=1 TO L:C$=MID$(W$,I,1)
+550 IF G(ASC(C$)-65)=1 THEN PRINT C$;" ";:GOTO 570
+560 PRINT "_ ";:M=M+1
+570 NEXT I
+580 LOCATE 2,0:PRINT "WRONG: ";R$;
+590 RETURN</pre>
+  <p>The subroutine starting at line 500 draws the display. For every position of the word it prints the letter if it has already been guessed, otherwise a dash. M counts the dashes. If M is 0 at the end, the word is complete.</p>
+<pre class="listing">600 REM GET KEY
+610 K=KEY(0):IF K=0 THEN 610
+620 IF KEY(0)&lt;&gt;0 THEN 620
+630 IF K&gt;=97 AND K&lt;=122 THEN K=K-32
+640 IF K&lt;65 OR K&gt;90 THEN 610
+650 B$=CHR$(K):RETURN</pre>
+  <p>The subroutine starting at line 600 waits for a key and for its release. Line 630 turns lowercase letters into uppercase, since their codes are exactly 32 apart. Line 640 lets only letters through. That way the game works with and without <kbd>Shift</kbd>.</p>
+<pre class="listing">700 REM WON
+710 LOCATE 3,0:PRINT "CORRECT!          ";
+720 FOR I=1 TO 5:LED ON:SLEEP 0.2:LED OFF:SLEEP 0.2:NEXT I
+730 RETURN
+800 REM LOST
+810 FOR I=0 TO 25:G(I)=1:NEXT I
+820 GOSUB 500
+830 LOCATE 3,0:PRINT "YOU LOST.         ";
+840 SLEEP 2
+850 RETURN</pre>
+  <p>On a win, the LED flashes five times. On a loss, line 810 simply marks all letters as guessed. The display subroutine then shows the whole word, without any extra code. The spaces after the messages overwrite leftovers from the previous line.</p>
+
+  <h3>The word list</h3>
+<pre class="listing">900 DATA COMPUTER,PROCESSOR,KEYBOARD,MEMORY
+910 DATA PROGRAM,LOOP,VARIABLE,DISPLAY
+920 DATA DISK,MONITOR,CHARACTER,SOUND
+930 DATA *</pre>
+  <p>Add your own words simply as further <code>DATA</code> lines before line 930. Three rules apply: uppercase letters A to Z only, no umlauts, at most 20 letters – otherwise the word does not fit on a line. In total, 20 words fit in the array. For more, enlarge <code>WL$</code> in line 20.</p>
+  <figure class="lcd">
+<pre>HANGMAN                    MISSES 2 / 8
+S O U N D
+WRONG: EX
+CORRECT!</pre>
+    <figcaption>Won – the LED flashes</figcaption>
+  </figure>
+  <p>What is in this program: arrays (<code>DIM</code>), subroutines (<code>GOSUB</code>, <code>ON … GOSUB</code>), data (<code>DATA</code>, <code>READ</code>), a user-defined function (<code>DEF FN</code>), random numbers with a seed (<code>RND</code>), string functions (<code>LEN</code>, <code>MID$</code>, <code>ASC</code>, <code>CHR$</code>), the display (<code>CLS</code>, <code>LOCATE</code>, <code>CURSOR</code>), the keyboard (<code>KEY</code>), and the LED. Plus loops, conditions, and variables from Chapter 3. Once you understand this program, you can write games of your own.</p>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Anhang C – Speicherbelegung</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang" data-buchstabe="C" data-kurztitel="Anhang C · Speicherbelegung">
+  <h1><span class="buchstabe">C</span>Speicherbelegung</h1>
+  <p>Der Arbeitsspeicher geht von <code>$0000</code> bis <code>$7EFF</code>. Unten liegen die Zero Page und der Stapel, darüber die Systemvariablen, dann Ihr BASIC-Programm. Ab <code>$7F00</code> sitzen die Bausteine für Schnittstelle, Tastatur, Anzeige und Ton. Ab <code>$8000</code> liegt der Festspeicher mit BASIC, Kernal und Monitor. Die sechs Bytes ganz oben sind die Sprungvektoren für NMI, Reset und IRQ.</p>
+  <table>
+    <thead><tr><th>Adresse</th><th>Inhalt</th><th>Größe</th></tr></thead>
+    <tbody>
+      <tr><td><code>$0000–$00FF</code></td><td>Zero Page</td><td>256 B</td></tr>
+      <tr><td><code>$0100–$01FF</code></td><td>Stack des Prozessors</td><td>256 B</td></tr>
+      <tr><td><code>$0200–$0278</code></td><td>Zeilenpuffer von BASIC</td><td>121 B</td></tr>
+      <tr><td><code>$0279–$031F</code></td><td>Anzeige</td><td>167 B</td></tr>
+      <tr><td><code>$0320–$03FE</code></td><td>Klangchip SID</td><td>223 B</td></tr>
+      <tr><td><code>$03FF</code></td><td>Diskette</td><td>1 B</td></tr>
+      <tr><td><code>$0400–$043F</code></td><td>serielle Konsole</td><td>64 B</td></tr>
+      <tr><td><code>$0440–$7EFF</code></td><td>BASIC-Programmspeicher</td><td>31424 B</td></tr>
+      <tr><td><code>$7F00–$7FFF</code></td><td>Ein-/Ausgabe (ACIA, VIA1, VIA2, SID)</td><td>256 B</td></tr>
+      <tr><td><code>$8000–$FFFF</code></td><td>ROM: BASIC, Kernal, Monitor</td><td>32 KB</td></tr>
+      <tr><td><code>$FFFA–$FFFF</code></td><td>Vektoren NMI, RESET, IRQ</td><td>6 B</td></tr>
+    </tbody>
+  </table>
+  <h2>Ein-/Ausgabe</h2>
+  <table class="zusammen">
+    <thead><tr><th>Adresse</th><th>Baustein</th><th>Aufgabe</th></tr></thead>
+    <tbody>
+      <tr><td><code>$7F00</code></td><td>ACIA 6551</td><td>serielle Schnittstelle</td></tr>
+      <tr><td><code>$7F20</code></td><td>VIA1 6522</td><td>LCD, LED, Tastatur, Takt alle 10 ms</td></tr>
+      <tr><td><code>$7F40</code></td><td>VIA2 6522</td><td>Tastatur, Takt alle 20 ms für den SID</td></tr>
+      <tr><td><code>$7F60</code></td><td>SID 8580</td><td>Ton</td></tr>
+    </tbody>
+  </table>
+  <h2>Systemvariablen</h2>
+  <p>Von <code>$0200</code> bis <code>$0278</code> liegt der Zeilenpuffer von BASIC. Ab <code>$0279</code> folgen die Variablen der Firmware, in der Reihenfolge, in der sie im Speicher stehen.</p>
+  <table>
+    <thead><tr><th>Adresse</th><th>Name</th><th>Aufgabe</th></tr></thead>
+    <tbody>
+      <tr><td><code>$0200–$0278</code></td><td><code>BUF</code></td><td>Eingabezeile, 120 Zeichen und die abschließende Null</td></tr>
+      <tr><td><code>$0279</code></td><td><code>lcd_porta</code></td><td>Schatten von VIA1 Port A, darin auch das Bit der LED</td></tr>
+      <tr><td><code>$027A</code></td><td><code>lcd_enable</code></td><td>welches Enable des LCD gesetzt ist</td></tr>
+      <tr><td><code>$027B</code></td><td><code>lcd_row</code></td><td>Zeile des Cursors, 0 bis 3</td></tr>
+      <tr><td><code>$027C</code></td><td><code>lcd_col</code></td><td>Spalte des Cursors, 0 bis 39</td></tr>
+      <tr><td><code>$027D</code></td><td><code>lcd_chr</code></td><td>zuletzt geschriebenes Zeichen</td></tr>
+      <tr><td><code>$027E</code></td><td><code>lcd_tmp</code></td><td>Zwischenwert beim Schreiben aufs LCD</td></tr>
+      <tr><td><code>$027F–$031E</code></td><td><code>lcd_buf</code></td><td>Bildpuffer, 4 Zeilen zu 40 Zeichen</td></tr>
+      <tr><td><code>$031F</code></td><td><code>lcd_mode</code></td><td>Anzeige, Unterstrich und Blinken</td></tr>
+      <tr><td><code>$0320–$0322</code></td><td><code>sid_fl</code></td><td>Frequenz, niedriges Byte, drei Stimmen</td></tr>
+      <tr><td><code>$0323–$0325</code></td><td><code>sid_fh</code></td><td>Frequenz, hohes Byte</td></tr>
+      <tr><td><code>$0326–$0328</code></td><td><code>sid_pl</code></td><td>Pulsbreite, niedriges Byte</td></tr>
+      <tr><td><code>$0329–$032B</code></td><td><code>sid_ph</code></td><td>Pulsbreite, hohes Byte</td></tr>
+      <tr><td><code>$032C–$032E</code></td><td><code>sid_ct</code></td><td>Wellenform und Gate</td></tr>
+      <tr><td><code>$032F–$0331</code></td><td><code>sid_ad</code></td><td>Attack und Decay</td></tr>
+      <tr><td><code>$0332–$0334</code></td><td><code>sid_sr</code></td><td>Sustain und Release</td></tr>
+      <tr><td><code>$0335</code></td><td><code>sid_mv</code></td><td>Lautstärke und Filter, wie der SID sie sieht</td></tr>
+      <tr><td><code>$0336</code></td><td><code>sid_mode</code></td><td>Filterart: Tiefpass, Bandpass, Hochpass</td></tr>
+      <tr><td><code>$0337–$033E</code></td><td><code>ins_wave</code></td><td>Wellenform der acht Instrumente</td></tr>
+      <tr><td><code>$033F–$0346</code></td><td><code>ins_ad</code></td><td>Attack und Decay der Instrumente</td></tr>
+      <tr><td><code>$0347–$034E</code></td><td><code>ins_sr</code></td><td>Sustain und Release der Instrumente</td></tr>
+      <tr><td><code>$034F–$0356</code></td><td><code>ins_pw</code></td><td>Pulsbreite der Instrumente</td></tr>
+      <tr><td><code>$0357–$0359</code></td><td><code>v_mode</code></td><td>Betriebsart der drei Stimmen</td></tr>
+      <tr><td><code>$035A–$035C</code></td><td><code>v_left</code></td><td>Takte bis zum nächsten Schritt</td></tr>
+      <tr><td><code>$035D–$035F</code></td><td><code>v_pos</code></td><td>Stelle in der Melodie</td></tr>
+      <tr><td><code>$0360–$0362</code></td><td><code>v_oct</code></td><td>Oktave</td></tr>
+      <tr><td><code>$0363–$0365</code></td><td><code>v_ins</code></td><td>Instrument</td></tr>
+      <tr><td><code>$0366–$0368</code></td><td><code>v_len</code></td><td>Länge des Tons in Sechzehnteln</td></tr>
+      <tr><td><code>$0369–$036B</code></td><td><code>v_ptr</code></td><td>Zeiger in die Melodie, niedriges Byte</td></tr>
+      <tr><td><code>$036C–$036E</code></td><td><code>v_ptrh</code></td><td>Zeiger in die Melodie, hohes Byte</td></tr>
+      <tr><td><code>$036F–$03FE</code></td><td><code>tune_buf</code></td><td>drei Melodien, je 48 Bytes</td></tr>
+      <tr><td><code>$03FF</code></td><td><code>disk_bad</code></td><td>Merker: Laden oder Speichern ist fehlgeschlagen</td></tr>
+      <tr><td><code>$0400</code></td><td><code>mon_basic</code></td><td>1, solange BASIC die serielle Leitung hat</td></tr>
+      <tr><td><code>$0401</code></td><td><code>io_def</code></td><td>Vorgabe: 1 Anzeige, 2 seriell</td></tr>
+      <tr><td><code>$0402</code></td><td><code>ser_cols</code></td><td>Spalten des Terminals, anfangs 80</td></tr>
+      <tr><td><code>$0403</code></td><td><code>ser_rows</code></td><td>Zeilen des Terminals, anfangs 24</td></tr>
+      <tr><td><code>$0404</code></td><td><code>ser_row</code></td><td>Cursorzeile am Terminal</td></tr>
+      <tr><td><code>$0405</code></td><td><code>ser_col</code></td><td>Cursorspalte am Terminal</td></tr>
+      <tr><td><code>$0406</code></td><td><code>ser_ncm</code></td><td>Breite einer <code>PRINT</code>-Spalte</td></tr>
+      <tr><td><code>$0407</code></td><td><code>ser_lim</code></td><td>Grenze für das Komma in <code>PRINT</code></td></tr>
+      <tr><td><code>$0408</code></td><td><code>ser_hello</code></td><td>Begrüßung auf der seriellen Leitung steht noch aus</td></tr>
+      <tr><td><code>$0409</code></td><td><code>ser_last</code></td><td>zuletzt empfangenes Zeichen</td></tr>
+      <tr><td><code>$040A</code></td><td><code>ser_head</code></td><td>Schreibzeiger des Empfangspuffers</td></tr>
+      <tr><td><code>$040B</code></td><td><code>ser_tail</code></td><td>Lesezeiger des Empfangspuffers</td></tr>
+      <tr><td><code>$040C</code></td><td><code>CHANNL</code></td><td>Gerät aus <code>#1</code> oder <code>#2</code>, 0 heißt Vorgabe</td></tr>
+      <tr><td><code>$040D</code></td><td><code>ed_ser</code></td><td>der Zeileneditor läuft am Terminal</td></tr>
+      <tr><td><code>$040E</code></td><td><code>ed_sidx</code></td><td>Cursor im Editor am Terminal</td></tr>
+      <tr><td><code>$040F</code></td><td><code>ser_parm</code></td><td>Zahl in einer ANSI-Steuerfolge</td></tr>
+      <tr><td><code>$0410–$043F</code></td><td><code>ser_buf</code></td><td>Empfangspuffer, 48 Bytes</td></tr>
+    </tbody>
+  </table>
+</section>
+</main>
+</body>
+</html>

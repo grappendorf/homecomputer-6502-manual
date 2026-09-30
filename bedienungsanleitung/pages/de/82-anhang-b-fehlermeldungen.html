@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Anhang B – Fehlermeldungen</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang referenz" data-buchstabe="B" data-kurztitel="Anhang B · Fehlermeldungen">
+  <h1><span class="buchstabe">B</span>Fehlermeldungen</h1>
+  <p>Eine Fehlermeldung beginnt mit einem Fragezeichen und endet mit <code>ERROR</code>. Läuft ein Programm, folgt <code>IN</code> und die Zeile:</p>
+  <p class="syntax">?SYNTAX ERROR IN 10</p>
+  <p>Im Direktmodus fehlt die Zeile. Das Programm bleibt stehen. Die Variablen behalten ihren Wert, Sie können sie mit <code>PRINT</code> ansehen. Korrigieren Sie die Zeile und starten Sie mit <code>RUN</code> neu.</p>
+  <p><code>BREAK IN 10</code> ist keine Fehlermeldung. <kbd>Pause</kbd>, <kbd>Strg</kbd>+<kbd>C</kbd> oder <code>STOP</code> haben angehalten. <code>CONT</code> läuft weiter.</p>
+
+  <h2>Im Programm</h2>
+
+  <h3>NEXT WITHOUT FOR</h3>
+  <p class="syntax">?NEXT WITHOUT FOR ERROR</p>
+  <p>Ein <code>NEXT</code> hat kein passendes <code>FOR</code>. Der Name hinter <code>NEXT</code> muss derselbe sein wie hinter <code>FOR</code>, oder Sie lassen ihn weg.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 NEXT I</code></td><td>kein <code>FOR I</code> davor</td></tr></tbody>
+  </table>
+  <p>Schreiben Sie die Schleife vollständig, zum Beispiel <code>10 FOR I=1 TO 5</code> und <code>20 NEXT I</code>.</p>
+
+  <h3>SYNTAX</h3>
+  <p class="syntax">?SYNTAX ERROR</p>
+  <p>Der Computer versteht die Zeile nicht. Oft ist ein Befehl falsch geschrieben, ein Zeichen fehlt, oder in einem Namen steckt ein BASIC-Wort.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 PRONT "HALLO"</code></td><td><code>PRINT</code> falsch geschrieben</td></tr></tbody>
+  </table>
+  <p>Die Zeile muss heißen <code>10 PRINT "HALLO"</code>. Steht der Fehler in einer <code>DATA</code>-Zeile, nennt die Meldung diese Zeile.</p>
+
+  <h3>RETURN WITHOUT GOSUB</h3>
+  <p class="syntax">?RETURN WITHOUT GOSUB ERROR</p>
+  <p><code>RETURN</code> kommt an, obwohl kein <code>GOSUB</code> dorthin gesprungen ist.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 RETURN</code></td><td>kein <code>GOSUB</code> vorher</td></tr></tbody>
+  </table>
+  <p>Rufen Sie das Unterprogramm mit <code>GOSUB</code> auf. <code>RETURN</code> steht an dessen Ende, nicht am Anfang des Programms.</p>
+
+  <h3>OUT OF DATA</h3>
+  <p class="syntax">?OUT OF DATA ERROR</p>
+  <p><code>READ</code> will einen weiteren Wert, aber die <code>DATA</code>-Liste ist zu Ende. Die Meldung zeigt die Zeile mit dem <code>READ</code>.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 READ A,B</code></td><td></td></tr><tr><td><code>20 DATA 1</code></td><td>ein Wert zu wenig</td></tr></tbody>
+  </table>
+  <p>Ergänzen Sie die Liste, hier <code>20 DATA 1,2</code>. Soll dieselbe Liste noch einmal gelesen werden, setzen Sie vorher <code>RESTORE</code>.</p>
+
+  <h3>ILLEGAL QUANTITY</h3>
+  <p class="syntax">?ILLEGAL QUANTITY ERROR</p>
+  <p>Eine Zahl liegt außerhalb des erlaubten Bereichs. <code>SQR</code> und <code>LOG</code> wollen keine negative Zahl. <code>CHR$</code> nimmt 0 bis 255. Bei <code>POKE</code> geht die Adresse von 0 bis 65535 und der Wert von 0 bis 255. Ein Dateiname darf 1 bis 16 Zeichen haben.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT SQR(-1)</code></td><td>Wurzel aus einer negativen Zahl</td></tr></tbody>
+  </table>
+  <p>Geben Sie einen Wert im erlaubten Bereich. Vor der Wurzel prüfen Sie zum Beispiel <code>IF X&gt;=0 THEN PRINT SQR(X)</code>.</p>
+
+  <h3>OVERFLOW</h3>
+  <p class="syntax">?OVERFLOW ERROR</p>
+  <p>Das Ergebnis ist zu groß. Die größte Zahl ist etwa <code>1.7E+38</code>.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT 1E38*10</code></td><td>liegt darüber</td></tr></tbody>
+  </table>
+  <p>Rechnen Sie mit kleineren Zahlen, oder fangen Sie große Zwischenergebnisse ab, bevor Sie weiter multiplizieren.</p>
+
+  <h3>OUT OF MEMORY</h3>
+  <p class="syntax">?OUT OF MEMORY ERROR</p>
+  <p>Der Speicher reicht nicht. Meist ist ein Feld zu groß, oder Texte belegen zu viel Platz. Nach dem Einschalten sind 31423 Bytes für Programm und Variablen frei.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>DIM A(100,100)</code></td><td>über 50&nbsp;000 Bytes</td></tr></tbody>
+  </table>
+  <p>Wählen Sie ein kleineres Feld. Lange Texte können Sie löschen, indem Sie der Variablen <code>""</code> zuweisen. <code>CLEAR</code> gibt den ganzen Variablenspeicher frei, das Programm bleibt.</p>
+
+  <h3>UNDEF'D STATEMENT</h3>
+  <p class="syntax">?UNDEF'D STATEMENT ERROR</p>
+  <p><code>GOTO</code>, <code>GOSUB</code> oder <code>RUN</code> zielt auf eine Zeile, die es nicht gibt.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 GOTO 20</code></td><td>Zeile 20 fehlt</td></tr></tbody>
+  </table>
+  <p>Legen Sie die Zeile an, oder ändern Sie die Nummer im Sprung. <code>LIST</code> zeigt, welche Zeilen es wirklich gibt.</p>
+
+  <h3>BAD SUBSCRIPT</h3>
+  <p class="syntax">?BAD SUBSCRIPT ERROR</p>
+  <p>Der Index eines Feldes liegt außerhalb, oder die Anzahl der Indizes stimmt nicht. Der erste Index ist 0. <code>DIM A(2)</code> hat die Plätze 0, 1 und 2. Ohne <code>DIM</code> geht der Index von 0 bis 10.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 DIM A(2):PRINT A(3)</code></td><td>3 gibt es nicht</td></tr></tbody>
+  </table>
+  <p>Bleiben Sie im Bereich, oder machen Sie das Feld mit <code>DIM</code> größer. Ein Feld mit zwei Indizes sprechen Sie auch mit zweien an: <code>B(1,2)</code>, nicht <code>B(1)</code>.</p>
+
+  <h3>REDIM'D ARRAY</h3>
+  <p class="syntax">?REDIM'D ARRAY ERROR</p>
+  <p><code>DIM</code> legt ein Feld an, das es in diesem Lauf schon gibt. Auch dieselbe Größe zählt als zweites Mal.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 DIM A(2)</code></td><td></td></tr><tr><td><code>20 DIM A(3)</code></td><td>A gibt es schon</td></tr></tbody>
+  </table>
+  <p>Lassen Sie das zweite <code>DIM</code> weg. <code>RUN</code> und <code>CLEAR</code> vergessen die Felder, danach darf <code>DIM</code> wieder.</p>
+
+  <h3>DIVISION BY ZERO</h3>
+  <p class="syntax">?DIVISION BY ZERO ERROR</p>
+  <p>Geteilt wurde durch 0.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT 1/0</code></td><td></td></tr></tbody>
+  </table>
+  <p>Prüfen Sie den Teiler vorher: <code>IF N&lt;&gt;0 THEN PRINT 1/N</code>.</p>
+
+  <h3>ILLEGAL DIRECT</h3>
+  <p class="syntax">?ILLEGAL DIRECT ERROR</p>
+  <p><code>INPUT</code> und <code>DEF FN</code> gehen nur in einem Programm, nicht im Direktmodus.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>INPUT A</code></td><td>ohne Zeilennummer getippt</td></tr></tbody>
+  </table>
+  <p>Schreiben Sie <code>10 INPUT A</code> und starten Sie mit <code>RUN</code>.</p>
+
+  <h3>TYPE MISMATCH</h3>
+  <p class="syntax">?TYPE MISMATCH ERROR</p>
+  <p>Zahl und Text sind vermischt. <code>A</code> ist eine Zahl, <code>A$</code> ein Text. Beides dürfen Sie nicht einander zuweisen oder miteinander verrechnen.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>A="HALLO"</code></td><td>Text in eine Zahlvariable</td></tr></tbody>
+  </table>
+  <p>Der Text gehört in <code>A$="HALLO"</code>. Eine Zahl aus einem Text holt <code>VAL</code>, einen Text aus einer Zahl <code>STR$</code>.</p>
+
+  <h3>STRING TOO LONG</h3>
+  <p class="syntax">?STRING TOO LONG ERROR</p>
+  <p>Ein Text wird länger als 255 Zeichen. Auch ein Dateiname über 16 Zeichen fällt nicht darunter, der ergibt <code>ILLEGAL QUANTITY</code>.</p>
+<pre class="listing">10 A$=""
+20 FOR I=1 TO 256
+30 A$=A$+"X"
+40 NEXT I</pre>
+  <p>In Zeile 30 kippt es bei 256 Zeichen. Lassen Sie die Schleife nur bis 255 laufen, oder schreiben Sie den Text in mehrere Variablen.</p>
+
+  <h3>FORMULA TOO COMPLEX</h3>
+  <p class="syntax">?FORMULA TOO COMPLEX ERROR</p>
+  <p>Ein Textausdruck braucht mehr als drei Zwischenergebnisse auf einmal. So viele hebt BASIC nicht auf.</p>
+  <p>Teilen Sie den Ausdruck. Erst zwei Teile in eine Variable, dann den Rest:</p>
+<pre class="listing">A$=LEFT$("AB",1)+MID$("CD",2,1)
+PRINT A$+RIGHT$("EF",1)</pre>
+
+  <h3>CAN'T CONTINUE</h3>
+  <p class="syntax">?CAN'T CONTINUE ERROR</p>
+  <p><code>CONT</code> kann nicht weitermachen. Entweder steht das Programm nicht an einem <code>STOP</code>, an <kbd>Pause</kbd> oder an <kbd>Strg</kbd>+<kbd>C</kbd>, oder Sie haben es in der Pause geändert.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>CONT</code></td><td>direkt nach dem Einschalten</td></tr></tbody>
+  </table>
+  <p>Halten Sie mit <code>STOP</code> an und tippen Sie <code>CONT</code>, ohne vorher eine Zeile zu ändern. Nach einer Änderung hilft nur <code>RUN</code>.</p>
+
+  <h3>UNDEF'D FUNCTION</h3>
+  <p class="syntax">?UNDEF'D FUNCTION ERROR</p>
+  <p><code>FN</code> ruft eine Funktion, die <code>DEF FN</code> in diesem Lauf nicht angelegt hat.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT FNA(1)</code></td><td>kein <code>DEF FNA</code></td></tr></tbody>
+  </table>
+  <p>Definieren Sie sie vorher im Programm, zum Beispiel <code>10 DEF FNA(X)=X*X</code>, und rufen Sie sie erst danach auf.</p>
+
+  <h3>REDO FROM START</h3>
+  <p class="syntax">?REDO FROM START</p>
+  <p><code>INPUT</code> wollte eine Zahl und hat einen Text bekommen. Das Programm bricht nicht ab. Sie geben die ganze Zeile noch einmal ein.</p>
+<pre class="listing">10 INPUT A</pre>
+  <p>Tippen Sie auf das Fragezeichen zum Beispiel <code>HALLO</code>, kommt die Meldung, und <code>INPUT</code> fragt erneut. Tippen Sie eine Zahl.</p>
+
+  <h3>EXTRA IGNORED</h3>
+  <p class="syntax">?EXTRA IGNORED</p>
+  <p><code>INPUT</code> hat mehr Werte bekommen, als Variablen da sind. Die überzähligen fallen weg, das Programm läuft weiter.</p>
+<pre class="listing">10 INPUT A</pre>
+  <p>Tippen Sie <code>1,2</code>, bleibt <code>A</code> gleich 1 und die 2 verschwindet. Brauchen Sie beide, schreiben Sie <code>INPUT A,B</code>.</p>
+
+  <h2>Diskette</h2>
+  <p>Diese Meldungen kommen von <code>LOAD</code>, <code>SAVE</code>, <code>DIR</code> und <code>DELETE</code>. Wie die Diskette angeschlossen wird, steht in Kapitel 6.</p>
+
+  <h3>NO DISK</h3>
+  <p class="syntax">?NO DISK ERROR</p>
+  <p>Am seriellen Anschluss ist kein Laufwerk verbunden.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOAD "test"</code></td><td>ohne angeschlossene Diskette</td></tr></tbody>
+  </table>
+  <p>Schließen Sie sie an, wie es Kapitel 6 beschreibt, und geben Sie den Befehl noch einmal.</p>
+
+  <h3>FILE NOT FOUND</h3>
+  <p class="syntax">FILE NOT FOUND</p>
+  <p>Die Datei gibt es auf der Diskette nicht. Das Programm im Speicher bleibt, wie es ist. Groß- und Kleinschreibung zählen.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOAD "fehlt"</code></td><td>kein fehlt.prg und kein fehlt.bas</td></tr></tbody>
+  </table>
+  <p><code>DIR</code> zeigt die vorhandenen Namen. Laden Sie einen davon, oder speichern Sie die Datei erst mit <code>SAVE</code>.</p>
+
+  <h3>BAD LOAD</h3>
+  <p class="syntax">BAD LOAD</p>
+  <p>Eine <code>.prg</code>-Datei passt nicht in den Speicher. Die ersten beiden Bytes müssen die Ladeadresse <code>$0441</code> sein, also 65 und 4, und die Datei darf nicht zu groß sein. Der Speicher bleibt leer.</p>
+  <p>Nehmen Sie eine Datei, die so aufgebaut ist wie in Kapitel 7. Ein BASIC-Programm laden Sie als <code>.bas</code>, nicht als <code>.prg</code>.</p>
+
+  <h3>NO PROGRAM</h3>
+  <p class="syntax">NO PROGRAM</p>
+  <p><code>SAVE</code> findet kein Programm im Speicher.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>NEW</code></td><td></td></tr><tr><td><code>SAVE "leer"</code></td><td>nichts zum Speichern</td></tr></tbody>
+  </table>
+  <p>Schreiben Sie erst ein Programm, dann <code>SAVE</code>.</p>
+
+  <h3>EMPTY FILE</h3>
+  <p class="syntax">EMPTY FILE</p>
+  <p>Die Datei ist da, enthält aber kein Programm.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOAD "leer"</code></td><td>die Datei hat keine Zeilen</td></tr></tbody>
+  </table>
+  <p>Speichern Sie das Programm neu, oder laden Sie eine andere Datei. <code>DIR</code> zeigt die Größe. 0 Bytes ist leer.</p>
+</section>
+</main>
+</body>
+</html>

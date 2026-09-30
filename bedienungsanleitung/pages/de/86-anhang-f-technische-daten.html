@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Anhang F – Technische Daten</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang" data-buchstabe="F" data-kurztitel="Anhang F · Technische Daten">
+  <h1><span class="buchstabe">F</span>Technische Daten</h1>
+  <table>
+    <thead><tr><th>Merkmal</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>Prozessor</td><td>MOS 6502, 1 MHz</td></tr>
+      <tr><td>Arbeitsspeicher</td><td>32 KB RAM</td></tr>
+      <tr><td>Festspeicher</td><td>32 KB EEPROM</td></tr>
+      <tr><td>Anzeige</td><td>LCD, 4 Zeilen × 40 Zeichen</td></tr>
+      <tr><td>Tastatur</td><td>deutsche Notebook-Tastatur, 89 Tasten</td></tr>
+      <tr><td>Ton</td><td>SID 8580, drei Stimmen</td></tr>
+      <tr><td>Schnittstelle</td><td>seriell über USB, 19200 Baud, 8N1</td></tr>
+      <tr><td>Ein-/Ausgabe</td><td>2 × VIA 6522</td></tr>
+      <tr><td>Stromversorgung</td><td>LiPo-Akku 3,7 V, 3200 mAh, oder USB; intern 5 V, für den SID zusätzlich 9 V</td></tr>
+      <tr><td>Abmessungen</td><td>30 cm × 20 cm × 4,5 cm</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Der Schaltplan</h2>
+  <p>Auf den folgenden Seiten steht der vollständige Schaltplan des HomeComputer 6502. Er wurde aus dem ursprünglichen Eagle-Schaltplan in KiCad 10 neu gezeichnet und steht unter der CERN Open Hardware Licence v1.2. Drehen Sie das Handbuch zum Lesen im Uhrzeigersinn.</p>
+  <table>
+    <thead><tr><th>Blatt</th><th>Inhalt</th><th>Was darauf zu sehen ist</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Übersicht</td><td>Die fünf Teilpläne und wie sie zusammenhängen</td></tr>
+      <tr><td>2</td><td>Stromversorgung und Reset</td><td>Spannungseingang, Reset-Schaltung mit NE555 und Reset-Taster</td></tr>
+      <tr><td>3</td><td>Adressdekoder</td><td>Wählt anhand der Adresse RAM, ROM oder einen Ein-/Ausgabebaustein aus</td></tr>
+      <tr><td>4</td><td>Prozessor und Speicher</td><td>6502, 32 KB RAM, 32 KB EEPROM, 1-MHz-Takt, NMI-Anschluss</td></tr>
+      <tr><td>5</td><td>VIAs, Anzeige und Tastatur</td><td>Die beiden 6522, Anschluss von LCD und Tastaturmatrix, LED</td></tr>
+      <tr><td>6</td><td>Serielle Schnittstelle und Klang</td><td>ACIA 6551 mit Baudraten-Quarz, SID 8580 mit Ausgangsstufe und 9-V-Versorgung</td></tr>
+    </tbody>
+  </table>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-1.svg" alt="Schaltplan Blatt 1: Übersicht">
+      <figcaption>Schaltplan, Blatt 1 von 6: Übersicht</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-2.svg" alt="Schaltplan Blatt 2: Stromversorgung und Reset">
+      <figcaption>Schaltplan, Blatt 2 von 6: Stromversorgung und Reset</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-3.svg" alt="Schaltplan Blatt 3: Adressdekoder">
+      <figcaption>Schaltplan, Blatt 3 von 6: Adressdekoder</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-4.svg" alt="Schaltplan Blatt 4: Prozessor und Speicher">
+      <figcaption>Schaltplan, Blatt 4 von 6: Prozessor und Speicher</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-5.svg" alt="Schaltplan Blatt 5: VIAs, Anzeige und Tastatur">
+      <figcaption>Schaltplan, Blatt 5 von 6: VIAs, Anzeige und Tastatur</figcaption>
+    </figure>
+  </section>
+  <section class="schaltplan-seite">
+    <figure>
+      <img src="../schematic/seite-6.svg" alt="Schaltplan Blatt 6: Serielle Schnittstelle und Klang">
+      <figcaption>Schaltplan, Blatt 6 von 6: Serielle Schnittstelle und Klang</figcaption>
+    </figure>
+  </section>
+</section>
+</main>
+</body>
+</html>

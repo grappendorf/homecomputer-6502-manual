@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 4</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="4" data-titel="EEPROM and a First Program" data-kurztitel="EEPROM">
+  <p>So far the processor has only read NOPs. Now it gets a read-only memory that you program yourself, and it runs its first program of its own. Along the way you replace the home-made clock with a ready-made module.</p>
+
+  <h2>The read-only memory</h2>
+  <p>If you want the feeling of the eighties, use EPROMs of the 27C series and a UV eraser. But erasing takes more than a quarter of an hour, and during development you have to reprogram very often. That quickly becomes tedious.</p>
+  <p>So we use a modern parallel CMOS EEPROM, the AT28C256 from Atmel. It holds 32&nbsp;KB (32k × 8 bits) and can be erased and written electrically. You need a programmer for it. A universal device like the MiniPro TL866 works well. Under Linux the command line tool <code>minipro</code> controls it.</p>
+  <p>Since the chip keeps travelling between the programmer and the circuit, a ZIF socket (zero insertion force) in the circuit is worth it. It has a lever and needs no force when inserting.</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-eeprom.svg" alt="Schematic: crystal oscillator module and EEPROM with address and data bus">
+    <figcaption>Schematic of the oscillator and the EEPROM</figcaption>
+  </figure>
+  <p>The AT28C256 is connected to the address bus (A0 to A14) and the data bus (D0 to D7). It also has three control inputs: /CE (chip enable), /OE (output enable) and /WE (write enable).</p>
+  <p>/CE and /OE are tied to GND, so the chip is always active and outputs its data. /WE is tied to +5&nbsp;V, so the processor cannot overwrite the memory. There is no address decoding yet. That is why the EEPROM appears in the whole address space, once at $0000 to $7FFF and once at $8000 to $FFFF. The reset vector is there as well.</p>
+  <p>The clock now comes from a crystal oscillator module QG1 in a metal case. It delivers 1&nbsp;MHz at TTL level and has four connections: pin&nbsp;14 (+5&nbsp;V), pin&nbsp;7 (GND), pin&nbsp;8 (output) and pin&nbsp;1 (a control input on some types, tied to GND here). This makes R1, R2, C1 and Q1 from chapter 1 unnecessary, and gates A to C of the 74LS04 are free.</p>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC4</td><td>EEPROM, DIP-28</td><td>AT28C256</td></tr>
+      <tr><td>QG1</td><td>Crystal oscillator, DIP-14 case</td><td>1&nbsp;MHz, TTL</td></tr>
+      <tr><td>C7</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+  <p>Plus a third breadboard, preferably a 28-pin ZIF socket, and a programmer. You remove R1, R2, C1 and Q1.</p>
+
+  <h2>Assembly</h2>
+  <p>First you swap the clock. Breadboard 1 then looks like this, the circuit is otherwise unchanged:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-takt-modul.svg" alt="Breadboard 1 with the oscillator module to the right of the button">
+    <figcaption>Clock and reset with oscillator module (breadboard 1)</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Remove R1, R2, C1, the crystal Q1 and the wire from pin&nbsp;4 to pin&nbsp;5 of IC1. Also pull off the wire that carried the clock from pin&nbsp;6 to the processor.</div></li>
+    <li><div>Insert QG1 to the right of the button, pin&nbsp;1 in hole 28e.</div></li>
+    <li><div>Pin&nbsp;14 (hole 28j) goes to +5&nbsp;V. Pin&nbsp;1 (28a) and pin&nbsp;7 (34a) go to GND.</div></li>
+    <li><div>Run the clock from pin&nbsp;8 (hole 34j) to pin&nbsp;37 of the 6502 (hole 7j on breadboard 2), and /RESET from hole 11j to pin&nbsp;40 (hole 4j).</div></li>
+  </ol>
+  <p>Now the EEPROM on a new breadboard. The short named wires show where a connection goes. Wires with the same name belong together.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-eeprom.svg" alt="Breadboard 3 with the AT28C256 EEPROM and short wires with signal names">
+    <figcaption>The EEPROM on breadboard 3. Green: address, blue: data.</figcaption>
+  </figure>
+  <ol class="schritte" start="5">
+    <li><div>Run +5&nbsp;V and GND from breadboard 2 to breadboard 3 and connect the upper rails to the lower ones there.</div></li>
+    <li><div>Insert IC4 across the channel, notch left, pin&nbsp;1 in hole 5d. Like the 6502 it is 600 mil wide and sits in rows d and h. Better use a ZIF socket.</div></li>
+    <li><div>Power IC4: pin&nbsp;28 (hole 5j) to +5&nbsp;V and pin&nbsp;14 (18a) to GND. Place C7 between the upper rails.</div></li>
+    <li><div>/OE (pin&nbsp;22, hole 11j) and /CE (pin&nbsp;20, hole 13j) go to GND. /WE (pin&nbsp;27, hole 6j) goes to +5&nbsp;V.</div></li>
+    <li><div>Connect the 15 address and 8 data lines to the processor, each to the one with the same name. The table shows the pins. Use green wires for the addresses and blue for the data, it makes checking easier.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (pin)</th><th>AT28C256 (pin)</th></tr></thead>
+    <tbody>
+      <tr><td>A0 – A7</td><td>9, 10, 11, 12, 13, 14, 15, 16</td><td>10, 9, 8, 7, 6, 5, 4, 3</td></tr>
+      <tr><td>A8 – A14</td><td>17, 18, 19, 20, 22, 23, 24</td><td>25, 24, 21, 23, 2, 26, 1</td></tr>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>11, 12, 13, 15, 16, 17, 18, 19</td></tr>
+    </tbody>
+  </table>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p>Insert the EEPROM into the socket only with the power off, and check the orientation first. A chip inserted the wrong way round is quickly destroyed.</p>
+  </aside>
+
+  <h2>Software</h2>
+  <p>For the programs we use the cc65 tool suite: the assembler <code>ca65</code> and the linker <code>ld65</code>. The linker needs a configuration file that describes the memory. The first version, <code>first.cfg</code>:</p>
+  <pre class="listing">MEMORY
+{
+  ROM: start=$8000, size=$8000, type=ro, define=yes, fill=yes, file=%O;
+}
+SEGMENTS
+{
+  CODE:    load=ROM, type=ro;
+  VECTORS: load=ROM, type=ro, offset=$7ffa;
+}</pre>
+  <p>There is one memory area ROM from $8000 to $FFFF. That is the file we will write into the EEPROM later. The <code>VECTORS</code> section ends up at offset $7FFA, that is at $FFFA to $FFFF. That is where the processor expects its three vectors.</p>
+  <p>The first program, <code>first.s</code>, does almost nothing. After the reset the processor jumps to the label <code>loop</code>, loads $12 into the accumulator and jumps back:</p>
+  <pre class="listing">        .setcpu "6502"
+
+        .segment "VECTORS"
+        .word   loop            <span class="kommentar">; NMI</span>
+        .word   loop            <span class="kommentar">; Reset</span>
+        .word   loop            <span class="kommentar">; IRQ</span>
+
+        .code
+loop:   lda #$12
+        jmp loop</pre>
+  <p>Assemble it and write it into the EEPROM:</p>
+  <pre class="listing">$ ca65 -o first.o first.s
+$ ld65 -C first.cfg -o first.bin first.o
+$ minipro -p AT28C256 -w first.bin</pre>
+  <p>The result is a file of 32&nbsp;KB. The three vectors are at the end, all pointing to $8000:</p>
+  <pre class="listing">00000000  a9 12 4c 00 80 00 00 00  00 00 00 00 00 00 00 00
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+*
+00007ff0  00 00 00 00 00 00 00 00  00 00 00 80 00 80 00 80
+00008000</pre>
+  <p>If the chip is write-protected, the <code>minipro</code> option <code>-u</code> removes the protection.</p>
+
+  <h2>Measuring</h2>
+  <p>With a logic analyzer you can see what happens on the buses after the reset. The drawing shows the clock, the R/W line and the two buses as numbers. Each column is one bus cycle, that is one clock.</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/logik-eeprom.svg" alt="Logic analyzer picture of the bus cycles after the reset">
+    <figcaption>Bus cycles after the reset, schematic</figcaption>
+  </figure>
+  <p>The processor first reads the reset vector, then it runs the program:</p>
+  <table class="zusammen">
+    <thead><tr><th>Address</th><th>Value</th><th>Operation</th></tr></thead>
+    <tbody>
+      <tr><td>$FFFC</td><td>$00</td><td>Reset vector, low byte</td></tr>
+      <tr><td>$FFFD</td><td>$80</td><td>Reset vector, high byte</td></tr>
+      <tr><td>$8000</td><td>$A9</td><td>Instruction LDA</td></tr>
+      <tr><td>$8001</td><td>$12</td><td>Operand #$12</td></tr>
+      <tr><td>$8002</td><td>$4C</td><td>Instruction JMP</td></tr>
+      <tr><td>$8003</td><td>$00</td><td>Jump address, low byte</td></tr>
+      <tr><td>$8004</td><td>$80</td><td>Jump address, high byte</td></tr>
+      <tr><td>$8000</td><td>$A9</td><td>LDA, and so on</td></tr>
+    </tbody>
+  </table>
+  <p>Before the first access to the vector the processor makes a few dummy accesses, among others to the stack. The table starts at the vector.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>Nothing sensible to be seen? First check whether the EEPROM is programmed correctly (the programmer's verify function) and whether all 23 lines are in the right place.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

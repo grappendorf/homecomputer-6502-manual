@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 10</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="10" data-titel="The Keyboard" data-kurztitel="Keyboard">
+  <p>After the display the computer needs an input. A notebook keyboard is ideal for this: it is flat, has more than 80 keys and consists of nothing but a switch matrix. A second VIA comes along for it.</p>
+
+  <h2>The keyboard matrix</h2>
+  <p>A keyboard with 80 keys would need 80 lines if every key got its own connection. Instead the keys are arranged in a grid. Each key connects a row line to a column line. With a matrix of 14 rows and 8 columns, 22 lines are enough for 112 keys.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/en/matrix.svg" alt="Keyboard matrix with three rows and four columns, one pressed key is orange">
+    <figcaption>The principle of the matrix, here with 3 rows and 4 columns</figcaption>
+  </figure>
+  <p>Reading works like this: the rows are outputs, the columns inputs. The computer puts exactly one row low and reads all columns. The inputs have a pull-up resistor and therefore read 1 as long as no key pulls them down. If a key is pressed in the selected row, the matching column reads a 0. Row by row this builds up a picture of all keys.</p>
+  <p>From row and column a scancode is made: <code>row × 8 + column</code>. It runs from 0 to 111. The value $FF means “no key”.</p>
+  <p>Two things need attention. Mechanical contacts bounce: when pressed they switch back and forth for a few milliseconds. The program therefore scans twice, 10&nbsp;ms apart, and only believes what is the same both times. And without diodes at the keys, several keys pressed at the same time can create “ghost keys”. Our program therefore reports only one key at a time.</p>
+
+  <h2>The keyboard of this book</h2>
+  <p>The keyboard comes from a salvaged notebook, with a German layout and 89 keys. Of the board only the key foil and its connection pads are kept. The matrix has 14 rows and 8 columns, 87 positions are used. The keys Fn and Windows are not part of the matrix.</p>
+  <p>Here is the matrix, each cell with the key and the scancode below it:</p>
+  <table class="matrix">
+    <thead><tr><th>Row</th><th>Col. 0</th><th>Col. 1</th><th>Col. 2</th><th>Col. 3</th><th>Col. 4</th><th>Col. 5</th><th>Col. 6</th><th>Col. 7</th></tr></thead>
+    <tbody>
+      <tr><td>0<br><small>VIA2 PB0</small></td><td>1 !<br><small>0</small></td><td>A<br><small>1</small></td><td>^ °<br><small>2</small></td><td>Q @<br><small>3</small></td><td></td><td>Esc<br><small>5</small></td><td>Y<br><small>6</small></td><td>Tab<br><small>7</small></td></tr>
+      <tr><td>1<br><small>VIA2 PB1</small></td><td>3 § ³<br><small>8</small></td><td>D<br><small>9</small></td><td>F2<br><small>10</small></td><td>E €<br><small>11</small></td><td></td><td>F4<br><small>13</small></td><td>C<br><small>14</small></td><td>F3<br><small>15</small></td></tr>
+      <tr><td>2<br><small>VIA2 PB2</small></td><td>4 $<br><small>16</small></td><td>F<br><small>17</small></td><td>5 %<br><small>18</small></td><td>R<br><small>19</small></td><td>B<br><small>20</small></td><td>G<br><small>21</small></td><td>V<br><small>22</small></td><td>T<br><small>23</small></td></tr>
+      <tr><td>3<br><small>VIA2 PB3</small></td><td>7 / {<br><small>24</small></td><td>J<br><small>25</small></td><td>6 &amp;<br><small>26</small></td><td>U<br><small>27</small></td><td>N<br><small>28</small></td><td>H<br><small>29</small></td><td>M µ<br><small>30</small></td><td>Z<br><small>31</small></td></tr>
+      <tr><td>4<br><small>VIA2 PB4</small></td><td>8 ( [<br><small>32</small></td><td>K<br><small>33</small></td><td>´ `<br><small>34</small></td><td>I<br><small>35</small></td><td></td><td>F6<br><small>37</small></td><td>, ;<br><small>38</small></td><td>+ * ~<br><small>39</small></td></tr>
+      <tr><td>5<br><small>VIA2 PB5</small></td><td>0 = }<br><small>40</small></td><td>Ö<br><small>41</small></td><td>ß ? \<br><small>42</small></td><td>P<br><small>43</small></td><td>- _<br><small>44</small></td><td>Ä<br><small>45</small></td><td># &#x27;<br><small>46</small></td><td>Ü<br><small>47</small></td></tr>
+      <tr><td>6<br><small>VIA2 PB6</small></td><td>PrtSc<br><small>48</small></td><td></td><td></td><td>ScrLk<br><small>51</small></td><td>AltGr<br><small>52</small></td><td>Alt<br><small>53</small></td><td></td><td></td></tr>
+      <tr><td>7<br><small>VIA2 PB7</small></td><td>End<br><small>56</small></td><td></td><td>Home<br><small>58</small></td><td></td><td>Cursor ←<br><small>60</small></td><td>Cursor ↑<br><small>61</small></td><td>Pause<br><small>62</small></td><td>Menu<br><small>63</small></td></tr>
+      <tr><td>8<br><small>VIA1 PB0</small></td><td>F12<br><small>64</small></td><td>S<br><small>65</small></td><td>Ins<br><small>66</small></td><td>W<br><small>67</small></td><td>Cursor →<br><small>68</small></td><td></td><td><br><small>69</small></td><td>X<br><small>70</small></td><td>Caps Lock<br><small>71</small></td></tr>
+      <tr><td>9<br><small>VIA1 PB1</small></td><td>F10<br><small>72</small></td><td></td><td>F9<br><small>74</small></td><td></td><td>Space<br><small>76</small></td><td>F5<br><small>77</small></td><td>Enter<br><small>78</small></td><td>Backspace<br><small>79</small></td></tr>
+      <tr><td>10<br><small>VIA1 PB2</small></td><td>PgDn<br><small>80</small></td><td>L<br><small>81</small></td><td>PgUp<br><small>82</small></td><td>O<br><small>83</small></td><td></td><td></td><td>. :<br><small>86</small></td><td>F7<br><small>87</small></td></tr>
+      <tr><td>11<br><small>VIA1 PB3</small></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Shift right<br><small>94</small></td><td>Shift left<br><small>95</small></td></tr>
+      <tr><td>12<br><small>VIA1 PB4</small></td><td>F11<br><small>96</small></td><td>2 &quot; ²<br><small>97</small></td><td>Del<br><small>98</small></td><td>9 ) ]<br><small>99</small></td><td>Cursor ↓<br><small>100</small></td><td>F8<br><small>101</small></td><td>Num<br><small>102</small></td><td>F1<br><small>103</small></td></tr>
+      <tr><td>13<br><small>VIA1 PB5</small></td><td></td><td></td><td>Ctrl (left)<br><small>106</small></td><td></td><td></td><td></td><td>Ctrl (right)<br><small>110</small></td><td></td></tr>
+    </tbody>
+  </table>
+  <aside class="kasten">
+    <div class="kasten-titel">Your own keyboard</div>
+    <p>Another keyboard has another matrix. Measure it: expose the connection pads of the foil and hold one probe of a continuity tester to a pad. With the other probe touch the remaining pads while you press all keys one after the other. The tester beeps when a key connects the two pads. Note the pair of pads for every key. The pads fall into two groups, the rows and the columns.</p>
+  </aside>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-tastatur.svg" alt="Schematic: second VIA, keyboard connector JP3 and rows 8 to 13 at the first VIA">
+    <figcaption>Schematic of the keyboard</figcaption>
+  </figure>
+  <p>A second VIA (IC11) gets the output Y2 of the decoder as chip select. It thus lives at $7F40 to $7F5F: port B at $7F40, port A at $7F41, the direction registers at $7F42 and $7F43.</p>
+  <ul>
+    <li><strong>Columns:</strong> port A of the second VIA, PA0 to PA7, as inputs. The 6522 has its own pull-up resistors at port A, so external ones are not needed.</li>
+    <li><strong>Rows 0 to 7:</strong> port B of the second VIA, PB0 to PB7, as outputs.</li>
+    <li><strong>Rows 8 to 13:</strong> PB0 to PB5 of the first VIA. That is why the LED moved from PB0 to PA7 in chapter 9. PB6 and PB7 stay free.</li>
+  </ul>
+  <p>The keyboard is connected to the pin header JP3 by 22 wires. In the drawings the rows are called R0 to R13 and the columns C0 to C7:</p>
+  <table class="zusammen">
+    <thead><tr><th>JP3, pin</th><th>Signal</th><th>Connection</th></tr></thead>
+    <tbody>
+      <tr><td>1 to 6</td><td>R13 to R8</td><td>VIA 1, PB5 to PB0 (pins 15 to 10)</td></tr>
+      <tr><td>7 to 14</td><td>R7 to R0</td><td>VIA 2, PB7 to PB0 (pins 17 to 10)</td></tr>
+      <tr><td>15 to 22</td><td>C7 to C0</td><td>VIA 2, PA7 to PA0 (pins 9 to 2)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC11</td><td>VIA, DIP-40</td><td>6522</td></tr>
+      <tr><td>C15</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+      <tr><td>JP3</td><td>Pin header, 22 pins</td><td></td></tr>
+      <tr><td>–</td><td>Keyboard with matrix, 22 wires</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Plus two more breadboards.</p>
+
+  <h2>Assembly</h2>
+  <p>First the decoder gets its second output:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-dekoder137-via2.svg" alt="Breadboard 7 with the decoder and the new output Y2">
+    <figcaption>The decoder with output Y2 for the second VIA</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Bring out Y2 (pin&nbsp;13 of IC10, hole 8j) as /CS_VIA2.</div></li>
+  </ol>
+  <p>Then the second VIA:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via2.svg" alt="Breadboard 10 with the second VIA 6522 and wires with signal names">
+    <figcaption>The second VIA on breadboard 10</figcaption>
+  </figure>
+  <ol class="schritte" start="2">
+    <li><div>Run +5&nbsp;V and GND to a new breadboard and connect the upper rails to the lower ones there.</div></li>
+    <li><div>Insert IC11 across the channel, notch left, pin&nbsp;1 in hole 4d (wide IC, rows d and h).</div></li>
+    <li><div>Power as for the first VIA: pin&nbsp;20 (hole 23a) to +5&nbsp;V, pin&nbsp;1 (4a) to GND, CS1 (pin&nbsp;24, hole 20j) to +5&nbsp;V. C15 between the upper rails. /IRQ (pin&nbsp;21) stays open.</div></li>
+    <li><div>Connect the control wires to the connections of the same name. The table shows the pins.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (pin)</th><th>6522 (pin)</th></tr></thead>
+    <tbody>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>33, 32, 31, 30, 29, 28, 27, 26</td></tr>
+      <tr><td>A0 – A3</td><td>9, 10, 11, 12</td><td>38, 37, 36, 35</td></tr>
+      <tr><td>R/W</td><td>34</td><td>22</td></tr>
+      <tr><td>PHI2</td><td>39</td><td>25</td></tr>
+      <tr><td>/RESET</td><td>Breadboard 1, hole 11j</td><td>34</td></tr>
+      <tr><td>/CS_VIA2</td><td>IC10, pin 13</td><td>23 (/CS2)</td></tr>
+    </tbody>
+  </table>
+  <p>Rows 8 to 13 are at the first VIA. There pins&nbsp;10 to 15 (PB0 to PB5, holes 13a to 18a) each get a wire R8 to R13:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via-tast.svg" alt="Breadboard 8 with the first VIA: display, LED and the rows R8 to R13">
+    <figcaption>The first VIA with port A for the display and the rows R8 to R13</figcaption>
+  </figure>
+  <p>Finally the keyboard:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-tastatur.svg" alt="Breadboard 11 with the pin header JP3 and the 22 wires to the keyboard">
+    <figcaption>The keyboard at breadboard 11 (not to scale)</figcaption>
+  </figure>
+  <ol class="schritte" start="6">
+    <li><div>Solder 22 wires to the connection pads of the keyboard foil, in the order of the matrix table.</div></li>
+    <li><div>Insert the pin header JP3 into holes 5c to 26c and run the wires into holes 5d to 26d. Pin&nbsp;1 is on the left.</div></li>
+    <li><div>Connect R0 to R7 and C0 to C7 to the second VIA and R8 to R13 to the first VIA, each with the wire of the same name.</div></li>
+  </ol>
+
+  <h2>The program</h2>
+  <p>The program reports every newly pressed key with its scancode over the serial interface. <code>keys_scan</code> scans the 14 rows one after the other. <code>keys_update</code> repeats the scan after 10&nbsp;ms and keeps the code only if both results agree.</p>
+  <p>Important: rows 8 to 13 are at port B of the first VIA, whose PB6 and PB7 may be used otherwise. The program therefore changes only the lower six bits, with a mask. The main program:</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+ACIA_DATA    = $7f00
+ACIA_STATUS  = $7f01
+ACIA_COMMAND = $7f02
+ACIA_CONTROL = $7f03
+VIA1_ORB     = $7f20
+VIA1_DDRB    = $7f22
+VIA2_ORB     = $7f40
+VIA2_IRA     = $7f41
+VIA2_DDRB    = $7f42
+VIA2_DDRA    = $7f43
+
+        .zeropage
+ptr:    .res 2
+tmp:    .res 1
+code:   .res 1                  <span class="kommentar">; code of the pressed key ($FF = none)</span>
+last:   .res 1                  <span class="kommentar">; last code reported</span>
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff
+        txs
+        jsr acia_init
+        jsr keys_init
+        lda #$ff
+        sta last
+loop:   jsr keys_update
+        lda code
+        cmp last                <span class="kommentar">; report changes only</span>
+        beq loop
+        sta last
+        cmp #$ff
+        beq loop                <span class="kommentar">; releasing is not reported</span>
+        lda #&lt<span class="kommentar">;msg_key</span>
+        ldx #&gt<span class="kommentar">;msg_key</span>
+        jsr puts
+        lda code
+        jsr puthex
+        jsr newline
+        jmp loop</pre>
+  <p>Scanning the keyboard:</p>
+  <pre class="listing breit lang"><span class="kommentar">; set up the ports: rows output, columns input</span>
+keys_init:
+        lda #$ff
+        sta VIA2_DDRB           <span class="kommentar">; VIA2 port B: rows 0 to 7 as outputs</span>
+        lda #$00
+        sta VIA2_DDRA           <span class="kommentar">; VIA2 port A: columns 0 to 7 as inputs</span>
+        lda VIA1_DDRB
+        ora #$3f                <span class="kommentar">; VIA1 PB0 to PB5: rows 8 to 13 as outputs</span>
+        sta VIA1_DDRB
+        jmp rows_idle
+
+<span class="kommentar">; all rows high</span>
+rows_idle:
+        lda #$ff
+        sta VIA2_ORB
+        lda VIA1_ORB
+        ora #$3f
+        sta VIA1_ORB
+        rts
+
+<span class="kommentar">; X = row (0 to 13): only this row low</span>
+select_row:
+        jsr rows_idle
+        cpx #8
+        bcs @via1
+        lda row_mask,x
+        sta VIA2_ORB
+        rts
+@via1:  lda row_mask - 8,x
+        and VIA1_ORB
+        sta VIA1_ORB
+        rts
+
+row_mask: .byte $fe, $fd, $fb, $f7, $ef, $df, $bf, $7f
+
+<span class="kommentar">; scan the keyboard: A = scancode or $FF</span>
+keys_scan:
+        ldx #0
+@row:   jsr select_row
+        lda VIA2_IRA
+        eor #$ff                <span class="kommentar">; pressed = bit set</span>
+        bne @found
+        inx
+        cpx #14
+        bne @row
+        jsr rows_idle
+        lda #$ff
+        rts
+@found: ldy #0
+@bit:   lsr
+        bcs @done
+        iny
+        bne @bit
+@done:  sty tmp                 <span class="kommentar">; Y = column</span>
+        txa
+        asl
+        asl
+        asl
+        ora tmp                 <span class="kommentar">; row * 8 + column</span>
+        pha
+        jsr rows_idle
+        pla
+        rts
+
+<span class="kommentar">; scan with debouncing: code in code</span>
+keys_update:
+        jsr keys_scan
+        cmp #$ff
+        beq @none
+        sta code
+        ldx #10                 <span class="kommentar">; wait 10 ms and scan again</span>
+        jsr delay_ms
+        jsr keys_scan
+        cmp code
+        beq @done
+@none:  lda #$ff
+        sta code
+@done:  rts
+
+delay_ms:
+@ms:    ldy #199
+@us:    dey
+        bne @us
+        dex
+        bne @ms
+        rts</pre>
+  <p>The routines for output through the ACIA (<code>putc</code>, <code>puts</code>, <code>puthex</code> and <code>newline</code>) you know from chapter 7. The complete program is in <code>programme/en/tastatur.s</code>.</p>
+  <p>Assemble it and write it to the EEPROM like in the chapters before. Then open the terminal and type a few keys:</p>
+  <figure class="terminal">
+<pre>Scancode: $01
+Scancode: $1F
+Scancode: $4C
+Scancode: $51</pre>
+    <figcaption>The keys A, Z, space bar and L</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>If no key is reported, first check whether the second VIA answers at $7F40 (with the monitor: <code>w 7f42 ff</code> and then <code>m 7f40</code>). If a key reports the wrong scancode, two wires are swapped. The matrix table shows which.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

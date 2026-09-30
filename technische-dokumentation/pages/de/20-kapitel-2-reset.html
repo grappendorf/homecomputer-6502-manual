@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 2</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="2" data-titel="Reset-Schaltung" data-kurztitel="Reset-Schaltung">
+  <p>Beim Einschalten steigt die Versorgungsspannung nur langsam an. Dieses Kapitel baut eine Schaltung, die den Prozessor so lange im Reset hält, bis alles stabil ist. Ein Taster löst den Reset auch von Hand aus.</p>
+
+  <h2>Warum ein Reset?</h2>
+  <p>Wenn ein Computer eingeschaltet wird, steigt die Spannung nicht sofort auf 5&nbsp;V. Während einiger Takte arbeitet der Prozessor nicht zuverlässig. Deshalb wartet man mit dem Programmstart, bis die Umgebung sich beruhigt hat. Heute gibt es dafür fertige Überwachungsbausteine, die auch Spannungseinbrüche erkennen. Für einen historischen 6502-Computer leihen wir uns die Reset-Schaltung beim Commodore&nbsp;64: Ein Timer-Baustein NE555 hält die Reset-Leitung nach dem Einschalten etwa eine halbe Sekunde auf Low.</p>
+  <p>Den Schaltplan des C64 und seine Beschreibung der Reset-Schaltung finden Sie im C64 Service Manual auf archive.org.</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-reset.svg" alt="Schaltplan der Reset-Schaltung mit NE555, Taster und Inverter">
+    <figcaption>Schaltplan der Reset-Schaltung</figcaption>
+  </figure>
+  <p>Der NE555 arbeitet als Monoflop, das heißt: Ein kurzer Impuls am Eingang TRIG (Pin&nbsp;2) startet einen Impuls fester Länge am Ausgang OUT (Pin&nbsp;3). Die Länge bestimmen R4 und C5: <code>t = 1,1 · R4 · C5 = 1,1 · 47&nbsp;kΩ · 10&nbsp;µF ≈ 0,5&nbsp;s</code>. Pin&nbsp;6 und Pin&nbsp;7 sind dafür verbunden.</p>
+  <p>Beim Einschalten ist C4 noch leer, und TRIG liegt auf Low. Das startet das Monoflop. R3 (1&nbsp;MΩ) lädt C4 dann langsam auf, und TRIG geht auf High. Der Taster S1 zieht TRIG von Hand auf GND und startet dadurch den Impuls noch einmal.</p>
+  <p>Der Ausgang des 555 ist während des Impulses High. Der Prozessor braucht aber einen Reset, der bei Low aktiv ist (er heißt deshalb /RESET). Darum folgt der vierte Inverter des 74LS04 aus Kapitel 1, IC1D. Der Widerstand R5 (1&nbsp;kΩ) zieht den Ausgang nach dem Impuls auf +5&nbsp;V. Pin&nbsp;4 des 555 liegt auf +5&nbsp;V, damit der Baustein nicht versehentlich zurückgesetzt wird. Pin&nbsp;5 bleibt offen.</p>
+  <p>Der 6502 verlangt, dass /RESET mindestens zwei Taktzyklen lang Low ist. Die halbe Sekunde entspricht einer halben Million Takte, reicht also reichlich.</p>
+
+  <h2>Bauteile</h2>
+  <p>Zusätzlich zu den Bauteilen aus Kapitel 1:</p>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC2</td><td>Timer, DIP-8</td><td>NE555</td></tr>
+      <tr><td>R3</td><td>Widerstand</td><td>1&nbsp;MΩ</td></tr>
+      <tr><td>R4</td><td>Widerstand</td><td>47&nbsp;kΩ</td></tr>
+      <tr><td>R5</td><td>Widerstand</td><td>1&nbsp;kΩ</td></tr>
+      <tr><td>C3, C4</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+      <tr><td>C5</td><td>Elektrolytkondensator</td><td>10&nbsp;µF, mind. 10&nbsp;V</td></tr>
+      <tr><td>S1</td><td>Taster, 4 Beine</td><td>Reset</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Aufbau</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-reset.svg" alt="Steckbrett mit Takterzeugung und Reset-Schaltung">
+    <figcaption>Takt und Reset auf dem Steckbrett. Neu sind IC2 und alles rechts davon.</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Stecken Sie IC2 über die Rinne, Kerbe links, Pin&nbsp;1 in Loch 16e.</div></li>
+    <li><div>Versorgen Sie IC2: Pin&nbsp;8 (16j) an +5&nbsp;V, Pin&nbsp;1 (16a) an GND und Pin&nbsp;4 (19a) an +5&nbsp;V. Setzen Sie C3 zwischen die oberen Schienen.</div></li>
+    <li><div>Verbinden Sie Pin&nbsp;6 und Pin&nbsp;7 (17i und 18i).</div></li>
+    <li><div>Stecken Sie R4 von Loch 17h an +5&nbsp;V und C5 von Loch 18h an GND. Beim Elko kommt der Pluspol an 18h, die Seite mit dem Streifen an GND. Falsch herum eingebaut, kann er platzen.</div></li>
+    <li><div>Setzen Sie den Taster S1 über die Rinne (Löcher 22e, 24e, 22f, 24f). Verbinden Sie seine obere Hälfte (24j) mit GND.</div></li>
+    <li><div>Verbinden Sie Pin&nbsp;2 (17c) mit der unteren Hälfte des Tasters (22c). Stecken Sie R3 von Loch 24c an +5&nbsp;V und C4 von Loch 22b an GND.</div></li>
+    <li><div>Verbinden Sie den Ausgang, Pin&nbsp;3 (18d), mit Pin&nbsp;9 von IC1 (Loch 10h).</div></li>
+    <li><div>Verbinden Sie Pin&nbsp;8 von IC1 (11i) mit 12i und setzen Sie R5 von Loch 12h an +5&nbsp;V. Das Signal /RESET greifen Sie an Loch 11j ab.</div></li>
+  </ol>
+
+  <h2>Messen</h2>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/messung-reset.svg" alt="Oszilloskopbild: Versorgungsspannung und Reset-Signal beim Einschalten">
+    <figcaption>Kanal 1 zeigt die Versorgung, Kanal 2 das Signal /RESET</figcaption>
+  </figure>
+  <p>Kanal 1 ist die Versorgungsspannung, Kanal 2 die Leitung /RESET. Nach dem Einschalten bleibt /RESET etwa 560&nbsp;ms lang auf Low und geht dann auf High. Auch ein Druck auf den Taster erzeugt einen Impuls von über einer halben Sekunde.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Kein Impuls? Prüfen Sie zuerst die Polung von C5 und ob Pin&nbsp;4 des 555 an +5&nbsp;V liegt. Ist der Impuls viel zu kurz oder zu lang, stimmen R4 oder C5 nicht.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

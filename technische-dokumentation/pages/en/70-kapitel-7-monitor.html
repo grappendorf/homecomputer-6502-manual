@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 7</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="7" data-titel="The Monitor Program" data-kurztitel="Monitor program">
+  <p>From now on the computer becomes a tool for itself. A small program in ROM takes commands from the PC and lets you look at memory, change it and start programs. This chapter needs no new hardware.</p>
+
+  <h2>What a monitor does</h2>
+  <p>A monitor is a supervisor program: it sits in ROM, waits for commands and executes them. Our first monitor knows only three. From here one can grow it into a full tool with an assembler, disassembler, register display, breakpoints, single stepping and loading and saving of programs.</p>
+  <table class="zusammen">
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>m &lt;address&gt;</code></td><td>show 16 bytes from the address as hex numbers and as characters</td></tr>
+      <tr><td><code>w &lt;address&gt; &lt;byte&gt;</code></td><td>write the byte to the address</td></tr>
+      <tr><td><code>j &lt;address&gt;</code></td><td>jump to the address. An <code>RTS</code> returns to the monitor.</td></tr>
+    </tbody>
+  </table>
+  <p>You enter addresses and bytes in hexadecimal, in upper or lower case and without a dollar sign.</p>
+
+  <h2>A session</h2>
+  <p>After switching on, the monitor reports in the terminal. At power-on the RAM contains random values, so yours will look different:</p>
+  <figure class="terminal">
+<pre>Welcome to the 6502 monitor program!
+> <span class="eingabe">m 4000</span>
+4000  FF C0 F7 82 FF 10 FF 02  00 BF 21 BF 00 AF 00 FF   |..........!.....|
+> <span class="eingabe">w 4000 a5</span>
+4000:A5
+> <span class="eingabe">m 4000</span>
+4000  A5 C0 F7 82 FF 10 FF 02  00 BF 21 BF 00 AF 00 FF   |..........!.....|
+> <span class="eingabe">x</span>
+Unknown command
+> </pre>
+    <figcaption>Showing and changing memory</figcaption>
+  </figure>
+  <p>The display has the address at the front, then 16 bytes in two groups of eight and on the right the characters between vertical bars. Bytes that cannot be printed show up as a dot. To <code>w</code> the monitor answers with the value it reads back from memory afterwards. If the address cannot be written, for example in ROM, you would still see the old value there.</p>
+  <p>With <code>w</code> and <code>j</code> you can type in a program byte by byte and start it. This one prints an asterisk:</p>
+  <ul>
+    <li><code>A9 2A</code> is <code>LDA #'*'</code>,</li>
+    <li><code>8D 00 7F</code> is <code>STA $7F00</code> and sends the character to the ACIA,</li>
+    <li><code>60</code> is <code>RTS</code> and returns to the monitor.</li>
+  </ul>
+  <figure class="terminal">
+<pre>> <span class="eingabe">w 0300 a9</span>
+0300:A9
+> <span class="eingabe">w 0301 2a</span>
+0301:2A
+> <span class="eingabe">w 0302 8d</span>
+0302:8D
+> <span class="eingabe">w 0303 00</span>
+0303:00
+> <span class="eingabe">w 0304 7f</span>
+0304:7F
+> <span class="eingabe">w 0305 60</span>
+0305:60
+> <span class="eingabe">j 0300</span>
+*> </pre>
+    <figcaption>Typing in a program in RAM and starting it</figcaption>
+  </figure>
+
+  <h2>Structure of the program</h2>
+  <p>The program is split into small subroutines. Do not look for optimization of space or speed in it. What mattered was that the code stays readable and easy to change.</p>
+  <ul>
+    <li><strong>Main loop:</strong> it prints the prompt <code>&gt;</code>, reads a line and branches on the first letter to one of the three commands.</li>
+    <li><strong>Commands:</strong> <code>cmd_memory</code>, <code>cmd_write</code> and <code>cmd_jump</code>. Unknown commands and missing numbers lead to the message “Unknown command”.</li>
+    <li><strong>Reading input:</strong> <code>gets</code> reads characters up to the end of the line (Return), allows backspace and ignores control characters. <code>parse_hex</code> turns a hex number of the line into a 16-bit value.</li>
+    <li><strong>Output:</strong> <code>puts</code> prints a text, <code>puthex</code> a byte as two hex digits.</li>
+    <li><strong>ACIA:</strong> <code>putc</code> and <code>getc</code> send and receive one character each and wait for the status bit.</li>
+  </ul>
+  <p>The jump with <code>j</code> needs a small trick: the 6502 has no <code>JSR</code> through a pointer. So <code>cmd_jump</code> calls the label <code>call</code> with <code>JSR</code>, and there stands <code>JMP (val)</code>. The <code>RTS</code> of the called program then returns behind the <code>JSR</code>.</p>
+  <p>The variables live in RAM. The zero page holds the pointers, the input line starts at $0200, and the stack grows downwards from $01FF as always.</p>
+
+  <h2>The program</h2>
+  <p>First the configuration. New is the <code>BSS</code> section for variables without an initial value. It lives in RAM and does not go into the ROM file:</p>
+  <pre class="listing">MEMORY
+{
+  ZP:  start=$0000, size=$0100, type=rw, define=yes, file="";
+  RAM: start=$0200, size=$7d00, type=rw, define=yes, file="";
+  ROM: start=$8000, size=$8000, type=ro, define=yes, fill=yes, file=%O;
+}
+SEGMENTS
+{
+  ZEROPAGE: load=ZP,  type=zp,  define=yes;
+  BSS:      load=RAM, type=bss, define=yes;
+  CODE:     load=ROM, type=ro;
+  VECTORS:  load=ROM, type=ro, offset=$7ffa;
+}</pre>
+  <p>Then the main loop:</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+ACIA_DATA    = $7f00
+ACIA_STATUS  = $7f01
+ACIA_COMMAND = $7f02
+ACIA_CONTROL = $7f03
+
+BUFLEN = 80
+
+        .zeropage
+ptr:    .res 2                  <span class="kommentar">; pointer for strings and memory access</span>
+val:    .res 2                  <span class="kommentar">; value from parse_hex</span>
+tmp:    .res 1                  <span class="kommentar">; scratch variable</span>
+
+        .bss
+buffer: .res BUFLEN + 1         <span class="kommentar">; input line</span>
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff                <span class="kommentar">; initialize the stack</span>
+        txs
+        jsr acia_init
+        lda #&lt<span class="kommentar">;msg_welcome</span>
+        ldx #&gt<span class="kommentar">;msg_welcome</span>
+        jsr puts
+
+loop:   lda #&lt<span class="kommentar">;prompt</span>
+        ldx #&gt<span class="kommentar">;prompt</span>
+        jsr puts
+        jsr gets                <span class="kommentar">; read a line</span>
+        lda buffer
+        beq loop                <span class="kommentar">; empty line: do nothing</span>
+        cmp #'m'
+        bne @check_w
+        jsr cmd_memory
+        jmp loop
+@check_w:
+        cmp #'w'
+        bne @check_j
+        jsr cmd_write
+        jmp loop
+@check_j:
+        cmp #'j'
+        bne @unknown
+        jsr cmd_jump
+        jmp loop
+@unknown:
+        jsr error
+        jmp loop</pre>
+  <p>The three commands:</p>
+  <pre class="listing breit lang"><span class="kommentar">; print an error message</span>
+error:  lda #&lt<span class="kommentar">;msg_unknown</span>
+        ldx #&gt<span class="kommentar">;msg_unknown</span>
+        jmp puts
+
+<span class="kommentar">; m &lt;address&gt;: show 16 bytes</span>
+cmd_memory:
+        ldy #1
+        jsr parse_hex
+        bcs @error
+        lda val
+        sta ptr
+        lda val+1
+        sta ptr+1
+        lda ptr+1               <span class="kommentar">; print the address</span>
+        jsr puthex
+        lda ptr
+        jsr puthex
+        jsr space
+        jsr space
+        ldy #0
+@hex:   lda (ptr),y
+        jsr puthex
+        jsr space
+        cpy #7
+        bne @next
+        jsr space               <span class="kommentar">; gap between the two halves</span>
+@next:  iny
+        cpy #16
+        bne @hex
+        jsr space
+        jsr space
+        lda #'|'
+        jsr putc
+        ldy #0
+@ascii: lda (ptr),y
+        cmp #' '
+        bcc @dot                <span class="kommentar">; printable characters only, else a dot</span>
+        cmp #$7f
+        bcc @put
+@dot:   lda #'.'
+@put:   jsr putc
+        iny
+        cpy #16
+        bne @ascii
+        lda #'|'
+        jsr putc
+        jmp newline
+@error: jmp error
+
+<span class="kommentar">; w &lt;address&gt; &lt;byte&gt;: write a byte</span>
+cmd_write:
+        ldy #1
+        jsr parse_hex
+        bcs @error
+        lda val
+        sta ptr
+        lda val+1
+        sta ptr+1
+        jsr parse_hex           <span class="kommentar">; second value: the byte</span>
+        bcs @error
+        lda val
+        ldy #0
+        sta (ptr),y             <span class="kommentar">; store the byte</span>
+        lda ptr+1
+        jsr puthex
+        lda ptr
+        jsr puthex
+        lda #':'
+        jsr putc
+        lda (ptr),y             <span class="kommentar">; read back for checking</span>
+        jsr puthex
+        jmp newline
+@error: jmp error
+
+<span class="kommentar">; j &lt;address&gt;: call a program, RTS returns</span>
+cmd_jump:
+        ldy #1
+        jsr parse_hex
+        bcs @error
+        jsr call
+        rts
+@error: jmp error
+call:   jmp (val)               <span class="kommentar">; JSR to here, JMP to the target: its RTS returns to cmd_jump</span></pre>
+  <p>Input: reading and printing hex numbers.</p>
+  <pre class="listing breit lang"><span class="kommentar">; Reads a hex number from position Y of the input into val. Carry set: no number.</span>
+parse_hex:
+        lda #0
+        sta val
+        sta val+1
+@skip:  lda buffer,y
+        cmp #' '
+        bne @first
+        iny
+        bne @skip
+@first: jsr hexdigit
+        bcs @none
+@digit: sta tmp
+        asl val                 <span class="kommentar">; val = val * 16</span>
+        rol val+1
+        asl val
+        rol val+1
+        asl val
+        rol val+1
+        asl val
+        rol val+1
+        lda val
+        ora tmp
+        sta val
+        iny
+        lda buffer,y
+        jsr hexdigit
+        bcc @digit
+        clc
+        rts
+@none:  sec
+        rts
+
+<span class="kommentar">; A = character -&gt; A = value 0..15, carry set: not a hex digit</span>
+hexdigit:
+        cmp #'0'
+        bcc @no
+        cmp #'9' + 1
+        bcc @decimal
+        ora #$20                <span class="kommentar">; convert to lower case</span>
+        cmp #'a'
+        bcc @no
+        cmp #'f' + 1
+        bcs @no
+        sec
+        sbc #'a' - 10
+        clc
+        rts
+@decimal:
+        sec
+        sbc #'0'
+        clc
+        rts
+@no:    sec
+        rts
+
+<span class="kommentar">; print A as two hex digits</span>
+puthex: pha
+        lsr
+        lsr
+        lsr
+        lsr
+        jsr @nibble
+        pla
+        and #$0f
+@nibble:
+        cmp #10
+        bcc @digit
+        adc #'A' - 10 - 1       <span class="kommentar">; carry is set: +1</span>
+        jmp putc
+@digit: ora #'0'
+        jmp putc
+
+space:  lda #' '
+        jmp putc
+
+newline:
+        lda #$0d
+        jsr putc
+        lda #$0a
+        jmp putc</pre>
+  <p>Reading a line and printing text. Finally the character input and output through the ACIA and the texts:</p>
+  <pre class="listing breit lang"><span class="kommentar">; print text, address in A (low) and X (high)</span>
+puts:   sta ptr
+        stx ptr+1
+        ldy #0
+@loop:  lda (ptr),y
+        beq @done
+        jsr putc
+        iny
+        bne @loop
+@done:  rts
+
+<span class="kommentar">; read a line into buffer, backspace allowed</span>
+gets:   ldx #0
+@loop:  jsr getc
+        cmp #$0d
+        beq @done
+        cmp #$08
+        beq @back
+        cmp #$7f
+        beq @back
+        cmp #' '
+        bcc @loop               <span class="kommentar">; ignore control characters</span>
+        cpx #BUFLEN
+        bcs @loop
+        sta buffer,x
+        inx
+        jsr putc                <span class="kommentar">; echo the character</span>
+        jmp @loop
+@back:  cpx #0
+        beq @loop
+        dex
+        lda #$08
+        jsr putc
+        lda #' '
+        jsr putc
+        lda #$08
+        jsr putc
+        jmp @loop
+@done:  lda #0
+        sta buffer,x
+        jmp newline</pre>
+  <pre class="listing breit lang"><span class="kommentar">; ACIA: output and input of one character</span>
+acia_init:
+        lda #%00001011
+        sta ACIA_COMMAND
+        lda #%00011111
+        sta ACIA_CONTROL
+        rts
+
+putc:   pha
+@wait:  lda ACIA_STATUS
+        and #$10
+        beq @wait
+        pla
+        sta ACIA_DATA
+        rts
+
+getc:   lda ACIA_STATUS
+        and #$08
+        beq getc
+        lda ACIA_DATA
+        rts
+
+prompt:      .byte "&gt<span class="kommentar">; ", $00</span>
+msg_welcome: .byte $0d, $0a, "Welcome to the 6502 monitor program!", $0d, $0a, $00
+msg_unknown: .byte "Unknown command", $0d, $0a, $00</pre>
+
+  <h2>Assembling and starting</h2>
+  <pre class="listing">$ ca65 -o monitor.o monitor.s
+$ ld65 -C monitor.cfg -o monitor.bin monitor.o
+$ minipro -p AT28C256 -w monitor.bin</pre>
+  <p>Connect the converter, start the terminal program with <code>picocom -b 19200 /dev/ttyUSB0</code> and switch the computer on. The monitor reports with its prompt.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>The program sends Return and Line Feed at the end of a line. From your terminal it expects only Return. If a Line Feed arrives as well, it is ignored. Jump with <code>j</code> only to addresses where a program really is. Otherwise the computer crashes and you have to reset it.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

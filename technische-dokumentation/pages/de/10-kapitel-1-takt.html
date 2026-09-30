@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 1</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="1" data-titel="Takterzeugung" data-kurztitel="Takterzeugung">
+  <p>Jeder Computer braucht einen Herzschlag: ein Rechtecksignal, das den Prozessor von Schritt zu Schritt treibt. In diesem Kapitel bauen Sie ihn aus einem Quarz und einem 74LS04, dem ersten Baustein des Computers.</p>
+
+  <h2>Wozu ein Takt?</h2>
+  <p>Ein einfacher Prozessor wie der 6502 arbeitet so: Im ersten Taktzyklus holt er den nächsten Befehl aus dem Speicher. In den folgenden Zyklen holt er die Operanden, führt die Operation aus und schreibt das Ergebnis zurück. Jeder Schritt braucht mindestens einen Takt.</p>
+  <p>Wie schnell der Takt sein darf, hängt vom Typ ab: Ein normaler 6502 verträgt bis zu 1&nbsp;MHz, ein 6502A bis zu 2&nbsp;MHz, ein 6502B bis zu 3&nbsp;MHz. Es sind wirklich Megahertz, keine Gigahertz. Der HomeComputer 6502 läuft mit 1&nbsp;MHz.</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-takt.svg" alt="Schaltplan der Takterzeugung: drei Inverter, Quarz, zwei Widerstände und ein Kondensator">
+    <figcaption>Schaltplan der Takterzeugung</figcaption>
+  </figure>
+  <p>Es ist ein klassischer Quarzoszillator aus drei Invertern des 74LS04. Die ersten beiden bilden zusammen mit dem Quarz, zwei Widerständen und einem Kondensator einen Reihenresonanz-Oszillator. Er schwingt mit der Frequenz des Quarzes. Der dritte Inverter trennt als Puffer den Ausgang von der Schwingschaltung.</p>
+  <p>Die beiden Widerstände R1 und R2 (je 1&nbsp;kΩ) legen die Inverter in einen Arbeitspunkt zwischen „0“ und „1“, in dem sie wie Verstärker arbeiten. C1 koppelt die beiden Stufen. Der Quarz Q1 liegt zwischen Eingang des ersten und Ausgang des zweiten Inverters und lässt nur seine eigene Frequenz durch. Ausgang ist Pin&nbsp;6 des 74LS04. Dort liegt das Taktsignal CLK.</p>
+  <p>Der Kondensator C2 (100&nbsp;nF) sitzt dicht am IC zwischen +5&nbsp;V und GND. Er liefert kurze Stromspitzen beim Schalten und hält die Versorgung ruhig. Jedes IC in diesem Computer bekommt so einen Kondensator.</p>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC1</td><td>Sechsfach-Inverter, DIP-14</td><td>74LS04</td></tr>
+      <tr><td>Q1</td><td>Quarz, Grundton</td><td>1&nbsp;MHz</td></tr>
+      <tr><td>R1, R2</td><td>Widerstand</td><td>1&nbsp;kΩ</td></tr>
+      <tr><td>C1</td><td>Keramikkondensator</td><td>68&nbsp;nF</td></tr>
+      <tr><td>C2</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Aufbau</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-takt.svg" alt="Steckbrett mit dem Taktgenerator: 74LS04, zwei Widerstände, Kondensator und Quarz">
+    <figcaption>Die Takterzeugung auf dem Steckbrett</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Führen Sie +5&nbsp;V und GND links an die oberen Schienen. Verbinden Sie die oberen Schienen mit den unteren, damit beide Seiten Spannung haben.</div></li>
+    <li><div>Stecken Sie IC1 über die Mittelrinne. Die Kerbe zeigt nach links, Pin&nbsp;1 sitzt in Loch 5e.</div></li>
+    <li><div>Versorgen Sie IC1: Pin&nbsp;14 (Loch 5j) an +5&nbsp;V, Pin&nbsp;7 (Loch 11a) an GND. Setzen Sie C2 zwischen die oberen Schienen.</div></li>
+    <li><div>Stecken Sie R1 zwischen Pin&nbsp;1 und Pin&nbsp;2 (5b und 6b) und R2 zwischen Pin&nbsp;3 und Pin&nbsp;4 (7b und 8b).</div></li>
+    <li><div>Stecken Sie C1 zwischen Pin&nbsp;2 und Pin&nbsp;3 (6c und 7c).</div></li>
+    <li><div>Stecken Sie den Quarz Q1 zwischen Pin&nbsp;1 und Pin&nbsp;4 (5a und 8a). Er hat keine Polung.</div></li>
+    <li><div>Verbinden Sie Pin&nbsp;4 mit Pin&nbsp;5 (8d und 9d). Damit bekommt der dritte Inverter sein Signal.</div></li>
+    <li><div>Kontrollieren Sie alles noch einmal und schalten Sie die Spannung ein. Das Taktsignal liegt an Pin&nbsp;6 (Loch 10c).</div></li>
+  </ol>
+  <p>Die nicht benutzten Gatter des 74LS04 bleiben offen. Das ist bei dieser Bauform unkritisch.</p>
+
+  <h2>Messen</h2>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/messung-takt.svg" alt="Oszilloskopbild des Taktsignals">
+    <figcaption>Das Taktsignal an Pin 6 des 74LS04</figcaption>
+  </figure>
+  <p>Am Oszilloskop sehen Sie ein Rechtecksignal mit einer Periode von 1&nbsp;µs, also 1&nbsp;MHz. Ein perfektes Rechteck ist es nicht: Es schwingt nach jeder Flanke nach, und der obere Pegel steigt nur langsam auf etwa 4,2&nbsp;V. Für einen 6502 reicht das völlig.</p>
+  <p>Haben Sie kein Oszilloskop, dann prüft Kapitel 3 den Takt indirekt: Nur wenn er läuft, arbeitet der Prozessor.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Im fertigen Computer sitzt anstelle dieser Schaltung ein Quarzoszillator-Baustein. Er liefert 1&nbsp;MHz im TTL-Pegel und ist viel bequemer. Zum Verstehen und Ausprobieren ist die Schaltung aus Invertern aber lehrreicher.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

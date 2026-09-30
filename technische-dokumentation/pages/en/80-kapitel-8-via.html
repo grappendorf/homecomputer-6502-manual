@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 8</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="8" data-titel="The VIA: Ports and Timers" data-kurztitel="VIA">
+  <p>Now comes the “Hello World” of microcontrollers: a blinking LED. For this the computer gets another chip, the VIA 6522, and the address decoding is extended for several IO chips.</p>
+
+  <h2>More than one IO chip</h2>
+  <p>So far /CS1 of the ACIA is tied directly to /CS_IO. The ACIA therefore answers in the whole IO area, repeated 64 times in the 256 bytes from $7F00 to $7FFF. With several IO chips that no longer works. We divide the area into blocks, each with its own chip select signal.</p>
+  <p>A 3-to-8 decoder 74LS137 does that. It is only active when /CS_IO is low. Then A7, A6 and A5 select one of eight blocks of 32 bytes. One of eight outputs goes low:</p>
+  <table class="zusammen">
+    <thead><tr><th>Output</th><th>Addresses</th><th>Chip</th></tr></thead>
+    <tbody>
+      <tr><td>Y0</td><td>$7F00 to $7F1F</td><td>ACIA (/CS_ACIA)</td></tr>
+      <tr><td>Y1</td><td>$7F20 to $7F3F</td><td>VIA (/CS_VIA)</td></tr>
+      <tr><td>Y2 to Y7</td><td>$7F40 to $7FFF</td><td>still free</td></tr>
+    </tbody>
+  </table>
+  <p>Each block has room for up to 32 registers. The ACIA needs four, the VIA 16, and a SID later 29. The registers of an ACIA repeat eight times in its block. The addresses $7F00 to $7F03 stay the same, though, and the monitor program keeps running unchanged.</p>
+
+  <h2>The VIA 6522</h2>
+  <p>The VIA (Versatile Interface Adapter) has two 8-bit ports A and B, two 16-bit counters (timers), a shift register and four control lines. Every port line can be set individually as input or output. For that each port has a direction register (DDR): a 1 makes the line an output, a 0 an input. The output register (ORA, ORB) determines the level of the outputs.</p>
+  <p>Four address lines A0 to A3 select one of 16 registers. In the block starting at $7F20 they are here:</p>
+  <table class="zusammen">
+    <thead><tr><th>Address</th><th>Register</th><th>Address</th><th>Register</th></tr></thead>
+    <tbody>
+      <tr><td>$7F20</td><td>ORB / IRB (port B)</td><td>$7F28</td><td>T2C-L (timer 2)</td></tr>
+      <tr><td>$7F21</td><td>ORA / IRA (port A)</td><td>$7F29</td><td>T2C-H</td></tr>
+      <tr><td>$7F22</td><td>DDRB</td><td>$7F2A</td><td>SR (shift register)</td></tr>
+      <tr><td>$7F23</td><td>DDRA</td><td>$7F2B</td><td>ACR (auxiliary control)</td></tr>
+      <tr><td>$7F24</td><td>T1C-L (timer 1)</td><td>$7F2C</td><td>PCR (line control)</td></tr>
+      <tr><td>$7F25</td><td>T1C-H</td><td>$7F2D</td><td>IFR (interrupt flags)</td></tr>
+      <tr><td>$7F26</td><td>T1L-L</td><td>$7F2E</td><td>IER (interrupt enable)</td></tr>
+      <tr><td>$7F27</td><td>T1L-H</td><td>$7F2F</td><td>ORA / IRA without handshake</td></tr>
+    </tbody>
+  </table>
+  <p>In this chapter we only need two: DDRB and ORB.</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-via.svg" alt="Schematic: decoder 74LS137, VIA 6522 with an LED at PB0">
+    <figcaption>Schematic of the decoder and the VIA</figcaption>
+  </figure>
+  <p>The decoder IC10 gets A5, A6 and A7 at its inputs A, B and C. G1 is tied to +5&nbsp;V and /G2 to /CS_IO, so that it only works in the IO area. /GL is tied to GND and makes the address inputs “transparent”. Y0 goes to pin&nbsp;3 of the ACIA as /CS_ACIA, Y1 to the VIA as /CS_VIA.</p>
+  <p>The VIA is connected to the data bus, to PHI2, R/W and /RES. CS1 is tied to +5&nbsp;V, /CS2 gets /CS_VIA. RS0 to RS3 are connected to A0 to A3. The LED hangs at PB0 through a series resistor of 270&nbsp;Ω, its other side is at GND. The outputs of port B deliver enough current for an LED.</p>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC9</td><td>VIA, DIP-40</td><td>6522</td></tr>
+      <tr><td>IC10</td><td>3-to-8 decoder, DIP-16</td><td>74LS137</td></tr>
+      <tr><td>D1</td><td>LED</td><td>5&nbsp;mm</td></tr>
+      <tr><td>R10</td><td>Resistor</td><td>270&nbsp;Ω</td></tr>
+      <tr><td>C13, C14</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+  <p>Plus two more breadboards.</p>
+
+  <h2>Assembly</h2>
+  <p>First the decoder:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-dekoder137.svg" alt="Breadboard 7 with the decoder 74LS137">
+    <figcaption>The decoder on breadboard 7</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Run +5&nbsp;V and GND to a new breadboard and connect the upper rails to the lower ones there.</div></li>
+    <li><div>Insert IC10 across the channel, notch left, pin&nbsp;1 in hole 5e.</div></li>
+    <li><div>Power: pin&nbsp;16 (5j) to +5&nbsp;V, pin&nbsp;8 (12a) to GND. Tie G1 (pin&nbsp;6, hole 10a) to +5&nbsp;V and /GL (pin&nbsp;4, hole 8a) to GND. Place C13 between the upper rails.</div></li>
+    <li><div>Connect A5, A6 and A7 (pins&nbsp;14, 15 and 16 of the 6502) to pins&nbsp;1, 2 and 3 of IC10.</div></li>
+    <li><div>/CS_IO (pin&nbsp;8 of IC7 on breadboard 5) goes to pin&nbsp;5 of IC10.</div></li>
+    <li><div>The outputs: pin&nbsp;15 (Y0, hole 6j) is /CS_ACIA, pin&nbsp;14 (Y1, hole 7j) is /CS_VIA.</div></li>
+    <li><div>On breadboard 4: pull off the wire from /CS_IO to pin&nbsp;3 of the ACIA and run /CS_ACIA there instead.</div></li>
+  </ol>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-acia-137.svg" alt="Breadboard 4 with the ACIA, /CS1 at /CS_ACIA">
+    <figcaption>The ACIA with chip select from /CS_ACIA</figcaption>
+  </figure>
+  <p>Then the VIA with the LED:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via.svg" alt="Breadboard 8 with the VIA 6522 and the LED">
+    <figcaption>The VIA on breadboard 8, LED at PB0</figcaption>
+  </figure>
+  <ol class="schritte" start="8">
+    <li><div>Run +5&nbsp;V and GND to another breadboard and connect the upper rails to the lower ones there.</div></li>
+    <li><div>Insert IC9 across the channel, notch left, pin&nbsp;1 in hole 4d (wide IC, rows d and h).</div></li>
+    <li><div>Power: pin&nbsp;20 (hole 23a) to +5&nbsp;V, pin&nbsp;1 (4a) to GND and CS1 (pin&nbsp;24, hole 20j) to +5&nbsp;V. Place C14 between the upper rails.</div></li>
+    <li><div>Connect the remaining connections with wires of the same name. The table shows the pins. /IRQ (pin&nbsp;21) stays open for now.</div></li>
+    <li><div>The LED: run PB0 (pin&nbsp;10, hole 13b) by wire to hole 27b. Insert R10 from 27c to 31c and the LED with the anode (long leg) at 31b and the cathode at GND.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (pin)</th><th>6522 (pin)</th></tr></thead>
+    <tbody>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>33, 32, 31, 30, 29, 28, 27, 26</td></tr>
+      <tr><td>A0 – A3</td><td>9, 10, 11, 12</td><td>38, 37, 36, 35</td></tr>
+      <tr><td>R/W</td><td>34</td><td>22</td></tr>
+      <tr><td>PHI2</td><td>39</td><td>25</td></tr>
+      <tr><td>/RESET</td><td>Breadboard 1, hole 11j</td><td>34</td></tr>
+      <tr><td>/CS_VIA</td><td>IC10, pin 14</td><td>23 (/CS2)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The program</h2>
+  <p>We set all lines of port B to output, switch the levels off, wait, switch them on, wait again, and so on forever. The delay loop counts 200 times 256 passes. Each pass of the inner loop takes five clocks. That makes about 257,000 clocks, or roughly 0.26 seconds between the changes. The LED blinks about twice a second.</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+VIA_ORB  = $7f20
+VIA_DDRB = $7f22
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   lda #$ff                <span class="kommentar">; all lines of port B as outputs</span>
+        sta VIA_DDRB
+loop:   lda #$00                <span class="kommentar">; LED off</span>
+        sta VIA_ORB
+        jsr delay
+        lda #$ff                <span class="kommentar">; LED on</span>
+        sta VIA_ORB
+        jsr delay
+        jmp loop
+
+delay:  ldx #200                <span class="kommentar">; delay loop: 200 × 256 passes, about a quarter of a second</span>
+@outer: ldy #0
+@inner: dey
+        bne @inner
+        dex
+        bne @outer
+        rts</pre>
+  <p>Assemble it as in chapter 4 with <code>first.cfg</code> and write it to the EEPROM:</p>
+  <pre class="listing">$ ca65 -o blink.o blink.s
+$ ld65 -C first.cfg -o blink.bin blink.o
+$ minipro -p AT28C256 -w blink.bin</pre>
+
+  <h2>Measuring</h2>
+  <p>At pin PB0 you see a square wave. It changes between low and high about every 0.26 seconds.</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/messung-led.svg" alt="Oscilloscope picture: voltage at PB0, square wave of about 2 Hz">
+    <figcaption>Voltage at PB0 with the blinking LED</figcaption>
+  </figure>
+  <p>If you still have the monitor program from chapter 7 in the EEPROM, you can switch the LED by hand beforehand. That tests the circuit and the decoder before the software comes into play:</p>
+  <figure class="terminal">
+<pre>&gt; <span class="eingabe">w 7f22 ff</span>
+7F22:FF
+&gt; <span class="eingabe">w 7f20 01</span>
+7F20:01
+&gt; <span class="eingabe">w 7f20 00</span>
+7F20:00</pre>
+    <figcaption>Switching the LED on and off with the monitor</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>Nothing lights up? Check the polarity of the LED and whether /CS_VIA (pin&nbsp;23 of the VIA) goes low briefly when you write to $7F20. If the ACIA no longer answers, something is wrong at the decoder: its /CS1 must now come from Y0.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 8</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="8" data-titel="Das VIA: Ports und Timer" data-kurztitel="VIA">
+  <p>Jetzt kommt das „Hello World“ der Mikrocontroller: eine blinkende LED. Dazu bekommt der Computer einen weiteren Baustein, den VIA 6522, und die Adressdekodierung wird für mehrere IO-Bausteine ausgebaut.</p>
+
+  <h2>Mehr als ein IO-Baustein</h2>
+  <p>Bisher hängt /CS1 der ACIA direkt an /CS_IO. Die ACIA antwortet deshalb im ganzen IO-Bereich, 64-mal wiederholt in den 256 Bytes von $7F00 bis $7FFF. Mit mehreren IO-Bausteinen geht das nicht mehr. Wir teilen den Bereich in Blöcke, jeder mit eigenem Chip-Select-Signal.</p>
+  <p>Das erledigt ein 3-zu-8-Dekoder 74LS137. Er ist nur aktiv, wenn /CS_IO Low ist. Dann wählen A7, A6 und A5 einen von acht Blöcken zu je 32 Bytes. Einer von acht Ausgängen geht auf Low:</p>
+  <table class="zusammen">
+    <thead><tr><th>Ausgang</th><th>Adressen</th><th>Baustein</th></tr></thead>
+    <tbody>
+      <tr><td>Y0</td><td>$7F00 bis $7F1F</td><td>ACIA (/CS_ACIA)</td></tr>
+      <tr><td>Y1</td><td>$7F20 bis $7F3F</td><td>VIA (/CS_VIA)</td></tr>
+      <tr><td>Y2 bis Y7</td><td>$7F40 bis $7FFF</td><td>noch frei</td></tr>
+    </tbody>
+  </table>
+  <p>Jeder Block hat Platz für bis zu 32 Register. Die ACIA braucht vier, der VIA 16, und ein SID später 29. Die Register einer ACIA wiederholen sich im Block acht Mal. Die Adressen $7F00 bis $7F03 bleiben aber dieselben, das Monitorprogramm läuft unverändert weiter.</p>
+
+  <h2>Der VIA 6522</h2>
+  <p>Der VIA (Versatile Interface Adapter) hat zwei 8-Bit-Ports A und B, zwei 16-Bit-Zähler (Timer), ein Schieberegister und vier Steuerleitungen. Jede Portleitung lässt sich einzeln als Ein- oder Ausgang einstellen. Dafür gibt es je Port ein Richtungsregister (DDR): Eine 1 macht die Leitung zum Ausgang, eine 0 zum Eingang. Den Pegel der Ausgänge bestimmt das Ausgaberegister (ORA, ORB).</p>
+  <p>Vier Adressleitungen A0 bis A3 wählen eines von 16 Registern. Im Block ab $7F20 liegen sie hier:</p>
+  <table class="zusammen">
+    <thead><tr><th>Adresse</th><th>Register</th><th>Adresse</th><th>Register</th></tr></thead>
+    <tbody>
+      <tr><td>$7F20</td><td>ORB / IRB (Port B)</td><td>$7F28</td><td>T2C-L (Timer 2)</td></tr>
+      <tr><td>$7F21</td><td>ORA / IRA (Port A)</td><td>$7F29</td><td>T2C-H</td></tr>
+      <tr><td>$7F22</td><td>DDRB</td><td>$7F2A</td><td>SR (Schieberegister)</td></tr>
+      <tr><td>$7F23</td><td>DDRA</td><td>$7F2B</td><td>ACR (Hilfssteuerung)</td></tr>
+      <tr><td>$7F24</td><td>T1C-L (Timer 1)</td><td>$7F2C</td><td>PCR (Leitungssteuerung)</td></tr>
+      <tr><td>$7F25</td><td>T1C-H</td><td>$7F2D</td><td>IFR (Interrupt-Flags)</td></tr>
+      <tr><td>$7F26</td><td>T1L-L</td><td>$7F2E</td><td>IER (Interrupt-Freigabe)</td></tr>
+      <tr><td>$7F27</td><td>T1L-H</td><td>$7F2F</td><td>ORA / IRA ohne Handshake</td></tr>
+    </tbody>
+  </table>
+  <p>In diesem Kapitel brauchen wir nur zwei: DDRB und ORB.</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-via.svg" alt="Schaltplan: Dekoder 74LS137, VIA 6522 mit LED an PB0">
+    <figcaption>Schaltplan von Dekoder und VIA</figcaption>
+  </figure>
+  <p>Der Dekoder IC10 bekommt A5, A6 und A7 an seine Eingänge A, B und C. G1 liegt an +5&nbsp;V und /G2 an /CS_IO, so dass er nur im IO-Bereich arbeitet. /GL liegt an GND und macht die Adresseingänge „durchsichtig“. Y0 geht als /CS_ACIA an Pin&nbsp;3 der ACIA, Y1 als /CS_VIA an den VIA.</p>
+  <p>Der VIA hängt am Datenbus, an PHI2, R/W und /RES. CS1 liegt fest an +5&nbsp;V, /CS2 bekommt /CS_VIA. RS0 bis RS3 sind mit A0 bis A3 verbunden. An PB0 hängt über einen Vorwiderstand von 270&nbsp;Ω die LED, deren andere Seite an GND liegt. Die Ausgänge von Port B liefern genug Strom für eine Leuchtdiode.</p>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC9</td><td>VIA, DIP-40</td><td>6522</td></tr>
+      <tr><td>IC10</td><td>3-zu-8-Dekoder, DIP-16</td><td>74LS137</td></tr>
+      <tr><td>D1</td><td>Leuchtdiode</td><td>5&nbsp;mm</td></tr>
+      <tr><td>R10</td><td>Widerstand</td><td>270&nbsp;Ω</td></tr>
+      <tr><td>C13, C14</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+  <p>Dazu zwei weitere Steckbretter.</p>
+
+  <h2>Aufbau</h2>
+  <p>Zuerst der Dekoder:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-dekoder137.svg" alt="Steckbrett 7 mit dem Dekoder 74LS137">
+    <figcaption>Der Dekoder auf Steckbrett 7</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Führen Sie +5&nbsp;V und GND zu einem neuen Steckbrett und verbinden Sie dort die oberen Schienen mit den unteren.</div></li>
+    <li><div>Stecken Sie IC10 über die Rinne, Kerbe links, Pin&nbsp;1 in Loch 5e.</div></li>
+    <li><div>Versorgung: Pin&nbsp;16 (5j) an +5&nbsp;V, Pin&nbsp;8 (12a) an GND. Legen Sie G1 (Pin&nbsp;6, Loch 10a) an +5&nbsp;V und /GL (Pin&nbsp;4, Loch 8a) an GND. Setzen Sie C13 zwischen die oberen Schienen.</div></li>
+    <li><div>Verbinden Sie A5, A6 und A7 (Pin&nbsp;14, 15 und 16 des 6502) mit den Pins&nbsp;1, 2 und 3 von IC10.</div></li>
+    <li><div>/CS_IO (Pin&nbsp;8 von IC7 auf Steckbrett 5) geht an Pin&nbsp;5 von IC10.</div></li>
+    <li><div>Die Ausgänge: Pin&nbsp;15 (Y0, Loch 6j) ist /CS_ACIA, Pin&nbsp;14 (Y1, Loch 7j) ist /CS_VIA.</div></li>
+    <li><div>Auf Steckbrett 4: Ziehen Sie den Draht von /CS_IO an Pin&nbsp;3 der ACIA ab und führen Sie stattdessen /CS_ACIA heran.</div></li>
+  </ol>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-acia-137.svg" alt="Steckbrett 4 mit der ACIA, /CS1 an /CS_ACIA">
+    <figcaption>Die ACIA mit Chip-Select von /CS_ACIA</figcaption>
+  </figure>
+  <p>Dann der VIA mit der Leuchtdiode:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via.svg" alt="Steckbrett 8 mit dem VIA 6522 und der Leuchtdiode">
+    <figcaption>Der VIA auf Steckbrett 8, Leuchtdiode an PB0</figcaption>
+  </figure>
+  <ol class="schritte" start="8">
+    <li><div>Führen Sie +5&nbsp;V und GND zu einem weiteren Steckbrett und verbinden Sie dort die oberen Schienen mit den unteren.</div></li>
+    <li><div>Stecken Sie IC9 über die Rinne, Kerbe links, Pin&nbsp;1 in Loch 4d (breites IC, Reihen d und h).</div></li>
+    <li><div>Versorgung: Pin&nbsp;20 (Loch 23a) an +5&nbsp;V, Pin&nbsp;1 (4a) an GND und CS1 (Pin&nbsp;24, Loch 20j) an +5&nbsp;V. Setzen Sie C14 zwischen die oberen Schienen.</div></li>
+    <li><div>Verbinden Sie die übrigen Anschlüsse mit Drähten gleichen Namens. Die Tabelle zeigt die Pins. /IRQ (Pin&nbsp;21) bleibt vorerst offen.</div></li>
+    <li><div>Die LED: Führen Sie PB0 (Pin&nbsp;10, Loch 13b) per Draht nach Loch 27b. Stecken Sie R10 von 27c nach 31c und die LED mit der Anode (langes Bein) an 31b und der Kathode an GND.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (Pin)</th><th>6522 (Pin)</th></tr></thead>
+    <tbody>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>33, 32, 31, 30, 29, 28, 27, 26</td></tr>
+      <tr><td>A0 – A3</td><td>9, 10, 11, 12</td><td>38, 37, 36, 35</td></tr>
+      <tr><td>R/W</td><td>34</td><td>22</td></tr>
+      <tr><td>PHI2</td><td>39</td><td>25</td></tr>
+      <tr><td>/RESET</td><td>Steckbrett 1, Loch 11j</td><td>34</td></tr>
+      <tr><td>/CS_VIA</td><td>IC10, Pin 14</td><td>23 (/CS2)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Das Programm</h2>
+  <p>Wir setzen alle Leitungen von Port B auf Ausgang, schalten die Pegel aus, warten, schalten sie ein, warten wieder, und das endlos. Das Programm zählt in der Warteschleife 200 mal 256 Durchläufe. Jeder Durchlauf der inneren Schleife dauert fünf Takte. Das ergibt etwa 257.000 Takte, also rund 0,26 Sekunden zwischen den Wechseln. Die LED blinkt etwa zweimal pro Sekunde.</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+VIA_ORB  = $7f20
+VIA_DDRB = $7f22
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   lda #$ff                <span class="kommentar">; alle Leitungen von Port B als Ausgang</span>
+        sta VIA_DDRB
+loop:   lda #$00                <span class="kommentar">; LED aus</span>
+        sta VIA_ORB
+        jsr delay
+        lda #$ff                <span class="kommentar">; LED an</span>
+        sta VIA_ORB
+        jsr delay
+        jmp loop
+
+delay:  ldx #200                <span class="kommentar">; Warteschleife: 200 × 256 Durchläufe, etwa eine Viertelsekunde</span>
+@outer: ldy #0
+@inner: dey
+        bne @inner
+        dex
+        bne @outer
+        rts</pre>
+  <p>Übersetzen Sie es wie in Kapitel 4 mit <code>erste.cfg</code> und schreiben Sie es in den EEPROM:</p>
+  <pre class="listing">$ ca65 -o blink.o blink.s
+$ ld65 -C erste.cfg -o blink.bin blink.o
+$ minipro -p AT28C256 -w blink.bin</pre>
+
+  <h2>Messen</h2>
+  <p>Am Pin PB0 sehen Sie ein Rechtecksignal. Es wechselt etwa alle 0,26 Sekunden zwischen Low und High.</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/messung-led.svg" alt="Oszilloskopbild: Spannung an PB0, Rechteck mit etwa 2 Hz">
+    <figcaption>Spannung an PB0 bei der blinkenden LED</figcaption>
+  </figure>
+  <p>Wenn Sie noch das Monitorprogramm aus Kapitel 7 im EEPROM haben, können Sie die LED davor von Hand schalten. Das prüft Schaltung und Dekoder, bevor die Software ins Spiel kommt:</p>
+  <figure class="terminal">
+<pre>&gt; <span class="eingabe">w 7f22 ff</span>
+7F22:FF
+&gt; <span class="eingabe">w 7f20 01</span>
+7F20:01
+&gt; <span class="eingabe">w 7f20 00</span>
+7F20:00</pre>
+    <figcaption>LED mit dem Monitor ein- und ausschalten</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Leuchtet nichts? Prüfen Sie die Polung der LED und ob /CS_VIA (Pin&nbsp;23 des VIA) beim Schreiben auf $7F20 kurz Low wird. Antwortet die ACIA nicht mehr, stimmt etwas am Dekoder nicht: ihr /CS1 muss jetzt von Y0 kommen.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

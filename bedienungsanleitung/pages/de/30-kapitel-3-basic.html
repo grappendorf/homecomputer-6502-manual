@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 3 – Einstieg in BASIC</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="3" data-titel="Einstieg in BASIC" data-kurztitel="Einstieg in BASIC">
+  <p>Bisher haben Sie dem Computer einzelne Befehle gegeben, und er hat sie sofort ausgeführt. In diesem Kapitel schreiben Sie Ihre ersten Programme. Ein Programm ist eine Liste von Befehlen, die sich der Computer merkt und dann der Reihe nach abarbeitet, so oft Sie wollen.</p>
+  <p>Die Sprache dafür heißt BASIC. Der HomeComputer 6502 hat Microsoft BASIC in der Version 1.1 fest eingebaut. Es ist sofort nach dem Einschalten bereit.</p>
+
+  <h2>Das erste Programm</h2>
+  <p>Tippen Sie die folgenden zwei Zeilen ein und drücken Sie nach jeder Zeile <kbd>Enter</kbd>:</p>
+<pre class="listing">10 PRINT "HALLO"
+20 GOTO 10</pre>
+  <p>Diesmal passiert nach <kbd>Enter</kbd> nichts. Das ist richtig so. Weil die Zeilen mit einer Zahl beginnen, führt der Computer sie nicht aus, sondern speichert sie. Die Zahl am Anfang ist die <strong>Zeilennummer</strong>. Sie legt fest, in welcher Reihenfolge die Zeilen im Programm stehen. Erlaubt sind Nummern von 0 bis 63999.</p>
+  <p>Jetzt starten Sie das Programm mit dem Befehl <code>RUN</code>:</p>
+<pre class="listing">RUN</pre>
+  <figure class="lcd">
+<pre>HALLO
+HALLO
+HALLO
+HALLO</pre>
+    <figcaption>Das Programm läuft und läuft</figcaption>
+  </figure>
+  <p>Zeile 10 schreibt <code>HALLO</code> auf die Anzeige. Zeile 20 sagt: „Mach bei Zeile 10 weiter.“ Der Computer springt zurück, schreibt wieder <code>HALLO</code>, springt wieder zurück, und so weiter, ohne Ende. So etwas nennt man eine <strong>Endlosschleife</strong>.</p>
+
+  <h3>Ein Programm anhalten</h3>
+  <p>Drücken Sie <kbd>Pause</kbd> oder <kbd>Strg</kbd> + <kbd>C</kbd>. Das Programm hält an, und der Computer meldet, in welcher Zeile er gerade war:</p>
+  <figure class="lcd">
+<pre>HALLO
+
+BREAK IN  20
+<span class="cursor"> </span></pre>
+    <figcaption>Angehalten in Zeile 20</figcaption>
+  </figure>
+  <p>Mit <code>CONT</code> (für englisch <em>continue</em>, weitermachen) läuft das Programm an derselben Stelle weiter. Mit <code>RUN</code> beginnt es wieder von vorn.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Wenn ein Programm zu Ende ist oder angehalten wurde, schreibt der Computer keine Meldung wie <code>READY.</code> Der Cursor steht einfach in der nächsten Zeile, und Sie können weitertippen.</p>
+  </aside>
+
+  <h3>Groß oder klein?</h3>
+  <p>Die Tastatur schreibt kleine Buchstaben. Große bekommen Sie, solange Sie <kbd>Shift</kbd> gedrückt halten. Für längere Texte drücken Sie einmal kurz <kbd>Caps Lock</kbd>: Dann kommen alle Buchstaben groß, bis Sie <kbd>Caps Lock</kbd> noch einmal drücken. Halten Sie bei eingeschaltetem <kbd>Caps Lock</kbd> die <kbd>Shift</kbd>-Taste, kommt ein kleiner Buchstabe. Nach dem Einschalten ist <kbd>Caps Lock</kbd> immer aus.</p>
+  <p>Für BASIC ist das kein Problem. Befehle und Variablennamen dürfen Sie klein tippen. Beim Speichern macht der Computer Großbuchstaben daraus, und so zeigt <code>LIST</code> sie auch. Nur Text zwischen Anführungszeichen bleibt genau so, wie Sie ihn getippt haben. Aus <code>print "Hallo"</code> wird im Programm <code>PRINT "Hallo"</code>.</p>
+  <p>Die Listings in diesem Handbuch stehen so da, wie <code>LIST</code> sie zeigt: Befehle groß, Texte meist auch groß. Solche Texte tippen Sie mit gedrückter <kbd>Shift</kbd>-Taste oder mit <kbd>Caps Lock</kbd>, oder Sie schreiben sie klein, ganz wie Sie mögen. In den LCD-Kästen steht Ihre Eingabe klein, so wie sie auf der Anzeige erscheint.</p>
+  <p>Statt <code>PRINT</code> können Sie auch kurz <code>?</code> schreiben.</p>
+
+  <h2>Programme ansehen und ändern</h2>
+  <p>Der Befehl <code>LIST</code> zeigt das Programm, das gerade im Speicher steht:</p>
+<pre class="listing">LIST
+10 PRINT "HALLO"
+20 GOTO 10</pre>
+  <p>Bei längeren Programmen können Sie auch nur einen Teil ansehen:</p>
+  <table>
+    <thead><tr><th>Eingabe</th><th>zeigt</th></tr></thead>
+    <tbody>
+      <tr><td><code>LIST</code></td><td>das ganze Programm</td></tr>
+      <tr><td><code>LIST 30</code></td><td>nur Zeile 30</td></tr>
+      <tr><td><code>LIST 30-</code></td><td>ab Zeile 30 bis zum Ende</td></tr>
+      <tr><td><code>LIST -30</code></td><td>vom Anfang bis Zeile 30</td></tr>
+      <tr><td><code>LIST 100-200</code></td><td>die Zeilen 100 bis 200</td></tr>
+    </tbody>
+  </table>
+  <p>Die Anzeige hat nur vier Zeilen. Ist das Programm länger, hält <code>LIST</code> nach drei Zeilen an und schreibt <code>MORE - PRESS A KEY</code>. Die LED oben rechts leuchtet. Mit einer beliebigen Taste geht es weiter. Mit <kbd>Pause</kbd> oder <kbd>Strg</kbd> + <kbd>C</kbd> brechen Sie ab.</p>
+
+  <h3>Zeilen ersetzen, löschen und einfügen</h3>
+  <ul>
+    <li><strong>Ersetzen:</strong> Tippen Sie eine Zeile mit derselben Nummer neu ein. Die alte Zeile wird überschrieben.</li>
+    <li><strong>Löschen:</strong> Tippen Sie nur die Zeilennummer und drücken Sie <kbd>Enter</kbd>.</li>
+    <li><strong>Einfügen:</strong> Nehmen Sie eine Nummer, die zwischen zwei vorhandenen liegt. Aus <code>15 PRINT "WELT"</code> wird eine neue Zeile zwischen 10 und 20.</li>
+  </ul>
+  <p>Darum nummeriert man Programme in Zehnerschritten: 10, 20, 30. So bleibt Platz für Zeilen, die Ihnen später noch einfallen.</p>
+
+  <h3>Eine Zeile zurückholen</h3>
+  <p>Sie müssen eine Zeile nicht ganz neu tippen, um sie zu ändern. Drücken Sie in einer leeren Eingabezeile <kbd>↑</kbd>. Der Computer holt die letzte Programmzeile auf die Anzeige. Jedes weitere <kbd>↑</kbd> holt die Zeile davor, <kbd>↓</kbd> die Zeile danach. Tippen Sie erst eine Zeilennummer und dann <kbd>↑</kbd>, holt er genau diese Zeile.</p>
+  <p>Mit <kbd>←</kbd> und <kbd>→</kbd> bewegen Sie den Cursor in der Zeile. Die Rücktaste löscht das Zeichen vor dem Cursor, <kbd>Entf</kbd> das Zeichen unter dem Cursor. <kbd>Pos1</kbd> und <kbd>Ende</kbd> springen an den Anfang und ans Ende. <kbd>Esc</kbd> verwirft die ganze Zeile. Mit <kbd>Enter</kbd> übernehmen Sie die geänderte Zeile. Ändern Sie dabei die Zeilennummer, entsteht eine Kopie unter der neuen Nummer. Die alte Zeile bleibt stehen.</p>
+  <p>Eine Zeile darf bis zu 120 Zeichen lang sein. Auf der Anzeige läuft sie nach 40 Zeichen in der nächsten Zeile weiter.</p>
+
+  <h3>Neu anfangen</h3>
+  <p><code>NEW</code> löscht das ganze Programm und alle Variablen. Es gibt keine Sicherheitsabfrage. Wie Sie ein Programm vorher auf Diskette speichern, steht in Kapitel 6.</p>
+
+  <h3>Mehrere Befehle in einer Zeile</h3>
+  <p>In eine Zeile passen mehrere Befehle, getrennt durch einen Doppelpunkt. Mit <code>REM</code> (für englisch <em>remark</em>, Bemerkung) schreiben Sie einen Kommentar. Alles hinter <code>REM</code> ignoriert der Computer, auch ein Doppelpunkt.</p>
+<pre class="listing">10 REM MEIN ZWEITES PROGRAMM
+20 PRINT "HALLO":PRINT "WELT"</pre>
+
+  <h2>Variablen</h2>
+  <p>Eine Variable ist ein Name, unter dem sich der Computer einen Wert merkt. Sie geben ihr mit dem Gleichheitszeichen einen Wert:</p>
+<pre class="listing">10 A=5
+20 B=A*2
+30 PRINT A;B</pre>
+  <figure class="lcd">
+<pre>run
+ 5  10</pre>
+    <figcaption>A ist 5, B ist doppelt so groß</figcaption>
+  </figure>
+  <p>Das Gleichheitszeichen bedeutet hier nicht „ist gleich“, sondern „bekommt den Wert“. Darum ist auch <code>A=A+1</code> sinnvoll: A bekommt den alten Wert von A plus eins. Früher schrieb man dafür <code>LET A=A+1</code>. Das geht immer noch, das <code>LET</code> dürfen Sie aber weglassen.</p>
+
+  <h3>Drei Arten von Variablen</h3>
+  <table>
+    <thead><tr><th>Beispiel</th><th>enthält</th><th>Bereich</th></tr></thead>
+    <tbody>
+      <tr><td><code>A</code>, <code>X1</code>, <code>ZZ</code></td><td>Zahl mit Komma</td><td>etwa 9 gültige Stellen</td></tr>
+      <tr><td><code>A%</code>, <code>N%</code></td><td>ganze Zahl</td><td>−32768 bis 32767</td></tr>
+      <tr><td><code>A$</code>, <code>NA$</code></td><td>Text (Zeichenkette)</td><td>bis 255 Zeichen</td></tr>
+    </tbody>
+  </table>
+  <p>Text steht immer zwischen Anführungszeichen: <code>N$="OTTO"</code>. Zwei Texte hängen Sie mit <code>+</code> aneinander: <code>PRINT "HAUS"+"TIER"</code> schreibt <code>HAUSTIER</code>. Geben Sie einer ganzen Zahl einen Wert mit Komma, fällt alles hinter dem Komma weg: Nach <code>A%=7.9</code> ist <code>A%</code> gleich 7.</p>
+  <p>Eine Variable, der Sie noch nichts zugewiesen haben, ist 0 oder leer. <code>RUN</code> und <code>NEW</code> setzen alle Variablen wieder auf 0 oder leer.</p>
+
+  <h3>Gute Namen</h3>
+  <p>Ein Name beginnt mit einem Buchstaben. Danach dürfen Buchstaben und Ziffern folgen. Der Computer unterscheidet Namen aber nur an den <strong>ersten zwei Zeichen</strong>. <code>NAME$</code> und <code>NACHT$</code> sind für ihn dieselbe Variable <code>NA$</code>:</p>
+<pre class="listing">NAME$="OTTO":NACHT$="X":PRINT NAME$
+X</pre>
+  <p>Außerdem darf in einem Namen kein BASIC-Befehl stecken. <code>TOTAL</code> enthält <code>TO</code>, <code>FORM</code> enthält <code>FOR</code>. Beides führt zu <code>?SYNTAX ERROR</code>. Am sichersten sind kurze Namen aus ein oder zwei Zeichen.</p>
+
+  <h3>Ausgaben mit PRINT</h3>
+  <p><code>PRINT</code> kann mehrere Dinge auf einmal ausgeben. Was dazwischen steht, bestimmt den Abstand:</p>
+  <ul>
+    <li>Ein <strong>Semikolon</strong> <code>;</code> schreibt direkt dahinter weiter.</li>
+    <li>Ein <strong>Komma</strong> <code>,</code> springt in die nächste Spalte. Die Spalten sind 10 Zeichen breit.</li>
+    <li>Steht am Ende ein <code>;</code> oder <code>,</code>, bleibt der Cursor in der Zeile. Das nächste <code>PRINT</code> schreibt dort weiter.</li>
+  </ul>
+  <p>Vor jede Zahl setzt <code>PRINT</code> ein Leerzeichen, bei negativen Zahlen steht dort das Minus. Hinter jede Zahl kommt ebenfalls ein Leerzeichen. Darum stehen Zahlen nie direkt aneinander.</p>
+  <figure class="lcd">
+<pre>print 5;10;-3
+ 5  10 -3
+print 5,10
+ 5         10</pre>
+    <figcaption>Semikolon und Komma</figcaption>
+  </figure>
+
+  <h2>Schleifen mit FOR … NEXT</h2>
+  <p>Mit <code>GOTO</code> haben Sie schon eine Schleife gebaut, allerdings eine ohne Ende. Soll etwas genau fünfmal passieren, nehmen Sie <code>FOR</code> und <code>NEXT</code>:</p>
+<pre class="listing">10 FOR I=1 TO 5
+20 PRINT I;
+30 NEXT I
+40 PRINT "FERTIG"</pre>
+  <figure class="lcd">
+<pre>run
+ 1  2  3  4  5 FERTIG</pre>
+    <figcaption>Die Schleife zählt von 1 bis 5</figcaption>
+  </figure>
+  <p><code>FOR</code> setzt die Variable I auf 1. Alles bis <code>NEXT</code> wird ausgeführt. <code>NEXT I</code> erhöht I um eins und springt zurück, solange I nicht größer als 5 ist. Danach geht es mit der Zeile hinter <code>NEXT</code> weiter.</p>
+
+  <h3>Andere Schritte</h3>
+  <p>Mit <code>STEP</code> legen Sie fest, um wie viel die Variable jedes Mal wächst. Ein negativer Schritt zählt rückwärts:</p>
+<pre class="listing">FOR I=0 TO 20 STEP 5:PRINT I;:NEXT
+ 0  5  10  15  20
+FOR I=10 TO 0 STEP -5:PRINT I;:NEXT
+ 10  5  0</pre>
+  <p>Wie Sie sehen, darf hinter <code>NEXT</code> der Name auch fehlen. Dann gehört <code>NEXT</code> zur zuletzt begonnenen Schleife.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Eine <code>FOR</code>-Schleife läuft immer mindestens einmal. <code>FOR I=5 TO 1</code> führt den Inhalt einmal mit I=5 aus, obwohl 5 schon größer als 1 ist.</p>
+  </aside>
+
+  <h3>Schleifen in Schleifen</h3>
+  <p>Schleifen lassen sich ineinander schachteln. Die innere Schleife muss dabei vor der äußeren enden:</p>
+<pre class="listing">10 FOR I=1 TO 3
+20 FOR J=1 TO 3
+30 PRINT I*J;
+40 NEXT J
+50 PRINT
+60 NEXT I</pre>
+  <figure class="lcd">
+<pre>run
+ 1  2  3
+ 2  4  6
+ 3  6  9</pre>
+    <figcaption>Ein kleines Einmaleins</figcaption>
+  </figure>
+  <p>Das <code>PRINT</code> ohne alles in Zeile 50 beendet nur die Zeile auf der Anzeige.</p>
+
+  <h2>Eingaben mit INPUT</h2>
+  <p>Bisher stand alles schon im Programm. Mit <code>INPUT</code> fragt das Programm Sie, während es läuft:</p>
+<pre class="listing">10 INPUT "WIE HEISST DU";N$
+20 PRINT "HALLO ";N$</pre>
+  <figure class="lcd">
+<pre>run
+WIE HEISST DU? Anna
+HALLO Anna
+<span class="cursor"> </span></pre>
+    <figcaption>Das Programm wartet auf Ihre Antwort</figcaption>
+  </figure>
+  <p><code>INPUT</code> schreibt den Text zwischen den Anführungszeichen, hängt ein Fragezeichen an und wartet. Was Sie tippen, landet nach <kbd>Enter</kbd> in der Variablen. Der Text und das Semikolon dürfen fehlen. Dann erscheint nur das Fragezeichen.</p>
+  <p>Ein <code>INPUT</code> kann auch mehrere Werte auf einmal abfragen. Trennen Sie sie beim Eintippen mit einem Komma. Geben Sie zu wenige ein, fragt der Computer mit <code>??</code> nach dem Rest:</p>
+<pre class="listing">10 INPUT "ZWEI ZAHLEN";A,B
+20 PRINT "SUMME:";A+B</pre>
+  <figure class="lcd">
+<pre>run
+ZWEI ZAHLEN? 5
+?? 7
+SUMME: 12</pre>
+    <figcaption>Der zweite Wert wird nachgefragt</figcaption>
+  </figure>
+  <p>Erwartet das Programm eine Zahl und Sie tippen Buchstaben, antwortet der Computer mit <code>?REDO FROM START</code> und fragt noch einmal. Das Programm läuft danach normal weiter.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p><code>INPUT</code> geht nur in einem Programm. Direkt eingetippt meldet der Computer <code>?ILLEGAL DIRECT ERROR</code>.</p>
+  </aside>
+
+  <h2>Entscheidungen mit IF … THEN</h2>
+  <p>Ein Programm wird erst richtig nützlich, wenn es auf Eingaben reagiert. Dafür gibt es <code>IF</code> (wenn) und <code>THEN</code> (dann):</p>
+<pre class="listing">10 INPUT "WIE ALT BIST DU";A
+20 IF A&lt;18 THEN PRINT "NOCH NICHT VOLLJAEHRIG"
+30 IF A&gt;=18 THEN PRINT "VOLLJAEHRIG"</pre>
+  <p>Ist die Bedingung hinter <code>IF</code> wahr, führt der Computer aus, was hinter <code>THEN</code> steht. Ist sie falsch, überspringt er den <strong>ganzen Rest der Zeile</strong>, auch alles hinter einem Doppelpunkt. Das können Sie nutzen:</p>
+<pre class="listing">20 IF A&lt;18 THEN PRINT "ZU JUNG":GOTO 10</pre>
+  <p>Hier springt das Programm nur dann zurück zu Zeile 10, wenn A kleiner als 18 ist.</p>
+
+  <h3>Vergleiche</h3>
+  <table>
+    <thead><tr><th>Zeichen</th><th>bedeutet</th><th>Beispiel</th></tr></thead>
+    <tbody>
+      <tr><td><code>=</code></td><td>gleich</td><td><code>IF A=0 THEN …</code></td></tr>
+      <tr><td><code>&lt;&gt;</code></td><td>ungleich</td><td><code>IF A$&lt;&gt;"J" THEN …</code></td></tr>
+      <tr><td><code>&lt;</code></td><td>kleiner</td><td><code>IF A&lt;10 THEN …</code></td></tr>
+      <tr><td><code>&gt;</code></td><td>größer</td><td><code>IF A&gt;B THEN …</code></td></tr>
+      <tr><td><code>&lt;=</code></td><td>kleiner oder gleich</td><td><code>IF A&lt;=100 THEN …</code></td></tr>
+      <tr><td><code>&gt;=</code></td><td>größer oder gleich</td><td><code>IF A&gt;=18 THEN …</code></td></tr>
+    </tbody>
+  </table>
+  <p>Texte lassen sich genauso vergleichen: <code>IF A$="J" THEN …</code>. Bei <code>&lt;</code> und <code>&gt;</code> gilt die Reihenfolge im Alphabet, <code>"ABC"</code> ist kleiner als <code>"ABD"</code>.</p>
+  <p>Mehrere Bedingungen verbinden Sie mit <code>AND</code> (beide müssen stimmen) und <code>OR</code> (eine muss stimmen). <code>NOT</code> dreht eine Bedingung um:</p>
+<pre class="listing">IF X&gt;1 AND X&lt;5 THEN PRINT "DAZWISCHEN"</pre>
+
+  <h3>THEN mit Zeilennummer</h3>
+  <p>Steht hinter <code>THEN</code> nur eine Zeilennummer, springt der Computer dorthin. <code>IF A=0 THEN 100</code> ist dasselbe wie <code>IF A=0 THEN GOTO 100</code> oder <code>IF A=0 GOTO 100</code>.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Für Neugierige</div>
+    <p>Ein Vergleich ist für den Computer eine Rechnung. Wahr ergibt −1, falsch ergibt 0. Probieren Sie <code>PRINT 5&gt;3, 3&gt;5</code>. <code>IF</code> prüft nur, ob der Wert 0 ist. Darum führt <code>IF 7 THEN …</code> den Befehl aus und <code>IF 0 THEN …</code> nicht.</p>
+  </aside>
+
+  <h2>Ein Ratespiel</h2>
+  <p>Jetzt haben Sie alles zusammen für ein richtiges Spiel. Der Computer denkt sich eine Zahl zwischen 1 und 100, und Sie raten:</p>
+<pre class="listing">10 REM RATESPIEL
+20 Z=INT(RND(1)*100)+1
+30 V=0
+40 PRINT "ICH DENKE MIR EINE ZAHL VON 1 BIS 100."
+50 INPUT "DEIN TIPP";T
+60 V=V+1
+70 IF T&lt;Z THEN PRINT "ZU KLEIN.":GOTO 50
+80 IF T&gt;Z THEN PRINT "ZU GROSS.":GOTO 50
+90 PRINT "RICHTIG! DU HAST";V;"VERSUCHE GEBRAUCHT."
+100 INPUT "NOCH EINMAL (J/N)";A$
+110 IF A$="J" OR A$="j" THEN 20
+120 END</pre>
+  <figure class="lcd">
+<pre>DEIN TIPP? 15
+RICHTIG! DU HAST 5 VERSUCHE GEBRAUCHT.
+NOCH EINMAL (J/N)? n
+<span class="cursor"> </span></pre>
+    <figcaption>Gewonnen</figcaption>
+  </figure>
+  <p>Sie finden das Programm auch im Firmware-Projekt als <code>examples/ratespiel.bas</code>. Ist das Laufwerk aus Kapitel 6 verbunden, laden Sie es mit <code>LOAD "ratespiel"</code>.</p>
+  <p>So arbeitet das Programm:</p>
+  <ul>
+    <li><strong>Zeile 20</strong> erzeugt die geheime Zahl Z. <code>RND(1)</code> liefert eine Zufallszahl zwischen 0 und 1. Mal 100 genommen und mit <code>INT</code> auf eine ganze Zahl abgerundet, ergibt das 0 bis 99. Plus eins: 1 bis 100.</li>
+    <li><strong>Zeile 30</strong> setzt den Zähler für die Versuche auf 0.</li>
+    <li><strong>Zeilen 50 und 60</strong> fragen nach Ihrem Tipp und zählen mit.</li>
+    <li><strong>Zeilen 70 und 80</strong> vergleichen den Tipp mit Z. Liegt er daneben, gibt es einen Hinweis, und das Programm fragt in Zeile 50 erneut.</li>
+    <li><strong>Zeile 90</strong> wird nur erreicht, wenn der Tipp weder zu klein noch zu groß war.</li>
+    <li><strong>Zeilen 100 und 110</strong> starten auf Wunsch eine neue Runde. Weil die Tastatur klein schreibt, prüft Zeile 110 auf <code>"J"</code> und auf <code>"j"</code>. <code>END</code> beendet das Programm.</li>
+  </ul>
+  <p>Die Umlaute sind im Programm als AE, OE und UE geschrieben. So sieht der Text auf jeder Anzeige und jedem Terminal gleich aus.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Nach dem Einschalten liefert <code>RND(1)</code> immer dieselbe Folge von Zufallszahlen. Die erste Runde beginnt deshalb jedes Mal mit derselben Zahl. Wie Sie das ändern, zeigt Kapitel 4.</p>
+  </aside>
+
+  <h2>Fehlermeldungen</h2>
+  <p>Versteht der Computer etwas nicht, meldet er einen Fehler. Die Meldung beginnt mit einem Fragezeichen. Passiert der Fehler in einem Programm, steht dahinter die Zeilennummer:</p>
+<pre class="listing">10 PRINT "A"
+20 PRUNT "B"</pre>
+  <figure class="lcd">
+<pre>run
+A
+
+?SYNTAX ERROR IN  20</pre>
+    <figcaption>Ein Tippfehler in Zeile 20</figcaption>
+  </figure>
+  <p>Keine Sorge: Ein Fehler kann dem Computer nicht schaden. Holen Sie die Zeile mit <kbd>↑</kbd> zurück, verbessern Sie sie und starten Sie das Programm neu. Die Meldungen, die Ihnen in diesem Kapitel am ehesten begegnen:</p>
+  <table>
+    <thead><tr><th>Meldung</th><th>Ursache</th></tr></thead>
+    <tbody>
+      <tr><td><code>?SYNTAX ERROR</code></td><td>Tippfehler, fehlendes Anführungszeichen oder ein Befehl im Variablennamen</td></tr>
+      <tr><td><code>?UNDEF'D STATEMENT ERROR</code></td><td><code>GOTO</code> oder <code>THEN</code> zu einer Zeile, die es nicht gibt</td></tr>
+      <tr><td><code>?NEXT WITHOUT FOR ERROR</code></td><td><code>NEXT</code> ohne passendes <code>FOR</code>, oder Schleifen in falscher Reihenfolge geschlossen</td></tr>
+      <tr><td><code>?TYPE MISMATCH ERROR</code></td><td>Text und Zahl verwechselt, zum Beispiel <code>A$=5</code></td></tr>
+      <tr><td><code>?ILLEGAL QUANTITY ERROR</code></td><td>Wert zu groß oder zu klein, zum Beispiel <code>A%=40000</code></td></tr>
+      <tr><td><code>?ILLEGAL DIRECT ERROR</code></td><td><code>INPUT</code> außerhalb eines Programms</td></tr>
+    </tbody>
+  </table>
+  <p>Alle Fehlermeldungen finden Sie in Anhang B.</p>
+</section>
+</main>
+</body>
+</html>

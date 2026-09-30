@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 6 – Serial Interface, Monitor and Disk</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="6" data-titel="Serial Interface, Monitor and Disk" data-kurztitel="Monitor and Disk">
+  <p>Via the micro-USB port on the back you connect the HomeComputer 6502 to a PC. This opens up three new possibilities: you can use the <strong>monitor</strong> to look into memory, you can save and load programs on a <strong>disk</strong> on the PC, and you can run <strong>BASIC on the PC</strong>, with a large screen and the PC keyboard.</p>
+
+  <h2>The Connection to the PC</h2>
+  <p>Plug a USB cable into micro-USB port 5 on the back (Chapter 1) and the other end into the PC. Inside the computer is a USB-to-serial converter. The PC sees it as a serial port. Under Linux it is usually called <code>/dev/ttyUSB0</code>.</p>
+  <p>The port works at 19200 baud, 8 data bits, no parity, one stop bit. In short: 19200 8N1. But you do not have to worry about the settings. Three scripts from the <code>tools</code> folder of the firmware project take care of that, one for each mode:</p>
+  <table>
+    <thead><tr><th>Mode</th><th>Script</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td>Monitor</td><td><code>tools/terminal/serial-pico.sh</code></td><td>looking into memory and changing it</td></tr>
+      <tr><td>Disk</td><td><code>tools/disk/serial-disk.sh</code></td><td><code>DIR</code>, <code>LOAD</code>, <code>SAVE</code> and <code>DELETE</code> on the device</td></tr>
+      <tr><td>BASIC on the PC</td><td><code>tools/terminal/serial-basic.sh</code></td><td>BASIC in the PC's terminal, disk included</td></tr>
+    </tbody>
+  </table>
+  <p>The scripts run under Linux. They need the terminal program <code>picocom</code> and the Ruby programming language. If your port is not <code>/dev/ttyUSB0</code>, pass its name as the last argument, for example <code>tools/terminal/serial-pico.sh /dev/ttyUSB1</code>.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>Only one program can use the port at a time. Quit one script before starting the next.</p>
+  </aside>
+
+  <h2>The Monitor</h2>
+  <p>The monitor is a small program in the firmware that constantly listens on the serial port in the background. With it you can view the computer's memory byte by byte, change it and start machine-language programs. It works independently of BASIC: while you are in the monitor on the PC, you can keep using BASIC on the device as normal.</p>
+  <p>Start it on the PC:</p>
+<pre class="listing">tools/terminal/serial-pico.sh</pre>
+  <p>You can also connect directly with <code>picocom</code>:</p>
+<pre class="listing">picocom -b 19200 --imap lfcrlf --omap crlf /dev/ttyUSB0</pre>
+  <p>The script additionally configures the port correctly beforehand. If your keystrokes only arrive after <kbd>Return</kbd> with the direct call, use the script. The monitor greets you with a star <code>*</code> as its prompt. Type <code>?</code> and <kbd>Return</kbd>, and a short help text appears:</p>
+<pre class="listing">*?
+A[.B] dump  A:hh poke  AG jsr
+*</pre>
+
+  <h3>The Commands</h3>
+  <p>You write all addresses and values in hexadecimal, i.e. with the digits 0 to 9 and A to F, upper or lower case. A leading <code>$</code> is not required.</p>
+  <table>
+    <thead><tr><th>Input</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>8000</code></td><td>show 16 bytes from address 8000, as hex numbers and as characters</td></tr>
+      <tr><td><code>8000.80FF</code></td><td>show all bytes from 8000 to 80FF</td></tr>
+      <tr><td><kbd>Return</kbd> alone</td><td>show the next 16 bytes</td></tr>
+      <tr><td><code>1000: 12 34 AB</code></td><td>write the bytes 12, 34 and AB starting at address 1000</td></tr>
+      <tr><td><code>1000G</code></td><td>start the machine-language program at address 1000</td></tr>
+      <tr><td><code>?</code></td><td>show help</td></tr>
+      <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td><td>abort a long output or the input line</td></tr>
+    </tbody>
+  </table>
+  <p>This is what it looks like:</p>
+<pre class="listing breit">*8000
+8000 78 D8 A2 FF 9A A9 00 AA 95 00 E8 D0 FB 20 72 80  x............ r.
+*1000: 12 34 ab
+*1000.1003
+1000 12 34 AB 00  .4..
+*xyz
+?
+*</pre>
+  <p>Every line starts with the address. Then come the bytes, on the right the same bytes as characters. Non-printable characters appear as a period. If the monitor does not understand an input, it answers with <code>?</code>. An input line may be at most 31 characters long. Quit <code>picocom</code> with <kbd>Ctrl</kbd> + <kbd>A</kbd> and then <kbd>Ctrl</kbd> + <kbd>X</kbd>.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p>The monitor writes anywhere, including right into your BASIC program. The program and variables live from 0440 to 7EFF. From 7F00 on are the input and output chips, from 8000 the ROM, which cannot be changed. The memory map is in Appendix C.</p>
+  </aside>
+  <p>A machine-language program you start with <code>G</code> must end with the <code>RTS</code> instruction. The monitor then returns and shows the star again. How to write machine-language programs is shown in Chapter 7.</p>
+
+  <h2>The Disk</h2>
+  <p>The HomeComputer 6502 has no drive of its own. Instead, a folder on the PC serves as the disk. Start on the PC:</p>
+<pre class="listing">tools/disk/serial-disk.sh</pre>
+  <p>By default the <code>examples</code> folder of the firmware project is the disk. It is the best way to get to know the commands, because the example programs from this manual are already there. For your own programs, pass a different folder, e.g. <code>tools/disk/serial-disk.sh ~/my-programs</code>. The script reports:</p>
+<pre class="listing">Disk ready: …/homecomputer-6502-firmware/examples
+Device: /dev/ttyUSB0</pre>
+  <p>While it is running, BASIC on the device understands four new commands:</p>
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>DIR</code></td><td>shows what is on the disk</td></tr>
+      <tr><td><code>LOAD "name"</code></td><td>loads a program and replaces the one in memory</td></tr>
+      <tr><td><code>SAVE "name"</code></td><td>saves the program from memory</td></tr>
+      <tr><td><code>DELETE "name"</code></td><td>deletes a program from the disk</td></tr>
+    </tbody>
+  </table>
+
+  <h3>What Is on the Disk</h3>
+  <figure class="lcd">
+<pre>0627 adventure.bas
+0058 blink.bas
+0484 build.sh
+MORE - PRESS A KEY</pre>
+    <figcaption>DIR shows sizes and names</figcaption>
+  </figure>
+  <p><code>DIR</code> shows every file in the folder with its size in bytes and its name, sorted alphabetically, including files that are not programs. After three files the display waits with <code>MORE - PRESS A KEY</code> for a key, and the LED lights up. At the end it says <code>END OF DIRECTORY</code>. Press <kbd>Pause</kbd> to abort.</p>
+
+  <h3>Loading and Saving</h3>
+  <figure class="lcd">
+<pre>load "ratespiel"
+[████████████████████] 100%
+LOADED
+<span class="cursor"> </span></pre>
+    <figcaption>A program being loaded</figcaption>
+  </figure>
+  <p>While loading and saving, a bar shows the progress. Afterwards the display says <code>LOADED</code> or <code>SAVED</code>. A few rules:</p>
+  <ul>
+    <li>A name is at most 16 characters long and is enclosed in quotation marks.</li>
+    <li>Without an extension, the computer first looks for a file with <code>.prg</code>, then with <code>.bas</code>. <code>.bas</code> files are BASIC programs, <code>.prg</code> files machine-language programs (Chapter 7).</li>
+    <li><code>SAVE</code> writes the program as an ordinary text file with the extension <code>.bas</code>, exactly as <code>LIST</code> shows it. You can view and edit it on the PC with any text editor.</li>
+    <li>If the file does not exist, the computer reports <code>FILE NOT FOUND</code>. The program in memory is then kept.</li>
+    <li>If there is no program in memory, <code>SAVE</code> just reports <code>NO PROGRAM</code> and writes nothing.</li>
+  </ul>
+
+  <h3>Deleting</h3>
+<pre class="listing">delete "test"
+DELETE? (Y/N) y
+DELETED</pre>
+  <p><code>DELETE</code> asks first. Only <kbd>Y</kbd> deletes the file; any other key leaves it alone.</p>
+
+  <h3>Ejecting the Disk</h3>
+  <p>Press <kbd>Ctrl</kbd> + <kbd>C</kbd> in the script's window on the PC. The script reports <code>Ejected</code> and exits, and the monitor is ready again. If you then try <code>DIR</code>, <code>LOAD</code> or <code>SAVE</code>, the computer reports <code>?NO DISK ERROR</code>.</p>
+
+  <h2>BASIC on the PC</h2>
+  <p>Longer programs are easier to write on the PC: big screen, familiar keyboard, copy and paste. To do so, bring BASIC into the PC's terminal:</p>
+<pre class="listing">tools/terminal/serial-basic.sh</pre>
+  <p>The script starts <code>picocom</code> and switches BASIC over to the serial port. BASIC's welcome message appears in the terminal, and you work there just like on the device. The computer's keyboard and display stay silent in the meantime.</p>
+<pre class="listing">6502 HOMECOMPUTER BASIC V1.1
+COPYRIGHT 1978 MICROSOFT
+31423 BYTES FREE
+print 2+3
+ 5</pre>
+  <p>The disk comes along too: <code>DIR</code>, <code>LOAD</code>, <code>SAVE</code> and <code>DELETE</code> work in the terminal as usual, again with the <code>examples</code> folder. You pass a different folder just like with the disk: <code>tools/terminal/serial-basic.sh ~/my-programs</code>. A few differences from the device:</p>
+  <ul>
+    <li><code>LIST</code> and <code>DIR</code> scroll through without <code>MORE</code>. The terminal can scroll back, after all.</li>
+    <li>The terminal has 80 columns and 24 rows. <code>CLS</code> and <code>LOCATE</code> refer to that size. With <code>TERM 100,30</code> you set a different size; <code>TERM</code> alone shows the current one. The terminal window must be at least that large.</li>
+    <li><code>CURSOR BLINK</code> and <code>DISPLAY</code> have no effect in the terminal.</li>
+  </ul>
+
+  <h3>Device and PC Together</h3>
+  <p>Even while BASIC runs in the terminal, a program can reach the device's display and keyboard. Append <code>#1</code> to <code>PRINT</code> or <code>INPUT</code> for that. <code>#2</code> means the serial port, i.e. the terminal:</p>
+<pre class="listing">10 PRINT #1,"YOUR NAME";
+20 INPUT #1,N$
+30 PRINT #1,"THANKS"
+40 PRINT "TYPED ON THE DEVICE: ";N$</pre>
+  <p>The program asks its question on the device's display, reads the answer from its keyboard and writes the result to the terminal. This way you can build, for example, a quiz where the quizmaster sits at the PC.</p>
+
+  <h3>Back to the Device</h3>
+  <p>Type <code>QUIT</code>. BASIC returns to the display and keyboard, and the terminal shows the monitor again. The same happens if you quit <code>picocom</code> with <kbd>Ctrl</kbd> + <kbd>A</kbd>, <kbd>Ctrl</kbd> + <kbd>X</kbd>. Your program stays in memory.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">In the Emulator</div>
+    <p>For the emulator there are the same scripts with <code>mame</code> instead of <code>serial</code> in the name: <code>mame-pico.sh</code>, <code>mame-disk.sh</code> and <code>mame-basic.sh</code>. They find the emulator's port on their own.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

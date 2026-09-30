@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 11</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="11" data-titel="Interrupts" data-kurztitel="Interrupts">
+  <p>Der Computer muss vieles gleichzeitig tun: Zeichen von der ACIA abholen, die Tastatur abtasten, Zeit messen, später Töne spielen. Dieses Kapitel zeigt, wie das mit Interrupts geht.</p>
+
+  <h2>Warum Interrupts?</h2>
+  <p>Man könnte im Hauptprogramm immer wieder nachsehen, ob etwas passiert ist. Das heißt Polling und ist für kleine Aufgaben eine gute Lösung. Zum Beispiel lässt sich eine Zustandsmaschine bauen, die in einer Schleife Ereignisse prüft, Aktionen ausführt und ihren Zustand ändert.</p>
+  <p>Schwierig wird es bei Wartezeiten. Eine Warteschleife blockiert das Hauptprogramm, es kann währenddessen nichts anderes tun. Vor allem kann es nicht sofort ein Byte von der ACIA holen, damit deren Empfangsregister frei wird.</p>
+  <p>Besser ist ein Mechanismus, der das Hauptprogramm unterbricht und ein besonderes Unterprogramm aufruft, wenn etwas geschieht. Das ist ein Interrupt.</p>
+
+  <h2>Wie der Prozessor unterbricht</h2>
+  <p>Der 6502 hat zwei Interrupt-Eingänge:</p>
+  <ul>
+    <li><strong>/IRQ</strong> (Interrupt Request) ist ein Eingang, der bei Low auslöst, solange er Low bleibt. Er lässt sich sperren: Das Flag I im Statusregister blockiert ihn. <code>SEI</code> setzt das Flag, <code>CLI</code> löscht es.</li>
+    <li><strong>/NMI</strong> (Non-Maskable Interrupt) löst bei der fallenden Flanke aus und lässt sich nicht sperren.</li>
+  </ul>
+  <p>Bei einem Interrupt beendet der Prozessor den laufenden Befehl, rettet den Programmzähler und das Statusregister auf den Stapel, setzt das Flag I und springt über einen Vektor: bei /IRQ über $FFFE und $FFFF, bei /NMI über $FFFA und $FFFB. Das dauert sieben Takte. Der Befehl <code>RTI</code> holt Statusregister und Programmzähler zurück, und das Hauptprogramm macht an der unterbrochenen Stelle weiter.</p>
+  <p>Wichtig: Die Interrupt-Routine muss alle Register retten, die sie verändert, und sie muss die Ursache des Interrupts löschen. Sonst springt der Prozessor gleich wieder hinein.</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-irq.svg" alt="Schaltplan: gemeinsame /IRQ-Leitung von ACIA und beiden VIAs und der NMI-Taster">
+    <figcaption>Schaltplan der Interrupt-Leitungen</figcaption>
+  </figure>
+  <p>Die meisten Bausteine für den 6502 haben einen Ausgang /IRQ, der meldet, dass im Baustein etwas passiert ist, zum Beispiel ein Timer-Überlauf oder ein empfangenes Byte. Diese Ausgänge sind offene Kollektoren (open collector, bei MOS-Bausteinen open drain): Sie ziehen die Leitung nur nach unten. Man kann alle /IRQ-Leitungen zusammenschalten und an den /IRQ-Eingang des Prozessors führen. Der Widerstand R9 (3,3&nbsp;kΩ) aus Kapitel 3 hält die Leitung sonst auf High. Eine solche Schaltung heißt „wired OR“.</p>
+  <p>Verbunden werden /IRQ der ACIA (Pin&nbsp;26), des ersten und zweiten VIA (je Pin&nbsp;21) und der /IRQ-Eingang des 6502 (Pin&nbsp;4). Der Eingang /NMI bekommt einen Taster nach GND. Sein Pull-up ist R8 aus Kapitel 3. Der Taster löst einen Interrupt aus, mit dem man später zum Beispiel einen Warmstart auslösen kann.</p>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>S2</td><td>Taster, 4 Beine</td><td>NMI</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Aufbau</h2>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Verbinden Sie Pin&nbsp;26 der ACIA, Pin&nbsp;21 des ersten und Pin&nbsp;21 des zweiten VIA mit Pin&nbsp;4 des 6502 (Loch 7a auf Steckbrett 2). Das ist dieselbe Leitung, an der R9 hängt.</div></li>
+    <li><div>Setzen Sie den Taster S2 über die Rinne eines kleinen Steckbretts (Löcher 6e, 8e, 6f und 8f). Verbinden Sie seine untere Hälfte (Loch 6a) mit /NMI, also mit Pin&nbsp;6 des 6502, und die obere Hälfte (Loch 8j) mit GND:</div></li>
+  </ol>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-nmi.svg" alt="Steckbrett mit dem NMI-Taster, Draht /NMI und GND">
+    <figcaption>Der NMI-Taster</figcaption>
+  </figure>
+  <p>Die Quellen auf den Steckbrettern 4, 8 und 10 bleiben sonst unverändert.</p>
+
+  <h2>Das Programm</h2>
+  <p>Das Beispiel lässt die LED mit dem Timer 1 des ersten VIA blinken, wie in Kapitel 8, aber ohne Warteschleife. Der Timer läuft im Dauerbetrieb: Er zählt mit jedem Takt von φ2 herunter, löst bei null einen Interrupt aus und lädt den Startwert neu. Mit 10.000 gibt das alle 100&nbsp;ms einen Interrupt. Wegen zwei zusätzlichen Takten für das Nachladen sind es genau 10,002&nbsp;ms.</p>
+  <p>Im Interrupt zählt das Programm bis 100 und schaltet dann die LED um, also jede Sekunde. Ein NMI setzt die Grenze auf 10, die LED wechselt dann jede Zehntelsekunde.</p>
+  <table class="zusammen">
+    <thead><tr><th>Register</th><th>Wert</th><th>Bedeutung</th></tr></thead>
+    <tbody>
+      <tr><td>ACR ($7F2B)</td><td><code>%01000000</code></td><td>Timer 1 läuft ständig, PB7 bleibt frei</td></tr>
+      <tr><td>IER ($7F2E)</td><td><code>%11000000</code></td><td>Bit 7 gesetzt: Bits anschalten, Bit 6: Interrupt von Timer 1</td></tr>
+      <tr><td>T1C-L, T1C-H ($7F24, $7F25)</td><td>10000</td><td>Startwert, erst das niedrige, dann das hohe Byte</td></tr>
+    </tbody>
+  </table>
+  <p>Den Interrupt von Timer 1 löscht das Lesen von T1C-L. Der Handler macht das als Erstes. Die Befehle <code>SEI</code> und <code>CLI</code> sperren und geben /IRQ frei.</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+VIA1_ORA  = $7f21
+VIA1_DDRA = $7f23
+VIA1_T1CL = $7f24
+VIA1_T1CH = $7f25
+VIA1_ACR  = $7f2b
+VIA1_IER  = $7f2e
+
+LED            = %10000000
+TIMER_INTERVAL = 10000          <span class="kommentar">; ein Interrupt alle 100 ms (bei 1 MHz)</span>
+
+        .zeropage
+ticks:      .res 1              <span class="kommentar">; gezählte Interrupts</span>
+max_ticks:  .res 1              <span class="kommentar">; so viele Interrupts bis zum Wechsel der LED</span>
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    jmp nmi_handler
+irq:    jmp irq_handler
+
+main:   sei                     <span class="kommentar">; Interrupts sperren, bis alles eingerichtet ist</span>
+        cld
+        ldx #$ff
+        txs
+        lda VIA1_DDRA           <span class="kommentar">; PA7 (die LED) als Ausgang, LED aus</span>
+        ora #LED
+        sta VIA1_DDRA
+        lda VIA1_ORA
+        and #&lt<span class="kommentar">;~LED</span>
+        sta VIA1_ORA
+        lda #0
+        sta ticks
+        lda #100                <span class="kommentar">; 100 mal 100 ms: LED wechselt jede Sekunde</span>
+        sta max_ticks
+        lda #%01000000          <span class="kommentar">; Timer 1 läuft ständig, PB7 bleibt frei</span>
+        sta VIA1_ACR
+        lda #%11000000          <span class="kommentar">; Interrupt von Timer 1 freigeben</span>
+        sta VIA1_IER
+        lda #&lt<span class="kommentar">;TIMER_INTERVAL    ; Zähler laden: erst niedriges, dann hohes Byte</span>
+        sta VIA1_T1CL
+        lda #&gt<span class="kommentar">;TIMER_INTERVAL</span>
+        sta VIA1_T1CH
+        cli                     <span class="kommentar">; Interrupts freigeben</span>
+loop:   jmp loop                <span class="kommentar">; das Hauptprogramm hat nichts zu tun</span>
+
+<span class="kommentar">; NMI: ab jetzt wechselt die LED zehnmal schneller</span>
+nmi_handler:
+        pha
+        lda #10                 <span class="kommentar">; 10 mal 100 ms: LED wechselt jede Zehntelsekunde</span>
+        sta max_ticks
+        pla
+        rti
+
+<span class="kommentar">; IRQ: alle 100 ms</span>
+irq_handler:
+        pha
+        lda VIA1_T1CL           <span class="kommentar">; Lesen von T1C-L löscht die Interrupt-Anforderung</span>
+        inc ticks
+        lda ticks
+        cmp max_ticks
+        bcc @done
+        lda #0
+        sta ticks
+        lda VIA1_ORA
+        eor #LED                <span class="kommentar">; LED umschalten</span>
+        sta VIA1_ORA
+@done:  pla
+        rti</pre>
+  <p>Übersetzen und in den EEPROM schreiben, wie in den Kapiteln davor.</p>
+
+  <h2>Messen</h2>
+  <p>Am Pin PA7 sehen Sie, wie sich die Wechselzeit nach dem Druck auf den NMI-Taster ändert:</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/messung-irq.svg" alt="Oszilloskopbild: LED-Pegel, erst jede Sekunde, nach dem NMI jede Zehntelsekunde">
+    <figcaption>Pegel an PA7: erst jede Sekunde, nach dem NMI jede Zehntelsekunde</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Das Beispiel nutzt nur eine Interruptquelle. Sobald mehrere Bausteine /IRQ auslösen dürfen, muss der Handler alle Quellen prüfen (das Flag-Register IFR der VIAs, Bit 7 des ACIA-Status) und jede einzeln löschen. Sonst bleibt die Leitung Low, und der Prozessor kommt aus dem Interrupt nicht mehr heraus.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

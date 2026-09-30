@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 12</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="12" data-titel="The SID: Sound" data-kurztitel="SID">
+  <p>A computer of the eighties needs sound. For that the HomeComputer gets the sound chip of the C64: the SID. It needs a second supply of 9&nbsp;V, which the build provides externally.</p>
+
+  <h2>The SID</h2>
+  <p>The SID (Sound Interface Device) has three voices. Each has an oscillator with four waveforms (triangle, sawtooth, pulse with adjustable width and noise), an envelope and a volume control. Added to that is a filter for all voices. It is addressed like a memory chip: 29 registers, all but four of which can only be written.</p>
+  <p>The frequency of a voice is a 16-bit value. With a 1&nbsp;MHz clock:</p>
+  <p><code>frequency value = frequency in Hz × 16.777216</code></p>
+  <p>For concert pitch A (440&nbsp;Hz) that gives 7382 or $1CD6.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p>The SID 8580 needs two voltages: 5&nbsp;V at pin&nbsp;25 and 9&nbsp;V at pin&nbsp;28. Do not swap them and never apply 9&nbsp;V to pin&nbsp;25. The older 6581 needs 12&nbsp;V and has other filter capacitors. This book builds with the 8580. Check the voltages with a multimeter before you insert the SID.</p>
+  </aside>
+
+  <h2>The registers of the first voice</h2>
+  <table class="zusammen">
+    <thead><tr><th>Address</th><th>Register</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>$7F60, $7F61</td><td>Frequency low, high</td><td>16-bit frequency value</td></tr>
+      <tr><td>$7F62, $7F63</td><td>Pulse width low, high</td><td>only for the pulse wave</td></tr>
+      <tr><td>$7F64</td><td>Control register</td><td>bit 0 gate, 1 sync, 2 ring, 3 test, 4 triangle, 5 sawtooth, 6 pulse, 7 noise</td></tr>
+      <tr><td>$7F65</td><td>Attack / decay</td><td>upper half attack, lower half decay</td></tr>
+      <tr><td>$7F66</td><td>Sustain / release</td><td>upper half sustain level, lower half release</td></tr>
+      <tr><td>$7F78</td><td>Mode / volume</td><td>bits 0 to 3 volume, upper bits filter</td></tr>
+    </tbody>
+  </table>
+  <p>Voices 2 and 3 follow above ($7F67 to $7F6D and $7F6E to $7F74) and are built the same way.</p>
+
+  <h2>The envelope</h2>
+  <p>A tone should not begin and end abruptly. The envelope shapes its volume. It has four phases: attack (swelling), decay (falling to the sustain level), sustain (holding as long as the key is pressed) and release (dying away). The bit “gate” in the control register starts it. With gate equal to 1 attack and decay run, and the tone holds at the sustain level. With gate equal to 0 release runs.</p>
+  <figure class="abbildung schmal">
+    <img class="zeichnung" src="../img/en/adsr.svg" alt="Envelope with attack, decay, sustain and release">
+    <figcaption>The envelope</figcaption>
+  </figure>
+  <p>Our program sets attack to 0, decay to 9, sustain to 8 and release to 10 (so the registers contain $09 and $8A).</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-sid.svg" alt="Schematic: SID 8580 with filter capacitors, supply and an output stage with a transistor">
+    <figcaption>Schematic of the SID with output stage</figcaption>
+  </figure>
+  <p>The SID is connected to the data bus and the address lines A0 to A4, plus R/W, φ2 (the clock), /RES and the chip select /CS_SID. For that the decoder gets its fourth output: Y3 lives at $7F60 to $7F7F. Two capacitors of 22&nbsp;nF sit at the connections for the filter (CAP1 and CAP2). That is the value for the 8580.</p>
+  <p>The output stage comes from the C64. The output AUDIO needs a resistor R13 (1&nbsp;kΩ) to ground. Then follow the ferrite bead FB1, which keeps out high frequencies, and a low-pass of R14 (10&nbsp;kΩ) and C20 (1&nbsp;nF). The transistor T1 (2N2222) works as an emitter follower and can thus drive a loudspeaker amplifier. C21 (10&nbsp;µF) separates the signal from the DC component. The supply of the transistor comes from the 9&nbsp;V.</p>
+  <p>A small active loudspeaker, that is one with a built-in amplifier, hangs at the output JP8.</p>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC12</td><td>Sound chip, DIP-28</td><td>SID 8580</td></tr>
+      <tr><td>T1</td><td>NPN transistor, TO-92</td><td>2N2222</td></tr>
+      <tr><td>C16, C17</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+      <tr><td>C18, C19</td><td>Ceramic capacitor</td><td>22&nbsp;nF</td></tr>
+      <tr><td>C20</td><td>Ceramic capacitor</td><td>1&nbsp;nF</td></tr>
+      <tr><td>C21</td><td>Electrolytic capacitor</td><td>10&nbsp;µF</td></tr>
+      <tr><td>R13, R15</td><td>Resistor</td><td>1&nbsp;kΩ</td></tr>
+      <tr><td>R14</td><td>Resistor</td><td>10&nbsp;kΩ</td></tr>
+      <tr><td>FB1</td><td>Ferrite bead, wired</td><td></td></tr>
+      <tr><td>JP8</td><td>Pin header, 2 pins</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Plus a 9 volt source (a bench supply or a boost converter module from 5 to 9&nbsp;V), an active loudspeaker and two more breadboards.</p>
+
+  <h2>Assembly</h2>
+  <p>First the decoder gets its output Y3:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-dekoder137-sid.svg" alt="Breadboard 7 with the decoder and the outputs Y2 and Y3">
+    <figcaption>The decoder with output Y3 for the SID</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Bring out Y3 (pin&nbsp;12 of IC10, hole 9j) as /CS_SID.</div></li>
+  </ol>
+  <p>Then the SID:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-sid.svg" alt="Breadboard 12 with the SID 8580, 9 volt lead and wires with signal names">
+    <figcaption>The SID on breadboard 12</figcaption>
+  </figure>
+  <ol class="schritte" start="2">
+    <li><div>Run +5&nbsp;V and GND to a new breadboard and connect the upper rails to the lower ones there. Bring the 9&nbsp;V separately to hole 5i.</div></li>
+    <li><div>Insert IC12 across the channel, notch left, pin&nbsp;1 in hole 5d (wide IC, rows d and h).</div></li>
+    <li><div>Power: pin&nbsp;25 (hole 8j) to +5&nbsp;V, pin&nbsp;28 (hole 5i) to +9&nbsp;V and pin&nbsp;14 (hole 18a) to GND. C16 sits between 9&nbsp;V and GND, C17 between +5&nbsp;V and GND.</div></li>
+    <li><div>The filter capacitors: C18 between pin&nbsp;1 and pin&nbsp;2 (holes 5a and 6a), C19 between pin&nbsp;3 and pin&nbsp;4 (holes 7a and 8a).</div></li>
+    <li><div>Connect the control wires to the connections of the same name. The table shows the pins. Pins&nbsp;23, 24 and 26 stay open.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (pin)</th><th>SID (pin)</th></tr></thead>
+    <tbody>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>15, 16, 17, 18, 19, 20, 21, 22</td></tr>
+      <tr><td>A0 – A4</td><td>9, 10, 11, 12, 13</td><td>9, 10, 11, 12, 13</td></tr>
+      <tr><td>R/W</td><td>34</td><td>7</td></tr>
+      <tr><td>PHI2</td><td>39</td><td>6</td></tr>
+      <tr><td>/RESET</td><td>Breadboard 1, hole 11j</td><td>5</td></tr>
+      <tr><td>/CS_SID</td><td>IC10, pin 12</td><td>8 (/CS)</td></tr>
+    </tbody>
+  </table>
+  <p>Finally the output stage on a breadboard of its own. It only gets the 9&nbsp;V and GND:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-audio.svg" alt="Breadboard 13 with the output stage: resistors, ferrite bead, transistor and output">
+    <figcaption>The output stage on breadboard 13</figcaption>
+  </figure>
+  <ol class="schritte" start="7">
+    <li><div>Run +9&nbsp;V and GND to the rails and connect the upper ones to the lower ones.</div></li>
+    <li><div>R13 from hole 5b to GND. The ferrite bead FB1 from hole 5c to 9c. R14 from 9d to 14d. C20 from 14b to GND.</div></li>
+    <li><div>The transistor T1 stands in holes 13e, 14e and 15e: emitter left, base in the middle, collector right (flat side facing you). The collector (hole 15a) goes to +9&nbsp;V.</div></li>
+    <li><div>R15 from hole 13b to GND. C21 from hole 13c to 18c, the plus pole at the emitter. The pin header JP8 sits in 18b and 19b. Hole 19a goes to GND.</div></li>
+    <li><div>The wire AUDIO connects pin&nbsp;27 of the SID (breadboard 12) with hole 5a.</div></li>
+  </ol>
+
+  <h2>The program</h2>
+  <p>The program turns the keyboard into a little piano. In an endless loop it scans the keyboard and looks up the scancode of the key in a table. If it finds it, it sets the frequency of the first voice and the gate bit. The oscillator runs through attack and decay and holds the sustain level. When the key is released, the program clears the gate bit and the tone dies away.</p>
+  <p>The keys of the middle row are the white keys, those of the upper row the black keys, as on a piano. The key with the Z sits at the place where English keyboards have the Y:</p>
+  <table class="zusammen">
+    <thead><tr><th>Key</th><th>A</th><th>W</th><th>S</th><th>E</th><th>D</th><th>F</th><th>T</th><th>G</th><th>Z</th><th>H</th><th>U</th><th>J</th><th>K</th><th>O</th><th>L</th><th>P</th></tr></thead>
+    <tbody><tr><td>Note</td><td>C</td><td>C#</td><td>D</td><td>D#</td><td>E</td><td>F</td><td>F#</td><td>G</td><td>G#</td><td>A</td><td>A#</td><td>B</td><td>c</td><td>c#</td><td>d</td><td>d#</td></tr></tbody>
+  </table>
+  <p>The main program and the note values:</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+VIA1_ORB     = $7f20
+VIA1_DDRB    = $7f22
+VIA2_ORB     = $7f40
+VIA2_IRA     = $7f41
+VIA2_DDRB    = $7f42
+VIA2_DDRA    = $7f43
+SID_FREQ_L   = $7f60
+SID_FREQ_H   = $7f61
+SID_CTRL     = $7f64
+SID_AD       = $7f65
+SID_SR       = $7f66
+SID_VOLUME   = $7f78
+
+GATE_ON  = %00100001            <span class="kommentar">; sawtooth, gate on: the tone starts</span>
+GATE_OFF = %00100000            <span class="kommentar">; sawtooth, gate off: the tone dies away</span>
+
+        .zeropage
+tmp:    .res 1
+code:   .res 1                  <span class="kommentar">; code of the pressed key</span>
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff
+        txs
+        jsr keys_init
+        lda #$09                <span class="kommentar">; attack 0, decay 9</span>
+        sta SID_AD
+        lda #$8a                <span class="kommentar">; sustain 8, release 10</span>
+        sta SID_SR
+        lda #$0f                <span class="kommentar">; full volume</span>
+        sta SID_VOLUME
+loop:   jsr keys_update
+        ldx #0
+@find:  lda note_keys,x         <span class="kommentar">; look the key up in the table</span>
+        cmp #$ff
+        beq @silent
+        cmp code
+        beq @play
+        inx
+        bne @find
+@play:  lda note_lo,x           <span class="kommentar">; set the frequency and start the tone</span>
+        sta SID_FREQ_L
+        lda note_hi,x
+        sta SID_FREQ_H
+        lda #GATE_ON
+        sta SID_CTRL
+        jmp loop
+@silent:
+        lda #GATE_OFF           <span class="kommentar">; no note pressed: let the tone die away</span>
+        sta SID_CTRL
+        jmp loop</pre>
+  <pre class="listing breit lang"><span class="kommentar">; keys (scancodes) and the frequency values of the notes C to D5</span>
+note_keys: .byte 1, 67, 65, 11, 9, 17, 23, 21, 31, 29, 27, 25, 33, 83, 81, 43, $ff
+note_lo:   .byte $25, $2a, $3f, $64, $9a, $e3, $3f, $b1, $38, $d6, $8d, $5e, $4b, $55, $7e, $c8
+note_hi:   .byte $11, $12, $13, $14, $15, $16, $18, $19, $1b, $1c, $1e, $20, $22, $24, $26, $28</pre>
+  <p>The keyboard scanning is the one from chapter 10. The complete program is in <code>programme/en/synth.s</code>. Assemble it and write it to the EEPROM like in the chapters before.</p>
+
+  <h2>Measuring</h2>
+  <p>If you hold the key H pressed, you see a sawtooth of 440&nbsp;Hz at the output:</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/messung-sid.svg" alt="Oscilloscope picture: sawtooth of 440 Hz at the output of the SID">
+    <figcaption>Output of the SID with the key H pressed (A, 440 Hz)</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>No sound? Check whether the SID answers at $7F60 (at the monitor: <code>w 7f78 0f</code>). Then the supply with 5&nbsp;V and 9&nbsp;V, the signal at pin&nbsp;27 and the output stage, last the loudspeaker. If the tone hums, decoupling capacitors are missing or the ground connection of the output stage is loose.</p>
+  </aside>
+  <h2>Further reading</h2>
+  <ul>
+    <li>Wikipedia: MOS Technology SID, en.wikipedia.org/wiki/MOS_Technology_SID</li>
+    <li>SID datasheet and background: sid.kubarth.com</li>
+    <li>SID programming: codebase64.org, page “SID programming”</li>
+  </ul>
+</section>
+</main>
+</body>
+</html>

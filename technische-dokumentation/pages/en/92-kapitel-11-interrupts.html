@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 11</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="11" data-titel="Interrupts" data-kurztitel="Interrupts">
+  <p>The computer has to do many things at once: fetch characters from the ACIA, scan the keyboard, measure time, later play tones. This chapter shows how that works with interrupts.</p>
+
+  <h2>Why interrupts?</h2>
+  <p>You could look again and again in the main program whether something has happened. That is called polling and is a good solution for small tasks. For example one can build a state machine that checks events in a loop, executes actions and changes its state.</p>
+  <p>It gets difficult with delays. A delay loop blocks the main program, it cannot do anything else meanwhile. Above all it cannot fetch a byte from the ACIA right away so that its receive register becomes free.</p>
+  <p>Better is a mechanism that interrupts the main program and calls a special subroutine when something happens. That is an interrupt.</p>
+
+  <h2>How the processor interrupts</h2>
+  <p>The 6502 has two interrupt inputs:</p>
+  <ul>
+    <li><strong>/IRQ</strong> (interrupt request) is an input that triggers on low, as long as it stays low. It can be blocked: the flag I in the status register blocks it. <code>SEI</code> sets the flag, <code>CLI</code> clears it.</li>
+    <li><strong>/NMI</strong> (non-maskable interrupt) triggers on the falling edge and cannot be blocked.</li>
+  </ul>
+  <p>On an interrupt the processor finishes the current instruction, saves the program counter and the status register on the stack, sets the flag I and jumps through a vector: through $FFFE and $FFFF for /IRQ, through $FFFA and $FFFB for /NMI. This takes seven clocks. The instruction <code>RTI</code> restores status register and program counter, and the main program continues where it was interrupted.</p>
+  <p>Important: the interrupt routine has to save all registers it changes, and it has to clear the cause of the interrupt. Otherwise the processor jumps right back in.</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-irq.svg" alt="Schematic: common /IRQ line from the ACIA and both VIAs and the NMI button">
+    <figcaption>Schematic of the interrupt lines</figcaption>
+  </figure>
+  <p>Most chips for the 6502 have an output /IRQ that reports that something happened inside the chip, for example a timer overflow or a received byte. These outputs are open collector (open drain with MOS chips): they only pull the line down. You can connect all /IRQ lines together and run them to the /IRQ input of the processor. The resistor R9 (3.3&nbsp;kΩ) from chapter 3 keeps the line high otherwise. Such a circuit is called “wired OR”.</p>
+  <p>The /IRQ of the ACIA (pin&nbsp;26), of the first and second VIA (pin&nbsp;21 each) and the /IRQ input of the 6502 (pin&nbsp;4) are connected. The input /NMI gets a button to GND. Its pull-up is R8 from chapter 3. The button triggers an interrupt that can later be used for a warm start, for example.</p>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>S2</td><td>Push button, 4 legs</td><td>NMI</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Assembly</h2>
+  <ol class="schritte">
+    <li><div>Switch the power off. Connect pin&nbsp;26 of the ACIA, pin&nbsp;21 of the first and pin&nbsp;21 of the second VIA to pin&nbsp;4 of the 6502 (hole 7a on breadboard 2). That is the same line R9 hangs at.</div></li>
+    <li><div>Place the button S2 across the channel of a small breadboard (holes 6e, 8e, 6f and 8f). Connect its lower half (hole 6a) to /NMI, that is pin&nbsp;6 of the 6502, and the upper half (hole 8j) to GND:</div></li>
+  </ol>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-nmi.svg" alt="Breadboard with the NMI button, wire /NMI and GND">
+    <figcaption>The NMI button</figcaption>
+  </figure>
+  <p>The sources on breadboards 4, 8 and 10 stay unchanged otherwise.</p>
+
+  <h2>The program</h2>
+  <p>The example blinks the LED with timer 1 of the first VIA as in chapter 8, but without a delay loop. The timer runs continuously: it counts down with every clock of φ2, triggers an interrupt at zero and reloads the start value. With 10,000 that gives an interrupt every 100&nbsp;ms. Because of two extra clocks for reloading it is exactly 10.002&nbsp;ms.</p>
+  <p>In the interrupt the program counts up to 100 and then toggles the LED, that is once per second. An NMI sets the limit to 10, and the LED then changes every tenth of a second.</p>
+  <table class="zusammen">
+    <thead><tr><th>Register</th><th>Value</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>ACR ($7F2B)</td><td><code>%01000000</code></td><td>timer 1 runs continuously, PB7 stays free</td></tr>
+      <tr><td>IER ($7F2E)</td><td><code>%11000000</code></td><td>bit 7 set: switch the given bits on, bit 6: timer 1 interrupt</td></tr>
+      <tr><td>T1C-L, T1C-H ($7F24, $7F25)</td><td>10000</td><td>start value, low byte first, then high byte</td></tr>
+    </tbody>
+  </table>
+  <p>The interrupt of timer 1 is cleared by reading T1C-L. The handler does that first. The instructions <code>SEI</code> and <code>CLI</code> block and release /IRQ.</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+VIA1_ORA  = $7f21
+VIA1_DDRA = $7f23
+VIA1_T1CL = $7f24
+VIA1_T1CH = $7f25
+VIA1_ACR  = $7f2b
+VIA1_IER  = $7f2e
+
+LED            = %10000000
+TIMER_INTERVAL = 10000          <span class="kommentar">; one interrupt every 100 ms (at 1 MHz)</span>
+
+        .zeropage
+ticks:      .res 1              <span class="kommentar">; interrupts counted</span>
+max_ticks:  .res 1              <span class="kommentar">; number of interrupts until the LED changes</span>
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    jmp nmi_handler
+irq:    jmp irq_handler
+
+main:   sei                     <span class="kommentar">; block interrupts until everything is set up</span>
+        cld
+        ldx #$ff
+        txs
+        lda VIA1_DDRA           <span class="kommentar">; PA7 (the LED) as output, LED off</span>
+        ora #LED
+        sta VIA1_DDRA
+        lda VIA1_ORA
+        and #&lt<span class="kommentar">;~LED</span>
+        sta VIA1_ORA
+        lda #0
+        sta ticks
+        lda #100                <span class="kommentar">; 100 times 100 ms: the LED changes every second</span>
+        sta max_ticks
+        lda #%01000000          <span class="kommentar">; timer 1 runs continuously, PB7 stays free</span>
+        sta VIA1_ACR
+        lda #%11000000          <span class="kommentar">; enable the timer 1 interrupt</span>
+        sta VIA1_IER
+        lda #&lt<span class="kommentar">;TIMER_INTERVAL    ; load the counter: low byte first, then high byte</span>
+        sta VIA1_T1CL
+        lda #&gt<span class="kommentar">;TIMER_INTERVAL</span>
+        sta VIA1_T1CH
+        cli                     <span class="kommentar">; enable interrupts</span>
+loop:   jmp loop                <span class="kommentar">; the main program has nothing to do</span>
+
+<span class="kommentar">; NMI: from now on the LED changes ten times faster</span>
+nmi_handler:
+        pha
+        lda #10                 <span class="kommentar">; 10 times 100 ms: the LED changes every tenth of a second</span>
+        sta max_ticks
+        pla
+        rti
+
+<span class="kommentar">; IRQ: every 100 ms</span>
+irq_handler:
+        pha
+        lda VIA1_T1CL           <span class="kommentar">; reading T1C-L clears the interrupt request</span>
+        inc ticks
+        lda ticks
+        cmp max_ticks
+        bcc @done
+        lda #0
+        sta ticks
+        lda VIA1_ORA
+        eor #LED                <span class="kommentar">; toggle the LED</span>
+        sta VIA1_ORA
+@done:  pla
+        rti</pre>
+  <p>Assemble it and write it to the EEPROM like in the chapters before.</p>
+
+  <h2>Measuring</h2>
+  <p>At pin PA7 you can see how the toggle time changes after you press the NMI button:</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/messung-irq.svg" alt="Oscilloscope picture: LED level, first every second, after the NMI every tenth of a second">
+    <figcaption>Level at PA7: first every second, after the NMI every tenth of a second</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>The example uses only one interrupt source. As soon as several chips may trigger /IRQ, the handler has to check all sources (the flag register IFR of the VIAs, bit 7 of the ACIA status) and clear each one separately. Otherwise the line stays low and the processor never gets out of the interrupt.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

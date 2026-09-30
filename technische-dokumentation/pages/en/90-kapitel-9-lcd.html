@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 9</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="9" data-titel="The LCD Display" data-kurztitel="LCD display">
+  <p>With the VIA a display is quickly connected. This chapter attaches a text display with the HD44780 controller to port A. For the first time the computer shows something by itself.</p>
+
+  <h2>The display</h2>
+  <p>The HD44780 is the standard controller for text displays. You send it characters and commands over four or eight data lines, plus the lines RS (command or character) and E (enable, takes over the data). The 4-bit mode saves four lines: every byte goes in two halves over D4 to D7.</p>
+  <p>Our display has four lines of 40 characters and contains two independent controllers. Each drives two lines and has its own enable (E1 for lines 1 and 2, E2 for lines 3 and 4). The display in this book is an Electronic Assembly Blue Line EA W404B-NLW. We cannot read from it, because R/W is tied to GND. That saves a line, but after every command we have to wait a fixed time instead of looking at the busy flag.</p>
+  <p>Besides the control lines the display needs the supply, an adjustable contrast voltage and a series resistor for the backlight. With this display a resistor of 150&nbsp;Ω fits.</p>
+  <p>You can also connect a display directly to the data and address buses. Then you have to take PHI2 into account as with the chip select of the RAM. We stay with the connection through the VIA.</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-lcd.svg" alt="Schematic: port A of the VIA and the display connection with trimmer and series resistor">
+    <figcaption>Schematic of the display connection</figcaption>
+  </figure>
+  <p>Port A of the VIA supplies seven lines: PA0 to PA3 go to D4 to D7 of the display, PA4 to RS, PA5 to E1 and PA6 to E2. The LED now hangs at PA7. It moves here from PB0, because port B belongs to the keyboard from chapter 10 on. The data lines D0 to D3 of the display stay open. The contrast voltage V0 comes from the wiper of a 10&nbsp;kΩ trimmer between +5&nbsp;V and GND. The backlight hangs through R11 at +5&nbsp;V.</p>
+  <p>The pinout of the connector for the display of this book, according to the project's schematic:</p>
+  <table class="zusammen">
+    <thead><tr><th>Pin</th><th>Name</th><th>Connection</th><th>Pin</th><th>Name</th><th>Connection</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>D7</td><td>PA3</td><td>10</td><td>R/W</td><td>GND</td></tr>
+      <tr><td>2</td><td>D6</td><td>PA2</td><td>11</td><td>RS</td><td>PA4</td></tr>
+      <tr><td>3</td><td>D5</td><td>PA1</td><td>12</td><td>V0</td><td>trimmer</td></tr>
+      <tr><td>4</td><td>D4</td><td>PA0</td><td>13</td><td>VSS</td><td>GND</td></tr>
+      <tr><td>5 to 8</td><td>D3 to D0</td><td>open</td><td>14</td><td>VDD</td><td>+5&nbsp;V</td></tr>
+      <tr><td>9</td><td>E1</td><td>PA5</td><td>15</td><td>E2</td><td>PA6</td></tr>
+      <tr><td></td><td></td><td></td><td>17</td><td>LED+</td><td>via R11 to +5&nbsp;V</td></tr>
+      <tr><td></td><td></td><td></td><td>18</td><td>LED−</td><td>GND</td></tr>
+    </tbody>
+  </table>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>This pinout applies to the display of this book. Other modules assign their connections differently and need another series resistor for the backlight. Check the datasheet before you apply power.</p>
+  </aside>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>LCD</td><td>Text display 4 × 40 with two HD44780</td><td>for example EA W404B-NLW</td></tr>
+      <tr><td>R11</td><td>Resistor (backlight)</td><td>150&nbsp;Ω</td></tr>
+      <tr><td>R12</td><td>Trimmer (contrast)</td><td>10&nbsp;kΩ</td></tr>
+      <tr><td>JP2</td><td>Pin header, 18 pins, with a cable to the display</td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Assembly</h2>
+  <p>First the VIA. Port A gets seven short wires with the names PA0 to PA6. The LED stays at PB0.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via-lcd.svg" alt="Breadboard 8 with the VIA, port A with wires PA0 to PA6">
+    <figcaption>The VIA with port A for the display</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Put a wire into each of the pins&nbsp;2 to 8 of the VIA (holes 5a to 11a) and label them PA0 to PA6.</div></li>
+    <li><div>The LED moves: the wire from PB0 (hole 13b) to 27b moves to PA7 (pin&nbsp;9, hole 12b). R10 and the LED stay where they are.</div></li>
+  </ol>
+  <p>Then the connection for the display on a new breadboard. The header is drawn here as one row of 18 pins. If your display has a connector with two rows, take over the numbering of the module.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-lcd.svg" alt="Breadboard 9 with the display connection, trimmer and series resistor">
+    <figcaption>The display connection on breadboard 9</figcaption>
+  </figure>
+  <ol class="schritte" start="3">
+    <li><div>Run +5&nbsp;V and GND to a new breadboard and connect the upper rails to the lower ones there.</div></li>
+    <li><div>Insert the header JP2 into holes 5c to 22c, pin&nbsp;1 on the left.</div></li>
+    <li><div>GND: pins&nbsp;10, 13 and 18. +5&nbsp;V: pin&nbsp;14.</div></li>
+    <li><div>The backlight: R11 from pin&nbsp;17 (hole 21b) to +5&nbsp;V.</div></li>
+    <li><div>The contrast: insert the trimmer R12 into holes 26c to 28c. The left leg goes to +5&nbsp;V, the right one to GND and the wiper in the middle through a wire (27d to 16d) to pin&nbsp;12.</div></li>
+    <li><div>The signals: connect PA0 to PA6 from the VIA to the wires of the same name on this board, as in the table above.</div></li>
+  </ol>
+
+  <h2>The program</h2>
+  <p>The controller needs a fixed time after every command. The program does it in three steps:</p>
+  <ul>
+    <li><strong>Send a nibble:</strong> put data and RS on port A, set E high briefly and low again. The controller takes over the data when E falls.</li>
+    <li><strong>Send a byte:</strong> first the upper, then the lower nibble. Then wait until the controller is done (about 40&nbsp;µs, 1.5&nbsp;ms for “clear display”).</li>
+    <li><strong>Two controllers:</strong> the variable <code>lcd_e</code> remembers whether E1 or E2 is pulsed. Lines 0 and 1 belong to E1, lines 2 and 3 to E2.</li>
+    <li><strong>The LED:</strong> PA7 shares the port A register with the display. The variable <code>led</code> remembers its state, and every write to port A carries it along. <code>led_on</code> and <code>led_off</code> switch the LED.</li>
+  </ul>
+  <p>At power-on the display is in 8-bit mode. The initialization brings it into 4-bit mode and follows the manufacturer's instructions:</p>
+  <table class="zusammen">
+    <thead><tr><th>Step</th><th>Value</th><th>Then wait</th></tr></thead>
+    <tbody>
+      <tr><td>at least 40&nbsp;ms after power-on</td><td></td><td></td></tr>
+      <tr><td>Nibble</td><td>$3</td><td>more than 4.1&nbsp;ms</td></tr>
+      <tr><td>Nibble</td><td>$3</td><td>more than 100&nbsp;µs</td></tr>
+      <tr><td>Nibble</td><td>$3</td><td>more than 100&nbsp;µs</td></tr>
+      <tr><td>Nibble</td><td>$2 (4-bit mode)</td><td>more than 40&nbsp;µs</td></tr>
+      <tr><td>Command</td><td>$28: 4 bit, two lines, 5×8 dots</td><td>40&nbsp;µs</td></tr>
+      <tr><td>Command</td><td>$08: display off</td><td>40&nbsp;µs</td></tr>
+      <tr><td>Command</td><td>$01: clear display</td><td>1.5&nbsp;ms</td></tr>
+      <tr><td>Command</td><td>$06: cursor moves to the right</td><td>40&nbsp;µs</td></tr>
+      <tr><td>Command</td><td>$0C: display on</td><td>40&nbsp;µs</td></tr>
+    </tbody>
+  </table>
+  <p>The program waits 2&nbsp;ms after every command. That is slow, but safe. First the constants and the main program:</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+VIA_ORA  = $7f21
+VIA_DDRA = $7f23
+
+LCD_RS = %00010000              <span class="kommentar">; register select: command (0) or character (1)</span>
+LCD_E1 = %00100000              <span class="kommentar">; enable of the upper controller (rows 1, 2)</span>
+LCD_E2 = %01000000              <span class="kommentar">; enable of the lower controller (rows 3, 4)</span>
+
+        .zeropage
+ptr:    .res 2
+lcd_e:  .res 1                  <span class="kommentar">; currently selected controller</span>
+led:    .res 1                  <span class="kommentar">; state of the LED at PA7 (bit 7)</span>
+tmp:    .res 1
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff
+        txs
+        jsr lcd_init
+        lda #&lt<span class="kommentar">;msg_welcome</span>
+        ldx #&gt<span class="kommentar">;msg_welcome</span>
+        jsr lcd_puts
+        ldx #0                  <span class="kommentar">; column 0</span>
+        ldy #1                  <span class="kommentar">; row 1 (the second)</span>
+        jsr lcd_goto
+        lda #'&gt<span class="kommentar">;'</span>
+        jsr lcd_putc
+        jsr lcd_cursor_blink
+        jsr led_on              <span class="kommentar">; LED on</span>
+        ldx #0
+        ldy #2                  <span class="kommentar">; row 2 (the third)</span>
+        jsr lcd_goto
+        lda #&lt<span class="kommentar">;msg_second</span>
+        ldx #&gt<span class="kommentar">;msg_second</span>
+        jsr lcd_puts
+halt:   jmp halt</pre>
+  <p>The initialization:</p>
+  <pre class="listing breit lang"><span class="kommentar">; initialize the display (4-bit mode, both controllers)</span>
+lcd_init:
+        lda #$ff                <span class="kommentar">; all lines of port A are outputs</span>
+        sta VIA_DDRA
+        lda led
+        sta VIA_ORA
+        ldx #40                 <span class="kommentar">; wait 40 ms after power-on</span>
+        jsr delay_ms
+        lda #LCD_E1 | LCD_E2    <span class="kommentar">; address both controllers</span>
+        sta lcd_e
+        lda #3                  <span class="kommentar">; $3 three times: make sure of 8-bit mode</span>
+        jsr lcd_write4
+        ldx #5
+        jsr delay_ms
+        lda #3
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #3
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #2                  <span class="kommentar">; then $2: switch to 4-bit mode</span>
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #%00101000          <span class="kommentar">; 4 bit, two lines, 5×8 dots</span>
+        jsr lcd_cmd
+        lda #%00001000          <span class="kommentar">; display off</span>
+        jsr lcd_cmd
+        jsr lcd_clear
+        lda #%00000110          <span class="kommentar">; cursor moves to the right</span>
+        jsr lcd_cmd
+        lda #%00001100          <span class="kommentar">; display on, cursor off</span>
+        jsr lcd_cmd
+        lda #LCD_E1             <span class="kommentar">; from now on select the upper controller</span>
+        sta lcd_e
+        rts</pre>
+  <p>And the routines the main program uses to operate the display:</p>
+  <pre class="listing breit lang"><span class="kommentar">; A = RS and nibble: set data, pulse E high (RS and data stay)</span>
+lcd_write4:
+        and #$1f
+        ora led                 <span class="kommentar">; the LED (PA7) is kept at every write</span>
+        sta tmp
+        sta VIA_ORA
+        ora lcd_e
+        sta VIA_ORA
+        lda tmp
+        sta VIA_ORA
+        rts
+
+<span class="kommentar">; A = command (RS = 0): high nibble first, then low nibble</span>
+lcd_cmd:
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        jsr lcd_write4
+        pla
+        and #$0f
+        jsr lcd_write4
+        ldx #2
+        jmp delay_ms
+
+lcd_putc:
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        ora #LCD_RS
+        jsr lcd_write4
+        pla
+        and #$0f
+        ora #LCD_RS
+        jsr lcd_write4
+        ldx #10                 <span class="kommentar">; wait about 50 µs</span>
+@wait:  dex
+        bne @wait
+        rts
+
+lcd_clear:
+        lda #%00000001
+        jmp lcd_cmd
+
+lcd_cursor_blink:
+        lda #%00001111
+        jmp lcd_cmd
+
+<span class="kommentar">; X = column, Y = row (0 to 3)</span>
+lcd_goto:
+        cpy #2
+        bcs @lower
+        lda #LCD_E1
+        bne @set
+@lower: lda #LCD_E2
+        dey
+        dey
+@set:   sta lcd_e
+        txa
+        cpy #0
+        beq @cmd
+        clc
+        adc #$40                <span class="kommentar">; second line starts at address $40</span>
+@cmd:   ora #$80
+        jmp lcd_cmd
+
+lcd_puts:
+        sta ptr
+        stx ptr+1
+        ldy #0
+@loop:  lda (ptr),y
+        beq @done
+        jsr lcd_putc
+        iny
+        bne @loop
+@done:  rts
+
+<span class="kommentar">; wait X milliseconds (at 1 MHz, 1001 clocks per millisecond)</span>
+delay_ms:
+@ms:    ldy #199
+@us:    dey
+        bne @us
+        dex
+        bne @ms
+        rts
+
+<span class="kommentar">; switch the LED on and off: PA7 shares port A with the display</span>
+led_on: lda #$80
+        sta led
+        sta VIA_ORA
+        rts
+
+led_off:
+        lda #0
+        sta led
+        sta VIA_ORA
+        rts
+
+msg_welcome: .byte "Welcome to the 6502 HomeComputer!", $00
+msg_second:  .byte "This is line 3.", $00</pre>
+  <p>Assemble and write it to the EEPROM like in the chapters before:</p>
+  <pre class="listing">$ ca65 -o lcd.o lcd.s
+$ ld65 -C first.cfg -o lcd.bin lcd.o
+$ minipro -p AT28C256 -w lcd.bin</pre>
+
+  <h2>The result</h2>
+  <p>After switching on it takes a moment, then the text appears. The LED lights up. In the second line there is a greater-than sign with a blinking cursor, and in the third line (the second controller) the last sentence. If nothing can be seen, turn the trimmer: with a wrong contrast voltage the display stays empty.</p>
+  <figure class="lcd">
+<pre>Welcome to the 6502 HomeComputer!
+&gt;<span class="cursor"> </span>
+This is line 3.
+</pre>
+    <figcaption>The display after the program starts</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>If the display stays empty although the backlight is on, the contrast is usually wrong or the initialization did not get through. Then check E1 and E2 (pins&nbsp;9 and 15) for pulses and whether the data lines are in the right place. If only the upper two lines appear, E2 is missing.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

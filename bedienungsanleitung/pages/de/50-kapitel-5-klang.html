@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 5 – Klänge mit dem SID</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="5" data-titel="Klänge mit dem SID" data-kurztitel="Klang">
+  <p>Im HomeComputer 6502 steckt derselbe Klangchip wie im Commodore 64: der <strong>SID</strong>, in der späteren Ausführung 8580. SID steht für <em>Sound Interface Device</em>. Er hat drei Stimmen, die gleichzeitig verschiedene Töne spielen können. Jede Stimme hat eine eigene Klangfarbe und einen eigenen Lautstärkeverlauf. In diesem Kapitel bringen Sie ihn zum Klingen: erst einzelne Töne, dann Melodien, dann mehrstimmige Musik. Zum Schluss wird der Computer zum Klavier.</p>
+
+  <h2>Der Klangchip SID</h2>
+  <p>Alle Klangbefehle arbeiten im Hintergrund. Der Befehl stößt den Ton an und kehrt sofort zurück. Ihr Programm läuft weiter, während die Musik spielt. So kann ein Spiel Musik machen und gleichzeitig auf Tasten reagieren.</p>
+  <p>Zwei Regler bestimmen, wie laut es wird. Der Regler auf der Rückseite (Kapitel 1) stellt den Verstärker ein. In BASIC setzen Sie die Lautstärke des SID mit <code>VOL</code>, von 0 (still) bis 15 (am lautesten):</p>
+<pre class="listing">VOL 15</pre>
+  <p>Nach dem Einschalten steht die Lautstärke schon auf 15.</p>
+
+  <h2>Einzelne Töne mit SOUND</h2>
+  <p>Der einfachste Klangbefehl ist <code>SOUND</code>. Er spielt einen Ton auf einer Stimme:</p>
+<pre class="listing">SOUND 1,4389,8</pre>
+  <p>Das spielt das eingestrichene C, eine Sekunde lang. Die drei Zahlen bedeuten:</p>
+  <table>
+    <thead><tr><th>Wert</th><th>Bedeutung</th><th>Bereich</th></tr></thead>
+    <tbody>
+      <tr><td>Stimme</td><td>welche der drei Stimmen spielt</td><td>1 bis 3</td></tr>
+      <tr><td>Frequenz</td><td>die Tonhöhe, als Zahl für den SID</td><td>0 bis 65535</td></tr>
+      <tr><td>Dauer</td><td>wie lange, in Sechzehnteln</td><td>1 bis 255</td></tr>
+      <tr><td>Instrument</td><td>optional, die Klangfarbe (siehe unten)</td><td>0 bis 7</td></tr>
+    </tbody>
+  </table>
+  <p>Die Frequenz ist keine Angabe in Hertz, sondern der Wert, den der SID erwartet. Für die Töne um das eingestrichene C sind es diese Zahlen:</p>
+  <table>
+    <thead><tr><th>Ton</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>A</th><th>H</th><th>C'</th></tr></thead>
+    <tbody>
+      <tr><td>Frequenz</td><td>4389</td><td>4927</td><td>5530</td><td>5859</td><td>6577</td><td>7382</td><td>8286</td><td>8778</td></tr>
+    </tbody>
+  </table>
+  <p>Eine Oktave höher ist die Zahl doppelt so groß, eine Oktave tiefer halb so groß. Das tiefe C ist also 2194, das hohe C 8778.</p>
+  <p>Die Dauer zählt in Sechzehnteln eines Taktes. Wie schnell ein Sechzehntel vergeht, bestimmt <code>TEMPO</code>: die Zahl der Sechzehntel pro Sekunde, von 1 bis 50. Nach dem Einschalten ist es 8. Eine Dauer von 8 dauert dann eine Sekunde, eine Dauer von 4 eine halbe.</p>
+
+  <h3>Eine Tonleiter</h3>
+<pre class="listing">10 FOR I=1 TO 8
+20 READ F
+30 SOUND 1,F,4
+40 SLEEP 0.5
+50 NEXT I
+60 DATA 4389,4927,5530,5859,6577,7382,8286,8778</pre>
+  <p>Weil <code>SOUND</code> nicht auf das Ende des Tons wartet, braucht die Schleife ein <code>SLEEP</code>. Sonst würden alle acht Töne fast gleichzeitig angestoßen, und Sie hörten nur den letzten. Ein neuer Ton auf derselben Stimme ersetzt nämlich den alten.</p>
+
+  <h2>Klangfarben</h2>
+  <p>Ob ein Ton weich wie eine Flöte oder scharf wie eine Trompete klingt, hängt von seiner <strong>Wellenform</strong> ab. Der SID kennt vier:</p>
+  <table>
+    <thead><tr><th>Nr.</th><th>Wellenform</th><th>Klang</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Dreieck</td><td>weich, rund, wie eine Flöte</td></tr>
+      <tr><td>1</td><td>Sägezahn</td><td>hell und kräftig, wie Blech oder Streicher</td></tr>
+      <tr><td>2</td><td>Puls</td><td>hohl bis näselnd, je nach Pulsbreite</td></tr>
+      <tr><td>3</td><td>Rauschen</td><td>kein Ton, sondern ein Zischen</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Die Instrumente</h3>
+  <p>Damit Sie nicht jedes Mal alles einzeln einstellen müssen, hat BASIC acht <strong>Instrumente</strong> eingebaut. Ein Instrument ist eine fertige Kombination aus Wellenform und Lautstärkeverlauf. Die Nummer hängen Sie als vierte Zahl an <code>SOUND</code>:</p>
+<pre class="listing">SOUND 1,4389,8,1</pre>
+  <table>
+    <thead><tr><th>Nr.</th><th>Instrument</th><th>Wellenform</th><th>Verhalten</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Orgel</td><td>Dreieck</td><td>klingt gleich laut, bis der Ton endet</td></tr>
+      <tr><td>1</td><td>Klavier</td><td>Sägezahn</td><td>kurzer Anschlag, klingt dann ab</td></tr>
+      <tr><td>2</td><td>Bass</td><td>Puls</td><td>Anschlag, dann gehalten</td></tr>
+      <tr><td>3</td><td>Rauschen</td><td>Rauschen</td><td>für Geräusche und Schlagzeug</td></tr>
+      <tr><td>4 bis 7</td><td>frei</td><td>Dreieck</td><td>wie die Orgel, zum Selbstgestalten</td></tr>
+    </tbody>
+  </table>
+  <p>Ohne Instrumentnummer behält die Stimme ihre Klangfarbe. Nach dem Einschalten ist das auf allen drei Stimmen die Orgel.</p>
+
+  <h3>Die Wellenform direkt wechseln</h3>
+  <p><code>WAVE</code> ändert die Wellenform einer Stimme sofort, auch mitten in einem Ton:</p>
+<pre class="listing">SOUND 1,4389,16:SLEEP 1:WAVE 1,2,512</pre>
+  <p>Die erste Zahl ist die Stimme, die zweite die Wellenform aus der Tabelle oben. Bei der Pulswelle können Sie als dritte Zahl die <strong>Pulsbreite</strong> angeben, von 0 bis 4095. 2048 ergibt eine gleichmäßige Rechteckwelle mit vollem, hohlem Klang. Je weiter der Wert davon weg liegt, desto dünner und näselnder klingt es. Der nächste <code>SOUND</code> mit Instrumentnummer stellt die Wellenform des Instruments wieder her.</p>
+
+  <h2>Hüllkurven</h2>
+  <p>Eine Gitarrensaite klingt anders als eine Orgelpfeife, selbst bei gleicher Tonhöhe. Das liegt vor allem daran, wie sich die Lautstärke eines Tons mit der Zeit ändert. Diesen Verlauf nennt man <strong>Hüllkurve</strong>. Beim SID hat sie vier Abschnitte:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/de/adsr.svg" alt="Hüllkurve mit den Abschnitten Attack, Decay, Sustain und Release">
+    <figcaption>Die vier Abschnitte einer Hüllkurve</figcaption>
+  </figure>
+  <ul>
+    <li><strong>Attack</strong> (Anschlag): Wie schnell der Ton am Anfang lauter wird.</li>
+    <li><strong>Decay</strong> (Abfall): Wie schnell er danach auf den Haltepegel sinkt.</li>
+    <li><strong>Sustain</strong> (Halten): Wie laut er bleibt, solange der Ton dauert. Das ist ein Pegel, keine Zeit.</li>
+    <li><strong>Release</strong> (Ausklingen): Wie schnell er verklingt, wenn der Ton zu Ende ist.</li>
+  </ul>
+  <p>Mit <code>ENVELOPE</code> geben Sie einem Instrument eine eigene Hüllkurve:</p>
+<pre class="listing">ENVELOPE 4,0,10,0,10
+SOUND 1,6577,8,4</pre>
+  <p>Die erste Zahl ist das Instrument (0 bis 7), dann folgen Attack, Decay, Sustain und Release, jeweils 0 bis 15. Bei den drei Zeiten bedeutet 0 sehr schnell, nur wenige Tausendstelsekunden, und 15 sehr langsam: Der Anschlag braucht dann 8 Sekunden, Abfall und Ausklingen bis zu 24 Sekunden. Beim Sustain ist 0 stumm und 15 volle Lautstärke. Das Beispiel oben macht aus Instrument 4 eine Glocke: sofort voll da, dann langsam verklingend.</p>
+  <table>
+    <thead><tr><th>Klang</th><th>Attack</th><th>Decay</th><th>Sustain</th><th>Release</th></tr></thead>
+    <tbody>
+      <tr><td>Orgel (Instrument 0)</td><td>0</td><td>0</td><td>15</td><td>0</td></tr>
+      <tr><td>Klavier (Instrument 1)</td><td>0</td><td>9</td><td>0</td><td>0</td></tr>
+      <tr><td>Glocke</td><td>0</td><td>10</td><td>0</td><td>10</td></tr>
+      <tr><td>Streicher, weich einsetzend</td><td>8</td><td>0</td><td>15</td><td>8</td></tr>
+    </tbody>
+  </table>
+  <p><code>ENVELOPE</code> ändert nur die Hüllkurve. Die Wellenform des Instruments bleibt, wie sie war. Die neue Hüllkurve gilt ab dem nächsten Ton mit diesem Instrument.</p>
+
+  <h2>Melodien mit TUNE und PLAY</h2>
+  <p>Eine Melodie Ton für Ton mit <code>SOUND</code> und <code>SLEEP</code> zu spielen, ist mühsam. Einfacher geht es mit <code>TUNE</code>. Damit schreiben Sie eine ganze Melodie als Text auf, in einer Art Notenschrift. <code>PLAY</code> spielt sie dann im Hintergrund ab:</p>
+<pre class="listing">10 TUNE 1,"I1CDEFL8GGL4AAAAL8GL4AAAAL8GL4FFFFL8EEL4DDDDL8C"
+20 PLAY 1</pre>
+  <p>Das ist „Alle meine Entchen“. Die Notenschrift besteht aus Buchstaben mit ein paar Zusätzen:</p>
+  <table>
+    <thead><tr><th>Zeichen</th><th>Bedeutung</th></tr></thead>
+    <tbody>
+      <tr><td><code>C D E F G A B</code></td><td>die Noten. Das deutsche H heißt hier <strong>B</strong>.</td></tr>
+      <tr><td><code>#</code> hinter der Note</td><td>einen Halbton höher: <code>F#</code> ist Fis</td></tr>
+      <tr><td>Ziffer hinter der Note</td><td>die Oktave dieser Note: <code>C5</code> ist das C eine Oktave höher</td></tr>
+      <tr><td><code>O</code> und Ziffer 0 bis 7</td><td>Oktave für alle folgenden Noten. Am Anfang gilt 4.</td></tr>
+      <tr><td><code>L</code> und Ziffer 1 bis 8</td><td>Länge der folgenden Noten in Sechzehnteln. Am Anfang gilt 4, also eine Viertelnote.</td></tr>
+      <tr><td><code>R</code> und Ziffer</td><td>eine Pause. Die Ziffer ist die Länge nur dieser Pause.</td></tr>
+      <tr><td><code>I</code> und Ziffer 0 bis 7</td><td>Instrument für die folgenden Noten</td></tr>
+    </tbody>
+  </table>
+  <p>Im Beispiel stellt <code>I1</code> das Klavier ein. <code>CDEF</code> sind vier Viertelnoten. <code>L8</code> macht die folgenden Noten zu halben Noten, <code>L4</code> schaltet wieder auf Viertel zurück. Leerzeichen dürfen Sie zur Übersicht einfügen, sie werden übersprungen. Ob Sie groß oder klein schreiben, ist egal.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Achtung</div>
+    <p>Schreiben Sie für das H immer <code>B</code>. Ein <code>H</code> und jedes andere unbekannte Zeichen beenden die Melodie an dieser Stelle.</p>
+  </aside>
+  <aside class="kasten">
+    <div class="kasten-titel">Tipp</div>
+    <p>Mit der Orgel verschmelzen gleiche Töne hintereinander zu einem langen Ton, weil sie gleichmäßig weiterklingt. Das Klavier schlägt jeden Ton neu an. Darum spielt das Beispiel mit <code>I1</code>.</p>
+  </aside>
+  <p>Ein Notentext darf höchstens 47 Zeichen lang sein. Die erste Zahl hinter <code>TUNE</code> ist der Platz, 1 bis 3. Jeder Platz gehört zu einer Stimme, <code>TUNE 2</code> spielt also auf Stimme 2. <code>PLAY</code> kennt diese Formen:</p>
+  <table>
+    <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>PLAY 1</code></td><td>Melodie 1 einmal spielen</td></tr>
+      <tr><td><code>PLAY 1 ON</code></td><td>Melodie 1 immer wieder von vorn spielen</td></tr>
+      <tr><td><code>PLAY 1 OFF</code></td><td>nur Stimme 1 anhalten</td></tr>
+      <tr><td><code>PLAY 0</code></td><td>alle Stimmen anhalten</td></tr>
+      <tr><td><code>PLAY 1,2</code></td><td>Melodie 1 und 2 zusammen starten</td></tr>
+    </tbody>
+  </table>
+  <p>Mit <code>TEMPO</code> machen Sie jede Melodie schneller oder langsamer. <code>TEMPO 16</code> spielt doppelt so schnell wie am Anfang, <code>TEMPO 4</code> halb so schnell.</p>
+
+  <h2>Mehrstimmige Musik</h2>
+  <p>Weil der SID drei Stimmen hat, können bis zu drei Melodien gleichzeitig laufen. Ein schönes Beispiel ist ein Kanon: Alle singen dasselbe Lied, aber die zweite Stimme beginnt später. So klingt „Bruder Jakob“ zweistimmig:</p>
+<pre class="listing">10 TEMPO 8
+20 TUNE 1,"I0L4CDECCDECEFL8GL4EFL8G"
+30 TUNE 2,"I1R8R8R8R8L4CDECCDECEFL8GL4EFL8G"
+40 PLAY 1,2</pre>
+  <p>Stimme 1 spielt mit der Orgel. Stimme 2 spielt dieselben Noten mit dem Klavier, wartet aber erst vier halbe Pausen ab, also zwei Takte. Dann setzt sie ein, während Stimme 1 schon weiter ist.</p>
+
+  <h2>Geräusche und Effekte</h2>
+  <p>Für Spiele gibt es neun fertige Geräusche:</p>
+  <table>
+    <thead><tr><th>Befehl</th><th>Geräusch</th><th>Klang</th><th>Dauer</th></tr></thead>
+    <tbody>
+      <tr><td><code>EFFECT 1</code></td><td>Schuss</td><td>Rauschen, fällt schnell ab</td><td>0,2 s</td></tr>
+      <tr><td><code>EFFECT 2</code></td><td>Explosion</td><td>Rauschen, lang abfallendes Grollen</td><td>0,9 s</td></tr>
+      <tr><td><code>EFFECT 3</code></td><td>Laser</td><td>Sägezahn, pfeift schnell nach unten</td><td>0,2 s</td></tr>
+      <tr><td><code>EFFECT 4</code></td><td>Sprung</td><td>Puls, steigt schnell nach oben</td><td>0,2 s</td></tr>
+      <tr><td><code>EFFECT 5</code></td><td>Münze</td><td>Puls, zwei helle Töne (H, dann E)</td><td>0,6 s</td></tr>
+      <tr><td><code>EFFECT 6</code></td><td>Extra</td><td>Dreieck, Dreiklang über zwei Oktaven aufwärts</td><td>0,5 s</td></tr>
+      <tr><td><code>EFFECT 7</code></td><td>Fehler</td><td>Sägezahn, zwei tiefe Töne abwärts</td><td>0,6 s</td></tr>
+      <tr><td><code>EFFECT 8</code></td><td>Sirene</td><td>Dreieck, zweimal auf und ab</td><td>0,6 s</td></tr>
+      <tr><td><code>EFFECT 9</code></td><td>Fallende Bombe</td><td>Sägezahn, langer Pfeifton nach unten</td><td>0,6 s</td></tr>
+    </tbody>
+  </table>
+  <p>Effekte spielen immer auf Stimme 3. Ein neuer Effekt ersetzt einen laufenden. <code>TEMPO</code> ändert ihre Dauer nicht. Die Stimmen 1 und 2 laufen dabei weiter. So kann die Musik im Hintergrund bleiben, während es kracht. Eigene Geräusche bauen Sie mit dem Rausch-Instrument 3. <code>SOUND 3,20000,1,3</code> zum Beispiel klingt wie ein kurzer Schlag auf eine kleine Trommel.</p>
+  <p>Das Spiel <code>gem.bas</code> im Firmware-Projekt nutzt Musik und Effekte zusammen. Es ist ein gutes Beispiel zum Nachlesen.</p>
+
+  <h2>Ein Tastenklavier</h2>
+  <p>Zum Abschluss wird die Tastatur zum Klavier. Die Tasten <kbd>A</kbd> bis <kbd>K</kbd> spielen die Töne C bis C'. Mit <kbd>1</kbd> bis <kbd>4</kbd> wählen Sie den Klang. Der Computer merkt sich, was Sie spielen, und spielt es auf <kbd>Enter</kbd> nach.</p>
+  <figure class="lcd">
+<pre>TASTENKLAVIER           KLANG: GLOCKE
+A BIS K SPIELEN, 1-4 KLANG, ESC ENDE
+ENTER NACHSPIELEN, RUECKTASTE LEEREN
+TON: C   AUFNAHME: 9 TOENE</pre>
+    <figcaption>Das Tastenklavier</figcaption>
+  </figure>
+  <p>Das Programm verbindet vieles aus den vorigen Kapiteln: Felder und <code>DATA</code>, die Tastaturabfrage mit <code>KEY</code>, Unterprogramme, Textfunktionen, <code>LOCATE</code> und die LED. Neu sind <code>SOUND</code>, <code>ENVELOPE</code>, <code>TUNE</code> und <code>PLAY</code>. Sie finden es auch als <code>examples/klavier.bas</code>. Ist das Laufwerk aus Kapitel 6 verbunden, laden Sie es mit <code>LOAD "klavier"</code>.</p>
+
+  <h3>Vorbereitung</h3>
+<pre class="listing">10 REM TASTENKLAVIER
+20 DIM F(7),N$(7),T$(7),K$(4)
+30 FOR I=0 TO 7:READ F(I),N$(I),T$(I):NEXT I
+40 FOR I=1 TO 4:READ K$(I):NEXT I
+50 TA$="asdfghjk":IS$="0124"
+60 ENVELOPE 4,0,10,0,10
+70 VOL 15:TEMPO 8
+80 CLS:CURSOR OFF
+90 PRINT "TASTENKLAVIER"
+100 PRINT "A BIS K SPIELEN, 1-4 KLANG, ESC ENDE"
+110 PRINT "ENTER NACHSPIELEN, RUECKTASTE LEEREN";
+120 KL=1:GOSUB 450
+130 IF KEY(0)&lt;&gt;0 THEN 130</pre>
+  <p>Für jeden der acht Töne liest Zeile 30 drei Werte: die Frequenz für <code>SOUND</code> in F, den Namen für die Anzeige in N$ und die Note für <code>TUNE</code> in T$. Zeile 40 liest die Namen der vier Klänge. TA$ enthält die acht Spieltasten in der Reihenfolge der Töne. IS$ ordnet den Klängen 1 bis 4 die Instrumente 0, 1, 2 und 4 zu. Instrument 4 wird in Zeile 60 zur Glocke. KL ist der gewählte Klang.</p>
+
+  <h3>Die Hauptschleife</h3>
+<pre class="listing">200 REM HAUPTSCHLEIFE
+210 K=KEY(0):IF K=0 THEN 210
+220 IF K&gt;=65 AND K&lt;=90 THEN K=K+32
+230 IF K=27 THEN 600
+240 IF K&gt;=49 AND K&lt;=52 THEN KL=K-48:GOSUB 400:GOTO 300
+250 IF K=13 THEN GOSUB 500:GOTO 300
+260 IF K=8 THEN GOSUB 450:GOTO 300
+270 P=0
+280 FOR J=1 TO 8:IF MID$(TA$,J,1)=CHR$(K) THEN P=J
+285 NEXT J
+290 IF P&gt;0 THEN GOSUB 350
+300 IF KEY(0)&lt;&gt;0 THEN 300
+310 LED OFF
+320 GOTO 210</pre>
+  <p>Zeile 210 wartet auf eine Taste. Zeile 220 macht große Buchstaben klein, damit das Klavier auch mit <kbd>Shift</kbd> spielt. Dann wird die Taste verteilt: <kbd>Esc</kbd> beendet, <kbd>1</kbd> bis <kbd>4</kbd> (Codes 49 bis 52) wechseln den Klang, <kbd>Enter</kbd> spielt nach, die Rücktaste leert die Aufnahme. Alles andere sucht die Schleife in den Zeilen 280 und 285 in TA$. Findet sie die Taste, ist P die Nummer des Tons. Zeile 300 wartet, bis die Taste losgelassen ist, dann geht die LED aus.</p>
+
+  <h3>Spielen, Klang wechseln, Aufnahme leeren</h3>
+<pre class="listing">350 REM TON SPIELEN UND AUFNEHMEN
+360 SOUND 1,F(P-1),4,VAL(MID$(IS$,KL,1))
+370 LED ON
+380 IF LEN(R$)&lt;46 THEN R$=R$+T$(P-1):N=N+1
+390 GOSUB 700:RETURN
+400 REM KLANG WECHSELN
+410 IF LEN(R$)&lt;46 THEN R$=R$+"I"+MID$(IS$,KL,1)
+420 GOSUB 700:RETURN
+450 REM AUFNAHME LEEREN
+460 R$="I"+MID$(IS$,KL,1):N=0:P=0
+470 GOSUB 700:RETURN</pre>
+  <p>Zeile 360 spielt den Ton mit dem Instrument des gewählten Klangs. <code>MID$</code> holt die Instrumentnummer als Ziffer aus IS$, <code>VAL</code> macht eine Zahl daraus. Die LED leuchtet, solange die Taste gedrückt ist.</p>
+  <p>Die Aufnahme ist einfach ein Notentext für <code>TUNE</code>. Zeile 380 hängt jede gespielte Note an R$ an, zum Beispiel <code>C4</code>. Ein Klangwechsel hängt in Zeile 410 ein <code>I</code> mit der Instrumentnummer an. Weil ein Notentext höchstens 47 Zeichen lang sein darf, nimmt das Programm nur auf, solange noch Platz ist. Das reicht für gut 20 Töne.</p>
+
+  <h3>Nachspielen, Ende und Anzeige</h3>
+<pre class="listing">500 REM NACHSPIELEN
+510 IF N=0 THEN RETURN
+520 TUNE 1,R$:PLAY 1
+530 RETURN
+600 PLAY 0:LED OFF:CLS:CURSOR ON:END
+700 REM STATUSZEILE
+710 LOCATE 0,24:PRINT "KLANG: ";K$(KL);"  ";
+720 LOCATE 3,0:PRINT "TON: ";
+730 IF P&gt;0 THEN PRINT N$(P-1);
+740 IF P=0 THEN PRINT "-";
+750 PRINT "   AUFNAHME:";N;"TOENE   ";
+760 RETURN
+800 DATA 4389,C,C4,4927,D,D4,5530,E,E4,5859,F,F4
+810 DATA 6577,G,G4,7382,A,A4,8286,H,B4,8778,C,C5
+820 DATA ORGEL,KLAVIER,BASS,GLOCKE</pre>
+  <p>Zum Nachspielen übergibt Zeile 520 die Aufnahme an <code>TUNE</code> und startet sie. Jede Note dauert dabei eine Viertel, egal wie lange Sie die Taste gedrückt haben. Das Unterprogramm ab Zeile 700 schreibt Klang, letzten Ton und Länge der Aufnahme auf die Anzeige. In den <code>DATA</code>-Zeilen sehen Sie noch einmal den Unterschied: Der Name des sechsten Tons ist H, in der Notenschrift heißt er <code>B4</code>.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Zum Weitermachen</div>
+    <p>Spielen Sie mit der Hüllkurve in Zeile 60 und hören Sie, wie sich die Glocke verändert. Oder legen Sie die schwarzen Tasten auf die obere Tastenreihe: Die Noten heißen dann zum Beispiel <code>C#4</code>.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

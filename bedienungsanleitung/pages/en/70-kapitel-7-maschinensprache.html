@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 7 – Machine Language</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="7" data-titel="Machine Language" data-kurztitel="Machine Language">
+  <p>BASIC is comfortable, but too slow for some things. Then you address the processor directly. A machine-language program is a sequence of bytes in memory. The 6502 executes them one after the other. This chapter presents the processor, a few instructions, and the ways to load such a program and start it from BASIC.</p>
+
+  <h2>The 6502 Processor</h2>
+  <p>The 6502 works with one byte, a number from 0 to 255. It knows 65536 memory locations, from 0 to 65535. In machine code, addresses are written in hexadecimal, with a dollar sign in front: <code>$0000</code> to <code>$FFFF</code>. BASIC wants the same addresses in decimal.</p>
+  <table>
+    <thead><tr><th>Register</th><th>Width</th><th>Job</th></tr></thead>
+    <tbody>
+      <tr><td>A</td><td>8 bit</td><td>the accumulator. This is where the result of a calculation lands</td></tr>
+      <tr><td>X and Y</td><td>8 bit</td><td>counting and forming addresses</td></tr>
+      <tr><td>PC</td><td>16 bit</td><td>address of the next instruction</td></tr>
+      <tr><td>S</td><td>8 bit</td><td>points to the stack</td></tr>
+      <tr><td>P</td><td>8 bit</td><td>flags, for example whether the last result was zero</td></tr>
+    </tbody>
+  </table>
+  <p>Two areas have fixed jobs. The <strong>stack</strong> lies at <code>$0100</code> to <code>$01FF</code>. The processor puts the return address there when it calls a subroutine. The <strong>zero page</strong>, <code>$0000</code> to <code>$00FF</code>, it reaches with shorter instructions. BASIC uses that itself.</p>
+  <table>
+    <thead><tr><th>Area</th><th>Address</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td>Program</td><td><code>$0440</code>–<code>$7EFF</code></td><td>BASIC and your machine-language programs</td></tr>
+      <tr><td>Input and output</td><td><code>$7F00</code>–<code>$7FFF</code></td><td>display, keyboard, serial interface, SID</td></tr>
+      <tr><td>ROM</td><td><code>$8000</code>–<code>$FFFF</code></td><td>BASIC, Kernal and monitor</td></tr>
+    </tbody>
+  </table>
+  <p>The exact memory map is in Appendix C.</p>
+
+  <h3>A Few Instructions</h3>
+  <p>An instruction begins with one byte, the opcode. One or two bytes often follow: a value or an address. The character <code>#</code> means: take this number itself, not the contents of a memory location.</p>
+  <table>
+    <thead><tr><th>Instruction</th><th>Example</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>LDA</code></td><td><code>LDA #65</code></td><td>loads 65 into the accumulator, the letter A</td></tr>
+      <tr><td><code>STA</code></td><td><code>STA $7E00</code></td><td>writes the accumulator to the address</td></tr>
+      <tr><td><code>LDX</code></td><td><code>LDX #0</code></td><td>loads register X</td></tr>
+      <tr><td><code>JSR</code></td><td><code>JSR $FF80</code></td><td>calls the subroutine at the address</td></tr>
+      <tr><td><code>RTS</code></td><td><code>RTS</code></td><td>returns from the subroutine</td></tr>
+    </tbody>
+  </table>
+  <p><code>JMP $7E00</code> jumps as well, but remembers no return address. An address is stored with the low byte first. <code>$FF80</code> becomes the bytes 128 and 255.</p>
+
+  <h2>Loading Machine-Language Programs</h2>
+  <p>A finished machine-language program usually comes in a file with the extension <code>.prg</code>, as on the Commodore 64. The first two bytes are the load address, the low one first. It must be <code>$0441</code>, that is the bytes 65 and 4. Behind them stands a BASIC line containing only <code>SYS</code> and the start address, and behind that the machine code.</p>
+  <p><code>LOAD "name"</code> stores the image and puts the end of the variables behind it, so that <code>RUN</code> does not overwrite the code. <code>LIST</code> shows the <code>SYS</code> line, <code>RUN</code> executes it. If the address does not fit or the file is too large, the memory stays empty and <code>BAD LOAD</code> appears. <code>SAVE</code> writes only the BASIC lines, not the machine code.</p>
+  <p>The game <code>raid</code> is such a file. Once the drive from Chapter 6 is connected, <code>LOAD "raid"</code> and <code>RUN</code> start it. Up and down dodge the walls, <kbd>Q</kbd> returns to BASIC.</p>
+  <p>You can also put the same bytes there by hand: in the monitor from Chapter 6, where <code>G</code> starts it, or from BASIC with <code>POKE</code>, as at the end of this chapter.</p>
+
+  <h2>SYS, PEEK and POKE</h2>
+  <p><code>POKE address, value</code> writes one byte. <code>PEEK(address)</code> reads one. <code>SYS address</code> jumps there. If the machine-language program ends with <code>RTS</code>, BASIC continues afterwards.</p>
+<pre class="listing">POKE 32256,96
+PRINT PEEK(32256)
+SYS 32256</pre>
+  <p>32256 is <code>$7E00</code>, high up in memory. 96 is the instruction <code>RTS</code>. <code>PRINT</code> shows 96 as a check, <code>SYS</code> returns immediately. Address and value must be in range: the address from 0 to 65535, the value from 0 to 255. Otherwise <code>?ILLEGAL QUANTITY ERROR</code> appears.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p><code>POKE</code> writes anywhere, including right into your BASIC program. That begins at 1089 (<code>$0441</code>). Zero page and stack belong to the system. The ROM from 32768 (<code>$8000</code>) cannot be changed.</p>
+  </aside>
+
+  <h2>The Kernal Jump Table</h2>
+  <p>From <code>$FF80</code> on, fixed entry points lie ready for display, keyboard and sound. A machine-language program calls them with <code>JSR</code>. The addresses stay the same, even if the firmware behind them changes. A, X and Y are modified in the process. Only when reading a key are X and Y preserved.</p>
+  <table>
+    <thead><tr><th>Address</th><th>Call</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>$FF80</code></td><td><code>JSR</code></td><td>clear the display</td></tr>
+      <tr><td><code>$FF83</code></td><td><code>JSR</code></td><td>set the cursor. A is the row 0 to 3, X the column 0 to 39</td></tr>
+      <tr><td><code>$FF86</code></td><td><code>JSR</code></td><td>output the character in A</td></tr>
+      <tr><td><code>$FF89</code></td><td><code>JSR</code></td><td>underscore: A = 0 off, otherwise on</td></tr>
+      <tr><td><code>$FF8C</code></td><td><code>JSR</code></td><td>key into A, or 0 if none is pressed</td></tr>
+      <tr><td><code>$FF8F</code></td><td><code>JSR</code></td><td>wait A milliseconds</td></tr>
+      <tr><td><code>$FF92</code></td><td><code>JSR</code></td><td>silence the SID</td></tr>
+      <tr><td><code>$FF95</code></td><td><code>JSR</code></td><td>sound effect, A = 1 to 9 as with <code>EFFECT</code></td></tr>
+    </tbody>
+  </table>
+  <p>The arrow keys come through as 17 left, 18 right, 19 up and 20 down.</p>
+
+  <h2>A Machine-Language Program from DATA</h2>
+  <p>Instead of a <code>.prg</code> file, BASIC can put the bytes in place itself. <code>READ</code> fetches them from <code>DATA</code>, <code>POKE</code> writes them, <code>SYS</code> starts. This program clears the display and writes an A in the upper left corner:</p>
+  <table>
+    <thead><tr><th>Bytes</th><th>Instruction</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>32, 128, 255</td><td><code>JSR $FF80</code></td><td>clear the display</td></tr>
+      <tr><td>169, 65</td><td><code>LDA #65</code></td><td>the letter A into the accumulator</td></tr>
+      <tr><td>32, 134, 255</td><td><code>JSR $FF86</code></td><td>output the character</td></tr>
+      <tr><td>96</td><td><code>RTS</code></td><td>back to BASIC</td></tr>
+    </tbody>
+  </table>
+<pre class="listing">10 AD=32256
+20 FOR I=0 TO 8
+30 READ B
+40 POKE AD+I,B
+50 NEXT I
+60 SYS AD
+70 DATA 32,128,255,169,65,32,134,255,96</pre>
+  <p>The nine bytes in line 70 stand in the same order as in the table. <code>$FF80</code> becomes 128, 255 and <code>$FF86</code> becomes 134, 255. Line 60 jumps to 32256. Afterwards BASIC waits for input again.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>32256 (<code>$7E00</code>) lies high up, away from the BASIC program. BASIC stores string variables from the top of memory downward. Many or long strings can overwrite these bytes.</p>
+  </aside>
+
+  <h2>Further Reading</h2>
+  <p>If this has caught your interest and you want to dive deeper, we recommend the book <em>Programming the 6502</em> by Rodney Zaks. The German edition is available at archive.org: <a href="https://archive.org/details/programmierung-des-6502-sybex">https://archive.org/details/programmierung-des-6502-sybex</a>.</p>
+</section>
+</main>
+</body>
+</html>

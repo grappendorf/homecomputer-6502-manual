@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 4</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="4" data-titel="EEPROM und erstes Programm" data-kurztitel="EEPROM">
+  <p>Bisher hat der Prozessor nur NOPs gelesen. Jetzt bekommt er einen Festspeicher, den Sie selbst beschreiben, und führt sein erstes eigenes Programm aus. Nebenbei ersetzen Sie den selbstgebauten Takt durch einen fertigen Baustein.</p>
+
+  <h2>Der Festspeicher</h2>
+  <p>Wer das Gefühl der Achtziger sucht, nimmt EPROMs der Serie 27C und ein UV-Löschgerät. Das Löschen dauert aber über eine Viertelstunde, und beim Entwickeln muss man sehr oft neu programmieren. Das wird schnell mühsam.</p>
+  <p>Deshalb nehmen wir einen modernen parallelen CMOS-EEPROM, den AT28C256 von Atmel. Er fasst 32&nbsp;KB (32k × 8 Bit) und lässt sich elektrisch löschen und beschreiben. Dazu brauchen Sie ein Programmiergerät. Gut geeignet ist ein universelles Gerät wie der MiniPro TL866. Unter Linux steuert das Kommandozeilenwerkzeug <code>minipro</code> es an.</p>
+  <p>Weil der Baustein ständig zwischen Programmiergerät und Schaltung wandert, lohnt sich ein ZIF-Sockel (Zero Insertion Force) in der Schaltung. Er hat einen Hebel und braucht beim Einsetzen keine Kraft.</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-eeprom.svg" alt="Schaltplan: Quarzoszillator-Baustein und EEPROM mit Adress- und Datenbus">
+    <figcaption>Schaltplan von Oszillator und EEPROM</figcaption>
+  </figure>
+  <p>Der AT28C256 hängt am Adressbus (A0 bis A14) und am Datenbus (D0 bis D7). Dazu hat er drei Steuereingänge: /CE (Chip Enable, Baustein ein), /OE (Output Enable, Daten ausgeben) und /WE (Write Enable, schreiben).</p>
+  <p>/CE und /OE liegen fest an GND, der Baustein ist also immer aktiv und gibt seine Daten aus. /WE liegt an +5&nbsp;V, der Prozessor kann den Speicher nicht überschreiben. Eine Adressdekodierung gibt es noch nicht. Darum erscheint der EEPROM im ganzen Adressraum, einmal bei $0000 bis $7FFF und einmal bei $8000 bis $FFFF. Dort liegt auch der Reset-Vektor.</p>
+  <p>Der Takt kommt jetzt von einem Quarzoszillator-Baustein QG1 im Metallgehäuse. Er liefert 1&nbsp;MHz im TTL-Pegel und hat vier Anschlüsse: Pin&nbsp;14 (+5&nbsp;V), Pin&nbsp;7 (GND), Pin&nbsp;8 (Ausgang) und Pin&nbsp;1 (bei manchen Typen ein Steuereingang, hier an GND). Damit werden R1, R2, C1 und Q1 aus Kapitel 1 überflüssig, und die Gatter A bis C des 74LS04 sind frei.</p>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC4</td><td>EEPROM, DIP-28</td><td>AT28C256</td></tr>
+      <tr><td>QG1</td><td>Quarzoszillator, DIP-14-Gehäuse</td><td>1&nbsp;MHz, TTL</td></tr>
+      <tr><td>C7</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+  <p>Dazu ein drittes Steckbrett, möglichst ein ZIF-Sockel mit 28 Kontakten und ein Programmiergerät. R1, R2, C1 und Q1 bauen Sie aus.</p>
+
+  <h2>Aufbau</h2>
+  <p>Zuerst tauschen Sie den Takt. Das Steckbrett 1 sieht danach so aus, die Schaltung bleibt sonst unverändert:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-takt-modul.svg" alt="Steckbrett 1 mit dem Oszillator-Baustein rechts neben dem Taster">
+    <figcaption>Takt und Reset mit Oszillator-Baustein (Steckbrett 1)</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Nehmen Sie R1, R2, C1, den Quarz Q1 und den Draht von Pin&nbsp;4 nach Pin&nbsp;5 von IC1 heraus. Ziehen Sie auch den Draht ab, der den Takt von Pin&nbsp;6 zum Prozessor führte.</div></li>
+    <li><div>Stecken Sie QG1 rechts neben den Taster, Pin&nbsp;1 in Loch 28e.</div></li>
+    <li><div>Pin&nbsp;14 (Loch 28j) kommt an +5&nbsp;V. Pin&nbsp;1 (28a) und Pin&nbsp;7 (34a) kommen an GND.</div></li>
+    <li><div>Führen Sie den Takt von Pin&nbsp;8 (Loch 34j) zu Pin&nbsp;37 des 6502 (Loch 7j auf Steckbrett 2), und /RESET von Loch 11j zu Pin&nbsp;40 (Loch 4j).</div></li>
+  </ol>
+  <p>Jetzt der EEPROM auf einem neuen Steckbrett. Die kurzen Drähte mit Namen zeigen, wohin ein Anschluss verbunden wird. Gleichnamige Drähte gehören zusammen.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-eeprom.svg" alt="Steckbrett 3 mit dem EEPROM AT28C256 und kurzen Drähten mit Signalnamen">
+    <figcaption>Der EEPROM auf Steckbrett 3. Grün: Adresse, blau: Daten.</figcaption>
+  </figure>
+  <ol class="schritte" start="5">
+    <li><div>Führen Sie +5&nbsp;V und GND von Steckbrett 2 zu Steckbrett 3 und verbinden Sie dort die oberen Schienen mit den unteren.</div></li>
+    <li><div>Stecken Sie IC4 über die Rinne, Kerbe links, Pin&nbsp;1 in Loch 5d. Wie der 6502 ist er 600 mil breit und sitzt in den Reihen d und h. Nehmen Sie besser einen ZIF-Sockel.</div></li>
+    <li><div>Versorgen Sie IC4: Pin&nbsp;28 (Loch 5j) an +5&nbsp;V und Pin&nbsp;14 (18a) an GND. Setzen Sie C7 zwischen die oberen Schienen.</div></li>
+    <li><div>/OE (Pin&nbsp;22, Loch 11j) und /CE (Pin&nbsp;20, Loch 13j) kommen an GND. /WE (Pin&nbsp;27, Loch 6j) kommt an +5&nbsp;V.</div></li>
+    <li><div>Verbinden Sie die 15 Adress- und 8 Datenleitungen mit dem Prozessor, jeweils mit gleichen Namen. Die Tabelle zeigt die Pins. Nehmen Sie grüne Drähte für die Adressen und blaue für die Daten, das erleichtert die Kontrolle.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (Pin)</th><th>AT28C256 (Pin)</th></tr></thead>
+    <tbody>
+      <tr><td>A0 – A7</td><td>9, 10, 11, 12, 13, 14, 15, 16</td><td>10, 9, 8, 7, 6, 5, 4, 3</td></tr>
+      <tr><td>A8 – A14</td><td>17, 18, 19, 20, 22, 23, 24</td><td>25, 24, 21, 23, 2, 26, 1</td></tr>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>11, 12, 13, 15, 16, 17, 18, 19</td></tr>
+    </tbody>
+  </table>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Achtung</div>
+    <p>Stecken Sie den EEPROM nur bei ausgeschalteter Spannung in den Sockel, und prüfen Sie vorher die Orientierung. Ein falsch herum eingesetzter Baustein ist schnell defekt.</p>
+  </aside>
+
+  <h2>Software</h2>
+  <p>Für die Programme benutzen wir die Werkzeuge der Suite cc65: den Assembler <code>ca65</code> und den Linker <code>ld65</code>. Der Linker braucht eine Konfigurationsdatei, die den Speicher beschreibt. Die erste Fassung, <code>erste.cfg</code>:</p>
+  <pre class="listing">MEMORY
+{
+  ROM: start=$8000, size=$8000, type=ro, define=yes, fill=yes, file=%O;
+}
+SEGMENTS
+{
+  CODE:    load=ROM, type=ro;
+  VECTORS: load=ROM, type=ro, offset=$7ffa;
+}</pre>
+  <p>Es gibt einen Speicherbereich ROM von $8000 bis $FFFF. Das ist die Datei, die wir später in den EEPROM schreiben. Der Abschnitt <code>VECTORS</code> landet ab Offset $7FFA, also bei $FFFA bis $FFFF. Dort erwartet der Prozessor seine drei Vektoren.</p>
+  <p>Das erste Programm, <code>erste.s</code>, tut fast nichts. Nach dem Reset springt der Prozessor zur Marke <code>loop</code>, lädt $12 in den Akkumulator und springt zurück:</p>
+  <pre class="listing">        .setcpu "6502"
+
+        .segment "VECTORS"
+        .word   loop            <span class="kommentar">; NMI</span>
+        .word   loop            <span class="kommentar">; Reset</span>
+        .word   loop            <span class="kommentar">; IRQ</span>
+
+        .code
+loop:   lda #$12
+        jmp loop</pre>
+  <p>Übersetzen und in den EEPROM schreiben:</p>
+  <pre class="listing">$ ca65 -o erste.o erste.s
+$ ld65 -C erste.cfg -o erste.bin erste.o
+$ minipro -p AT28C256 -w erste.bin</pre>
+  <p>Das Ergebnis ist eine Datei von 32&nbsp;KB. Hinten stehen die drei Vektoren, alle zeigen auf $8000:</p>
+  <pre class="listing">00000000  a9 12 4c 00 80 00 00 00  00 00 00 00 00 00 00 00
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+*
+00007ff0  00 00 00 00 00 00 00 00  00 00 00 80 00 80 00 80
+00008000</pre>
+  <p>Ist der Baustein schreibgeschützt, hilft bei <code>minipro</code> die Option <code>-u</code>, sie hebt den Schutz auf.</p>
+
+  <h2>Messen</h2>
+  <p>Mit einem Logikanalysator sehen Sie, was nach dem Reset auf den Bussen passiert. Die Zeichnung zeigt den Takt, die Leitung R/W und die beiden Busse in Zahlen. Jede Spalte ist ein Buszyklus, also ein Takt.</p>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/logik-eeprom.svg" alt="Logikanalysator-Bild der Buszyklen nach dem Reset">
+    <figcaption>Buszyklen nach dem Reset, schematisch</figcaption>
+  </figure>
+  <p>Der Prozessor liest zuerst den Reset-Vektor, dann führt er das Programm aus:</p>
+  <table class="zusammen">
+    <thead><tr><th>Adresse</th><th>Wert</th><th>Vorgang</th></tr></thead>
+    <tbody>
+      <tr><td>$FFFC</td><td>$00</td><td>Reset-Vektor, unteres Byte</td></tr>
+      <tr><td>$FFFD</td><td>$80</td><td>Reset-Vektor, oberes Byte</td></tr>
+      <tr><td>$8000</td><td>$A9</td><td>Befehl LDA</td></tr>
+      <tr><td>$8001</td><td>$12</td><td>Operand #$12</td></tr>
+      <tr><td>$8002</td><td>$4C</td><td>Befehl JMP</td></tr>
+      <tr><td>$8003</td><td>$00</td><td>Sprungadresse, unteres Byte</td></tr>
+      <tr><td>$8004</td><td>$80</td><td>Sprungadresse, oberes Byte</td></tr>
+      <tr><td>$8000</td><td>$A9</td><td>LDA, und so weiter</td></tr>
+    </tbody>
+  </table>
+  <p>Vor dem ersten Zugriff auf den Vektor macht der Prozessor noch einige Takte lang Scheinzugriffe, unter anderem auf den Stapel. Die Tabelle beginnt beim Vektor.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Sie sehen nichts Sinnvolles? Prüfen Sie zuerst, ob der EEPROM richtig programmiert ist (Prüfen-Funktion des Programmiergeräts) und ob alle 23 Leitungen an der richtigen Stelle sitzen.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

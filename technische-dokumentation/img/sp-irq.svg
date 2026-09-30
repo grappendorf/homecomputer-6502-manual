@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 -10 464 186" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="Schaltplan: Interrupt-Leitung und NMI-Taster">
+<title>Schaltplan: Interrupt-Leitung und NMI-Taster</title>
+<path d="M120 30 L150 30" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M120 80 L150 80" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M120 130 L150 130" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M150 30 L150 130" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M150 80 L174 80" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M320 10 L314 10" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M320 20 L314 20" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="20" y="10" width="90" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="65.0" y="21.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC5</text>
+<text x="65.0" y="33.0" font-size="8.5" text-anchor="middle" fill="#6f6d69" font-weight="400">ACIA 6551</text>
+<line x1="110" y1="20" x2="120" y2="20" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="17.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">26</text>
+<text x="106" y="22.6" font-size="7.5" text-anchor="end" fill="#2A2826" font-weight="400">/IRQ</text>
+<rect x="20" y="60" width="90" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="65.0" y="71.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC9</text>
+<text x="65.0" y="83.0" font-size="8.5" text-anchor="middle" fill="#6f6d69" font-weight="400">VIA 1</text>
+<line x1="110" y1="70" x2="120" y2="70" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="67.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">21</text>
+<text x="106" y="72.6" font-size="7.5" text-anchor="end" fill="#2A2826" font-weight="400">/IRQ</text>
+<rect x="20" y="110" width="90" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="65.0" y="121.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC11</text>
+<text x="65.0" y="133.0" font-size="8.5" text-anchor="middle" fill="#6f6d69" font-weight="400">VIA 2</text>
+<line x1="110" y1="120" x2="120" y2="120" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="117.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">21</text>
+<text x="106" y="122.6" font-size="7.5" text-anchor="end" fill="#2A2826" font-weight="400">/IRQ</text>
+<polygon points="174,80 178.2,75.8 199.6,75.8 199.6,84.2 178.2,84.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="181.2" y="82.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/IRQ</text>
+<rect x="330" y="0" width="90" height="40" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="375.0" y="16.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC3</text>
+<text x="375.0" y="28.0" font-size="8.5" text-anchor="middle" fill="#6f6d69" font-weight="400">6502</text>
+<line x1="330" y1="10" x2="320" y2="10" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="325" y="7.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">4</text>
+<text x="334" y="12.6" font-size="7.5" text-anchor="start" fill="#2A2826" font-weight="400">/IRQ</text>
+<line x1="330" y1="20" x2="320" y2="20" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="325" y="17.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">6</text>
+<text x="334" y="22.6" font-size="7.5" text-anchor="start" fill="#2A2826" font-weight="400">/NMI</text>
+<polygon points="314,10 309.8,5.8 288.40000000000003,5.8 288.40000000000003,14.2 309.8,14.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="290.40000000000003" y="12.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/IRQ</text>
+<polygon points="314,20 309.8,15.8 288.40000000000003,15.8 288.40000000000003,24.2 309.8,24.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="290.40000000000003" y="22.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/NMI</text>
+<line x1="280" y1="90" x2="280" y2="101" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="280" y1="119" x2="280" y2="130" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<rect x="275.5" y="101" width="9" height="18" rx="1.2" fill="#fff" stroke="#2A2826" stroke-width="1.4"/>
+<text x="271" y="109" font-size="8.5" text-anchor="end" fill="#2A2826" font-weight="700">R9</text>
+<text x="271" y="118.5" font-size="8" text-anchor="end" fill="#6f6d69" font-weight="400">3k3</text>
+<path d="M280 90 L280 82" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M275.5 82 L284.5 82 L280 76 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="287" y="81" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<polygon points="280,130 275.8,125.8 254.4,125.8 254.4,134.2 275.8,134.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="256.4" y="132.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/IRQ</text>
+<line x1="360" y1="90" x2="360" y2="101" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="360" y1="119" x2="360" y2="130" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<rect x="355.5" y="101" width="9" height="18" rx="1.2" fill="#fff" stroke="#2A2826" stroke-width="1.4"/>
+<text x="369" y="109" font-size="8.5" text-anchor="start" fill="#2A2826" font-weight="700">R8</text>
+<text x="369" y="118.5" font-size="8" text-anchor="start" fill="#6f6d69" font-weight="400">3k3</text>
+<path d="M360 90 L360 82" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M355.5 82 L364.5 82 L360 76 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="367" y="81" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<polygon points="360,130 364.2,125.8 385.59999999999997,125.8 385.59999999999997,134.2 364.2,134.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="367.2" y="132.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/NMI</text>
+<line x1="440" y1="110" x2="440" y2="122" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="440" y1="150" x2="440" y2="138" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<circle cx="440" cy="122" r="1.7" fill="#fff" stroke="#2A2826" stroke-width="1.1"/><circle cx="440" cy="138" r="1.7" fill="#fff" stroke="#2A2826" stroke-width="1.1"/>
+<line x1="440" y1="136.3" x2="431" y2="125.5" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="435.5" y1="130.9" x2="435.5" y2="119" stroke="#2A2826" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 1.8"/>
+<line x1="430.5" y1="119" x2="440.5" y2="119" stroke="#2A2826" stroke-width="1.2" stroke-linecap="round"/>
+<text x="451" y="129" font-size="8.5" text-anchor="start" fill="#2A2826" font-weight="700">S2</text>
+<text x="451" y="138.5" font-size="8" text-anchor="start" fill="#6f6d69" font-weight="400">NMI</text>
+<polygon points="440,110 435.8,105.8 414.40000000000003,105.8 414.40000000000003,114.2 435.8,114.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="416.40000000000003" y="112.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/NMI</text>
+<path d="M440 150 L440 153" stroke="#6f6d69" stroke-width="1.4" fill="none"/><path d="M433 153 H447 M435.4 156.4 H444.6 M437.8 159.8 H442.2" stroke="#6f6d69" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+<circle cx="150" cy="80" r="2.6" fill="#2A2826"/>
+</svg>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Introduction</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="einleitung" data-kurztitel="Introduction">
+  <h1>Introduction</h1>
+  <p>This manual shows how the HomeComputer 6502 comes to life: step by step, from the first clock signal to the finished device. It is technical documentation and build guide in one. How to operate the finished computer is described in the User Manual.</p>
+  <p>It is not a textbook about the 6502 processor. It is more of a build diary. Each chapter adds a piece to the circuit, shows the schematic, lists the parts you need and walks you through the assembly on a breadboard. Afterwards you measure whether the new piece does what it should. That way a single clock generator grows into a complete computer.</p>
+
+  <h2>Why all this effort?</h2>
+  <p>The 6502 is not a microcontroller like the Atmel AVR in an Arduino. It contains no RAM, no ROM and no input or output. All of these must be added as separate chips before the processor becomes a usable computer. That is exactly the charm of it: you see how the parts work together.</p>
+  <p>The model is the Commodore&nbsp;64, built from parts that were available back then. Two things are simpler: instead of a video signal there is a built-in LCD display, and instead of dynamic RAM the computer uses static RAM, which needs no refresh. Thanks to the display a battery fits into the device and the computer becomes portable.</p>
+  <p>The tools, on the other hand, are modern: oscilloscope, logic analyzer, PCB design software and a 3D printer. Back then circuits were wired by hand and machine code was produced with pencil and paper. Today you write the program on a Linux machine and compile it there. The effort is still considerable, but only a fraction of what it once was.</p>
+
+  <h2>The path</h2>
+  <p>The chapters follow the order in which the computer grew. Chapters 1 to 12 build the computer stage by stage. Chapter 13 gives an outlook.</p>
+  <table class="zusammen">
+    <thead><tr><th>Chapter</th><th>Topic</th><th>Afterwards the computer can</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Clock generation</td><td>produce a steady clock</td></tr>
+      <tr><td>2</td><td>Reset circuit</td><td>start cleanly when switched on</td></tr>
+      <tr><td>3</td><td>The microprocessor</td><td>execute instructions, still without a program</td></tr>
+      <tr><td>4</td><td>EEPROM and a first program</td><td>run a program of its own</td></tr>
+      <tr><td>5</td><td>ACIA, serial interface</td><td>send “Hello World!” to a PC</td></tr>
+      <tr><td>6</td><td>RAM</td><td>keep data in working memory</td></tr>
+      <tr><td>7</td><td>Monitor program</td><td>inspect and change memory</td></tr>
+      <tr><td>8</td><td>VIA, ports and timers</td><td>blink an LED</td></tr>
+      <tr><td>9</td><td>LCD display</td><td>show text</td></tr>
+      <tr><td>10</td><td>Keyboard</td><td>read input</td></tr>
+      <tr><td>11</td><td>Interrupts</td><td>react to events</td></tr>
+      <tr><td>12</td><td>SID, sound</td><td>make tones and music</td></tr>
+      <tr><td>13</td><td>Where to go next</td><td>grow further: board, case, software, extensions</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What you need</h2>
+  <ul>
+    <li>breadboards with about 830 tie points each. From chapter 3 on the drawings spread the circuit over several boards, up to thirteen by chapter 12. With larger boards you need fewer.</li>
+    <li>solid-core wire or ready-made jumper wires,</li>
+    <li>a regulated 5 volt power supply, for example a USB charger with a cut-open cable or a bench supply,</li>
+    <li>a multimeter,</li>
+    <li>an oscilloscope or a logic analyzer. It is not strictly necessary, but very helpful.</li>
+  </ul>
+  <p>The parts are listed at the start of each chapter. You only need a soldering iron once the breadboard build turns into a circuit board.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p>Work with 5&nbsp;V from a regulated supply only, never with mains voltage. Check polarity and wiring before you switch on the power. Insert and remove ICs only while the power is off.</p>
+  </aside>
+
+  <h2>How to read the chapters</h2>
+  <p>Every chapter has the same parts: what the new piece of circuit is for, the schematic, the parts, the assembly and the measurement.</p>
+  <p>The drawings show the breadboard from above. They are drawings, not photos. The placement of the parts is a suggestion, the wiring is what matters. The schematic and the breadboard drawing of a chapter were compared automatically when they were generated. Both describe the same circuit.</p>
+  <ul>
+    <li><strong>Holes</strong> are named by column and row. “5b” is column 5, row b.</li>
+    <li><strong>Connected</strong> are the five holes of a column in the upper half (rows f to j) and the five in the lower half (rows a to e). The center channel separates the halves. ICs straddle the channel, so every pin gets its own column. Small ICs sit in rows e and f. Wide ICs such as the 6502 and the 28-pin chips are six holes wide (600 mil) and sit in rows d and h.</li>
+    <li><strong>Power rails</strong> run along the full length at the top and bottom. In the drawings the red line carries +5&nbsp;V and the blue line GND (ground). Your breadboard may be marked differently. Check this.</li>
+    <li><strong>Oscilloscope pictures</strong> are drawn schematically and apply to any oscilloscope. The curves are calculated, not measured. Your display will additionally show noise and somewhat more overshoot.</li>
+    <li><strong>Wire colors:</strong> red for +5&nbsp;V, black for GND, yellow, green and blue for signals.</li>
+  </ul>
+
+  <h2>Further reading</h2>
+  <p>How a 6502 works together with memory and input/output is described in many books and articles. To get started:</p>
+  <ul>
+    <li>Rodnay Zaks: <em>Programming the 6502</em></li>
+    <li>Garth Wilson: <em>6502 Primer</em>, wilsonminesco.com/6502primer</li>
+    <li>Chris Ward: <em>6502 computer</em>, chrisward.org.uk/6502</li>
+    <li>6502.org: list of homebuilt 6502 computers, 6502.org/homebuilt</li>
+    <li>Commodore 64 Service Manual (schematic of a computer with the 6510 processor), archive.org</li>
+    <li>Noam Nisan, Shimon Schocken: <em>The Elements of Computing Systems</em></li>
+  </ul>
+  <p>Schematics, circuit boards and source code of this project are hosted at github.com/grappendorf/homecomputer-6502.</p>
+</section>
+</main>
+</body>
+</html>

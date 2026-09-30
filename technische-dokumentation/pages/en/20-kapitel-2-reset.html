@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 2</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="2" data-titel="Reset Circuit" data-kurztitel="Reset circuit">
+  <p>When you switch on, the supply voltage rises only slowly. This chapter builds a circuit that holds the processor in reset until everything has stabilized. A button also triggers a reset by hand.</p>
+
+  <h2>Why a reset?</h2>
+  <p>When a computer is powered up, the voltage does not jump to 5&nbsp;V at once. For a few clock cycles the processor does not work reliably. So you delay the program start until the environment has settled. Today there are dedicated supervisor chips for this, which also detect brown-outs. For a historical 6502 computer we borrow the reset circuit from the Commodore&nbsp;64: an NE555 timer holds the reset line low for about half a second after power-on.</p>
+  <p>You find the C64 schematic and its description of the reset circuit in the C64 Service Manual on archive.org.</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-reset.svg" alt="Schematic of the reset circuit with NE555, button and inverter">
+    <figcaption>Schematic of the reset circuit</figcaption>
+  </figure>
+  <p>The NE555 works as a one-shot multivibrator: a short pulse at the TRIG input (pin&nbsp;2) starts a pulse of fixed length at the OUT output (pin&nbsp;3). R4 and C5 set the length: <code>t = 1.1 · R4 · C5 = 1.1 · 47&nbsp;kΩ · 10&nbsp;µF ≈ 0.5&nbsp;s</code>. Pin&nbsp;6 and pin&nbsp;7 are connected for this.</p>
+  <p>At power-on C4 is still empty and TRIG is low. That starts the one-shot. R3 (1&nbsp;MΩ) then slowly charges C4 and TRIG goes high. The button S1 pulls TRIG to GND by hand and so starts the pulse again.</p>
+  <p>The output of the 555 is high during the pulse. The processor, however, needs a reset that is active low (which is why it is called /RESET). So the fourth inverter of the 74LS04 from chapter 1, IC1D, follows. The resistor R5 (1&nbsp;kΩ) pulls the output up to +5&nbsp;V after the pulse. Pin&nbsp;4 of the 555 is tied to +5&nbsp;V so that the chip cannot be reset by accident. Pin&nbsp;5 stays open.</p>
+  <p>The 6502 requires /RESET to be low for at least two clock cycles. Half a second is half a million cycles, so that is plenty.</p>
+
+  <h2>Parts</h2>
+  <p>In addition to the parts from chapter 1:</p>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC2</td><td>Timer, DIP-8</td><td>NE555</td></tr>
+      <tr><td>R3</td><td>Resistor</td><td>1&nbsp;MΩ</td></tr>
+      <tr><td>R4</td><td>Resistor</td><td>47&nbsp;kΩ</td></tr>
+      <tr><td>R5</td><td>Resistor</td><td>1&nbsp;kΩ</td></tr>
+      <tr><td>C3, C4</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+      <tr><td>C5</td><td>Electrolytic capacitor</td><td>10&nbsp;µF, at least 10&nbsp;V</td></tr>
+      <tr><td>S1</td><td>Push button, 4 legs</td><td>Reset</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Assembly</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-reset.svg" alt="Breadboard with clock generation and reset circuit">
+    <figcaption>Clock and reset on the breadboard. New are IC2 and everything to the right of it.</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Insert IC2 across the channel, notch left, pin&nbsp;1 in hole 16e.</div></li>
+    <li><div>Power IC2: pin&nbsp;8 (16j) to +5&nbsp;V, pin&nbsp;1 (16a) to GND and pin&nbsp;4 (19a) to +5&nbsp;V. Place C3 between the upper rails.</div></li>
+    <li><div>Connect pin&nbsp;6 and pin&nbsp;7 (17i and 18i).</div></li>
+    <li><div>Insert R4 from hole 17h to +5&nbsp;V and C5 from hole 18h to GND. The electrolytic capacitor has its plus leg in 18h, the side with the stripe goes to GND. Fitted the wrong way round it can burst.</div></li>
+    <li><div>Place the button S1 across the channel (holes 22e, 24e, 22f, 24f). Connect its upper half (24j) to GND.</div></li>
+    <li><div>Connect pin&nbsp;2 (17c) to the lower half of the button (22c). Insert R3 from hole 24c to +5&nbsp;V and C4 from hole 22b to GND.</div></li>
+    <li><div>Connect the output, pin&nbsp;3 (18d), to pin&nbsp;9 of IC1 (hole 10h).</div></li>
+    <li><div>Connect pin&nbsp;8 of IC1 (11i) to 12i and place R5 from hole 12h to +5&nbsp;V. You pick up the /RESET signal at hole 11j.</div></li>
+  </ol>
+
+  <h2>Measuring</h2>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/messung-reset.svg" alt="Oscilloscope screenshot: supply voltage and reset signal at power-on">
+    <figcaption>Channel 1 shows the supply, channel 2 the /RESET signal</figcaption>
+  </figure>
+  <p>Channel 1 is the supply voltage, channel 2 the /RESET line. After power-on /RESET stays low for about 560&nbsp;ms and then goes high. Pressing the button also produces a pulse of more than half a second.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>No pulse? Check the polarity of C5 first, and whether pin&nbsp;4 of the 555 is at +5&nbsp;V. If the pulse is much too short or too long, R4 or C5 are wrong.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

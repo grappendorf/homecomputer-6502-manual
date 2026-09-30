@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 3</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="3" data-titel="The Microprocessor" data-kurztitel="The microprocessor">
+  <p>We have a clock and a reset, now comes the processor. There is still no memory and no input or output. Even so, its work can be measured, because we play a trick on it: it reads only a single instruction.</p>
+
+  <h2>The 6502</h2>
+  <p>The MOS 6502 is an 8-bit processor with 40 pins. It has 16 address lines (A0 to A15) and thus 64&nbsp;KB of address space, eight data lines (D0 to D7) and an R/W line that shows whether it reads or writes. In addition there are the clock, reset, interrupt inputs and a few control lines. The following pins appear in the circuit:</p>
+  <table class="zusammen">
+    <thead><tr><th>Pin</th><th>Name</th><th>Meaning</th><th>Connection</th></tr></thead>
+    <tbody>
+      <tr><td>8</td><td>VCC</td><td>+5&nbsp;V</td><td>+5&nbsp;V</td></tr>
+      <tr><td>1, 21</td><td>VSS</td><td>Ground</td><td>GND</td></tr>
+      <tr><td>37</td><td>PHI0</td><td>Clock input</td><td>CLK</td></tr>
+      <tr><td>40</td><td>/RES</td><td>Reset, active low</td><td>/RESET</td></tr>
+      <tr><td>2</td><td>RDY</td><td>High = processor runs</td><td>to +5&nbsp;V via R6</td></tr>
+      <tr><td>4</td><td>/IRQ</td><td>Interrupt, active low</td><td>to +5&nbsp;V via R9</td></tr>
+      <tr><td>6</td><td>/NMI</td><td>Non-maskable interrupt</td><td>to +5&nbsp;V via R8</td></tr>
+      <tr><td>38</td><td>/SO</td><td>Sets the overflow flag</td><td>to +5&nbsp;V via R7</td></tr>
+      <tr><td>26 to 33</td><td>D7 to D0</td><td>Data bus</td><td>hard-wired to $EA</td></tr>
+      <tr><td>9 to 20, 22 to 25</td><td>A0 to A15</td><td>Address bus</td><td>open, measured</td></tr>
+    </tbody>
+  </table>
+  <p>Pins 3, 7, 34 and 39 (PHI1, SYNC, R/W, PHI2) as well as 5, 35 and 36 stay open.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>This description applies to the classic 6502. With CMOS successors such as the 65C02 some pins are assigned differently. Check the pinout in the datasheet in that case.</p>
+  </aside>
+
+  <h2>The idea: a memory full of NOPs</h2>
+  <p>After reset the processor reads the addresses $FFFC and $FFFD, the reset vector, and starts the program at the address found there. It reads an instruction at that location and executes it. One of them does exactly nothing: NOP, code $EA.</p>
+  <p>If we wire the data lines to always deliver $EA, the processor behaves as if there were one huge memory containing nothing but $EA. It reads $EAEA as the reset vector and starts at address $EAEA. It reads $EA and executes NOP. Then it increments the program counter to $EAEB, reads $EA again and so on, until the program counter overflows and starts over.</p>
+  <p>Since the program counter is incremented by one after every NOP, we should measure square waves on the address lines whose frequency is halved from line to line.</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-cpu.svg" alt="Schematic of the processor with fixed data lines and four pull-up resistors">
+    <figcaption>Schematic of the processor</figcaption>
+  </figure>
+  <p>The eight data lines are connected either to +5&nbsp;V or to GND. Together they form the value $EA = %11101010: D0, D2 and D4 to GND, all others to +5&nbsp;V. This is permissible because the processor only reads here. It would be safer to put a resistor into each line.</p>
+  <p>The four inputs RDY, /IRQ, /NMI and /SO are each tied to +5&nbsp;V through a 3.3&nbsp;kΩ resistor. That is the idle level: the processor runs, and there is neither an interrupt nor an overflow signal. C6 (100&nbsp;nF) decouples the supply. The pins PHI1 and PHI2 (pins&nbsp;3 and 39) are outputs that only become important with memory chips.</p>
+
+  <h2>Parts</h2>
+  <p>In addition to the parts of chapters 1 and 2, and a second breadboard:</p>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC3</td><td>Processor, DIP-40</td><td>MOS 6502</td></tr>
+      <tr><td>R6 to R9</td><td>Resistor</td><td>3.3&nbsp;kΩ (4 pieces)</td></tr>
+      <tr><td>C6</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Assembly</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-cpu.svg" alt="Two breadboards: clock and reset on top, the processor below">
+    <figcaption>Clock and reset at the top, the processor on the second breadboard</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Run +5&nbsp;V and GND from the first to the second breadboard, and connect the upper rails to the lower ones there.</div></li>
+    <li><div>Insert IC3 across the channel. The 6502 is wider than the small ICs: its pin rows are six holes apart and therefore sit in rows d and h. The notch points left, pin&nbsp;1 sits in hole 4d. Align all legs first: they stand slightly splayed and can be bent straight on the table. Press down evenly.</div></li>
+    <li><div>Power IC3: pin&nbsp;8 (11a) to +5&nbsp;V, pin&nbsp;1 (4a) and pin&nbsp;21 (23j) to GND. Place C6 between the lower rails.</div></li>
+    <li><div>Fix the data bus with eight wires from the holes of the upper row j to the upper rails. To GND: D0 (11j), D2 (13j) and D4 (15j). To +5&nbsp;V: D1 (12j), D3 (14j), D5 (16j), D6 (17j) and D7 (18j).</div></li>
+    <li><div>Place the four pull-up resistors: R6 at RDY (hole 5c), R9 at /IRQ (7c) and R8 at /NMI (9c), each from there to +5&nbsp;V. Place R7 at /SO from hole 6i to +5&nbsp;V.</div></li>
+    <li><div>Connect the clock: hole 10a on the first breadboard to pin&nbsp;37 (hole 7j) of the processor.</div></li>
+    <li><div>Connect /RESET: hole 11g on the first breadboard via 13c and 13a to pin&nbsp;40 (hole 4j) of the processor.</div></li>
+    <li><div>Check everything once more before you switch the power on.</div></li>
+  </ol>
+
+  <h2>Measuring</h2>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/messung-cpu.svg" alt="Oscilloscope screenshot: clock and address line A0">
+    <figcaption>Channel 1 shows the clock, channel 2 the address line A0</figcaption>
+  </figure>
+  <p>Channel 1 shows the 1&nbsp;MHz clock, channel 2 the line A0. A NOP takes two clock cycles: in the first the instruction is fetched, in the second it is executed. So A0 changes every 2&nbsp;µs, and the signal has 250&nbsp;kHz. Every further address line halves the frequency:</p>
+  <table class="zusammen">
+    <thead><tr><th>Line</th><th>A0</th><th>A1</th><th>A2</th><th>A3</th><th>A4</th><th>…</th><th>A14</th><th>A15</th></tr></thead>
+    <tbody><tr><td>Frequency</td><td>250&nbsp;kHz</td><td>125&nbsp;kHz</td><td>62.5&nbsp;kHz</td><td>31.3&nbsp;kHz</td><td>15.6&nbsp;kHz</td><td>…</td><td>15.3&nbsp;Hz</td><td>7.6&nbsp;Hz</td></tr></tbody>
+  </table>
+  <figure class="abbildung schmal">
+    <img class="messung" src="../img/en/messung-adressen.svg" alt="Oscilloscope screenshots of all address lines, A15 at the top to A0 at the bottom">
+    <figcaption>All address lines, A15 at the top to A0 at the bottom. The time base was adjusted for every four lines.</figcaption>
+  </figure>
+  <p>You can see it in the picture: every line has half the frequency of the previous one.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>No signals? Check one after the other: is +5&nbsp;V at pin&nbsp;8 and GND at pins&nbsp;1 and 21? Does the clock run at pin&nbsp;37? Does pin&nbsp;40 go high after about half a second? And are the eight data lines correct?</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

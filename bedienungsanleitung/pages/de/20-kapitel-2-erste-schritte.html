@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 2 – Erste Schritte</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="2" data-titel="Erste Schritte" data-kurztitel="Erste Schritte">
+  <p>Der Computer ist eingeschaltet, der Cursor wartet. In diesem Kapitel lernen Sie die Tastatur und die Anzeige kennen, geben die ersten Befehle ein und benutzen den Computer als Taschenrechner. Sie können dabei nichts kaputt machen. Probieren Sie ruhig alles aus.</p>
+
+  <h2>Die Tastatur</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/de/tastatur.svg" alt="Die Tastatur, Tastengruppen farbig markiert">
+    <figcaption>Die Tastatur, Tastengruppen farbig markiert</figcaption>
+  </figure>
+  <p>Die Tastatur hat das gewohnte deutsche Layout. Die Farben in der Zeichnung zeigen, wozu die Tasten dienen:</p>
+  <ul class="ohne-punkt">
+    <li><span class="farbe normal"></span><strong>Zeichen:</strong> Buchstaben, Ziffern, Satzzeichen und die Leertaste.</li>
+    <li><span class="farbe editieren"></span><strong>Bearbeiten:</strong> <kbd>Enter</kbd>, <kbd>Rücktaste</kbd>, <kbd>Entf</kbd>, <kbd>Einfg</kbd>, <kbd>Pos1</kbd>, <kbd>Ende</kbd>, <kbd>Esc</kbd> und die Pfeiltasten. Mehr dazu am Ende dieses Kapitels.</li>
+    <li><span class="farbe umschalten"></span><strong>Umschalten:</strong> <kbd>Shift</kbd>, <kbd>Caps Lock</kbd>, <kbd>AltGr</kbd> und <kbd>Strg</kbd>. Sie ändern, was eine andere Taste schreibt.</li>
+    <li><span class="farbe sonder"></span><strong>Sonderfunktionen:</strong> <kbd>Pause</kbd> hält ein laufendes Programm an. <kbd>Fn</kbd> und <kbd>Win</kbd> zusammen starten den Computer neu.</li>
+    <li><span class="farbe ohne"></span><strong>Ohne Funktion:</strong> <kbd>F1</kbd> bis <kbd>F12</kbd>, <kbd>Num</kbd>, <kbd>Druck</kbd>, <kbd>Rollen</kbd>, <kbd>Tab</kbd>, <kbd>Alt</kbd>, <kbd>Menü</kbd> und die Bild-Tasten. Sie tun zurzeit nichts.</li>
+  </ul>
+
+  <h3>Klein, groß und Sonderzeichen</h3>
+  <p>Ohne weitere Taste schreibt die Tastatur kleine Buchstaben. Halten Sie <kbd>Shift</kbd> gedrückt, kommen große Buchstaben und die oberen Zeichen der Tasten, also <code>!</code> statt <code>1</code>. <kbd>Caps Lock</kbd> schaltet große Buchstaben ein. Einmal kurz drücken, und alle Buchstaben kommen groß. Noch einmal drücken, und sie kommen wieder klein. Ziffern und Zeichen ändert <kbd>Caps Lock</kbd> nicht.</p>
+  <p>Mit <kbd>AltGr</kbd> erreichen Sie die Zeichen, die rechts unten auf den Tasten stehen:</p>
+  <table>
+    <thead><tr><th>Zeichen</th><th>Tasten</th><th>Zeichen</th><th>Tasten</th></tr></thead>
+    <tbody>
+      <tr><td><code>@</code></td><td><kbd>AltGr</kbd> + <kbd>Q</kbd></td><td><code>\</code></td><td><kbd>AltGr</kbd> + <kbd>ß</kbd></td></tr>
+      <tr><td><code>{</code> <code>}</code></td><td><kbd>AltGr</kbd> + <kbd>7</kbd>, <kbd>0</kbd></td><td><code>|</code></td><td><kbd>AltGr</kbd> + <kbd>&lt;</kbd></td></tr>
+      <tr><td><code>[</code> <code>]</code></td><td><kbd>AltGr</kbd> + <kbd>8</kbd>, <kbd>9</kbd></td><td><code>~</code></td><td><kbd>AltGr</kbd> + <kbd>+</kbd></td></tr>
+      <tr><td><code>€</code></td><td><kbd>AltGr</kbd> + <kbd>E</kbd></td><td><code>µ</code></td><td><kbd>AltGr</kbd> + <kbd>M</kbd></td></tr>
+    </tbody>
+  </table>
+  <p>Die Umlaute <kbd>Ä</kbd>, <kbd>Ö</kbd>, <kbd>Ü</kbd> sowie <kbd>ß</kbd> und <code>§</code> schreiben nichts in die Eingabezeile. BASIC benutzt die Codes dieser Zeichen intern für seine Befehlswörter. Schreiben Sie deshalb AE, OE, UE und SS. So machen es auch alle Beispiele in diesem Handbuch.</p>
+  <p>Halten Sie eine Taste länger fest, wiederholt sie sich, so wie Sie es vom PC kennen.</p>
+
+  <h2>Die Anzeige</h2>
+  <p>Die Anzeige zeigt vier Zeilen mit je 40 Zeichen. Der kleine Strich ist der <strong>Cursor</strong>. An seiner Stelle erscheint das nächste Zeichen.</p>
+  <ul>
+    <li>Tippen Sie über das Ende einer Zeile hinaus, geht es in der nächsten Zeile weiter.</li>
+    <li>Ist die unterste Zeile voll, rückt der ganze Inhalt eine Zeile nach oben. Die oberste Zeile verschwindet dabei.</li>
+    <li>Wenn der Computer mit etwas fertig ist, meldet er sich nicht mit einem Wort wie <code>READY.</code> Der Cursor steht einfach in der nächsten freien Zeile.</li>
+  </ul>
+  <p>Die Anzeige leuchtet von hinten, Sie können sie also auch im Dunkeln lesen. Der Kontrast ist fest eingestellt. Wie Sie selbst bestimmen, wo auf der Anzeige etwas steht, zeigt Kapitel 4.</p>
+
+  <h2>Der Direktmodus</h2>
+  <p>Alles, was Sie tippen, landet zunächst in der Eingabezeile. Erst mit <kbd>Enter</kbd> schicken Sie es an den Computer. Tippen Sie:</p>
+<pre class="listing">print "Hallo"</pre>
+  <p>und drücken Sie <kbd>Enter</kbd>. Der Computer führt den Befehl sofort aus und schreibt den Text zwischen den Anführungszeichen auf die Anzeige:</p>
+  <figure class="lcd">
+<pre>print "Hallo"
+Hallo
+<span class="cursor"> </span>
+</pre>
+    <figcaption>Der erste Befehl</figcaption>
+  </figure>
+  <p>Diese Art zu arbeiten heißt <strong>Direktmodus</strong>: Befehl eintippen, <kbd>Enter</kbd>, Ergebnis sehen. <code>PRINT</code> heißt auf Deutsch „drucke“. Gemeint ist: Schreib es auf die Anzeige. Ob Sie den Befehl klein oder groß schreiben, ist egal. Der Text in Anführungszeichen erscheint genau so, wie Sie ihn getippt haben.</p>
+  <p>Vergessen Sie das zweite Anführungszeichen, ist das auch nicht schlimm. BASIC nimmt dann den Rest der Zeile als Text.</p>
+
+  <h2>Rechnen mit PRINT</h2>
+  <p>Steht hinter <code>PRINT</code> eine Rechnung statt eines Textes, rechnet der Computer sie aus:</p>
+  <figure class="lcd">
+<pre>print 2+3
+ 5
+print 10/4
+ 2.5</pre>
+    <figcaption>Der Computer als Taschenrechner</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Zeichen</th><th>Rechenart</th><th>Beispiel</th><th>Ergebnis</th></tr></thead>
+    <tbody>
+      <tr><td><code>+</code></td><td>Plus</td><td><code>PRINT 7+5</code></td><td>12</td></tr>
+      <tr><td><code>-</code></td><td>Minus</td><td><code>PRINT 7-5</code></td><td>2</td></tr>
+      <tr><td><code>*</code></td><td>Mal</td><td><code>PRINT 7*5</code></td><td>35</td></tr>
+      <tr><td><code>/</code></td><td>Geteilt</td><td><code>PRINT 7/5</code></td><td>1.4</td></tr>
+      <tr><td><code>^</code></td><td>Hoch</td><td><code>PRINT 2^10</code></td><td>1024</td></tr>
+    </tbody>
+  </table>
+  <p>Wie in der Schule gilt Punkt vor Strich: <code>2+3*4</code> ergibt 14. Soll zuerst addiert werden, setzen Sie Klammern: <code>(2+3)*4</code> ergibt 20. Noch vor Punktrechnung kommt das Hochrechnen mit <code>^</code>.</p>
+
+  <h3>Wie der Computer Zahlen schreibt</h3>
+  <ul>
+    <li>Kommazahlen schreibt BASIC wie im Englischen mit einem <strong>Punkt</strong>: <code>2.5</code>, nicht 2,5. Das Komma hat in BASIC eine andere Aufgabe (Kapitel 3).</li>
+    <li>Vor jeder Zahl steht ein Leerzeichen, bei negativen Zahlen das Minuszeichen.</li>
+    <li>Eine Null vor dem Punkt lässt BASIC weg: <code>PRINT 1/2</code> ergibt <code>.5</code>.</li>
+    <li>BASIC rechnet mit etwa neun Stellen. <code>PRINT 1/3</code> ergibt <code>.333333333</code>.</li>
+    <li>Sehr große und sehr kleine Zahlen erscheinen mit <code>E</code>: <code>1E+20</code> bedeutet 1 mal 10 hoch 20, also eine 1 mit 20 Nullen. <code>PRINT 123456789012</code> ergibt <code>1.23456789E+11</code>.</li>
+  </ul>
+  <aside class="kasten">
+    <div class="kasten-titel">Tipp</div>
+    <p>Mit Anführungszeichen rechnet der Computer nicht. <code>PRINT "2+3"</code> schreibt <code>2+3</code>, <code>PRINT 2+3</code> schreibt <code>5</code>.</p>
+  </aside>
+
+  <h2>Fehler korrigieren</h2>
+  <p>Solange Sie <kbd>Enter</kbd> noch nicht gedrückt haben, können Sie die Eingabezeile beliebig ändern:</p>
+  <table>
+    <thead><tr><th>Taste</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Cursor ein Zeichen nach links oder rechts</td></tr>
+      <tr><td><kbd>Rücktaste</kbd></td><td>Zeichen links vom Cursor löschen</td></tr>
+      <tr><td><kbd>Entf</kbd></td><td>Zeichen unter dem Cursor löschen</td></tr>
+      <tr><td><kbd>Pos1</kbd> <kbd>Ende</kbd></td><td>an den Anfang oder hinter das letzte Zeichen springen</td></tr>
+      <tr><td><kbd>Einfg</kbd></td><td>zwischen Einfügen und Überschreiben umschalten</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>die ganze Zeile verwerfen</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>die Zeile abschicken, egal wo der Cursor steht</td></tr>
+    </tbody>
+  </table>
+  <p>Normalerweise schieben neue Zeichen den Rest der Zeile nach rechts. Nach <kbd>Einfg</kbd> überschreiben sie stattdessen, was unter dem Cursor steht. Ein zweites <kbd>Einfg</kbd> schaltet zurück. Die Pfeiltasten <kbd>↑</kbd> und <kbd>↓</kbd> holen Programmzeilen zum Ändern zurück. Wie das geht, zeigt Kapitel 3.</p>
+  <p>Versteht der Computer einen Befehl nicht, meldet er einen Fehler:</p>
+  <figure class="lcd">
+<pre>prunt 5
+
+?SYNTAX ERROR
+<span class="cursor"> </span></pre>
+    <figcaption>Ein Tippfehler</figcaption>
+  </figure>
+  <p><code>SYNTAX ERROR</code> heißt: Das ist kein gültiger BASIC-Befehl. Hier war <code>PRINT</code> falsch geschrieben. Tippen Sie die Zeile einfach richtig neu ein. Eine Fehlermeldung schadet dem Computer nicht. Alle Meldungen stehen in Anhang B.</p>
+</section>
+</main>
+</body>
+</html>

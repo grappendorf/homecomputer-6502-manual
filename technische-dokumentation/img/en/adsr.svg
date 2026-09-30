@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 190" width="480" height="190" role="img" aria-label="Envelope with attack, decay, sustain and release">
+<title>Envelope</title>
+<rect x="40" y="30" width="50" height="120" fill="#fbe3d9"/>
+<rect x="90" y="30" width="60" height="120" fill="#fff4d7"/>
+<rect x="150" y="30" width="180" height="120" fill="#e3e9fb"/>
+<rect x="330" y="30" width="100" height="120" fill="#ececea"/>
+<polyline points="40,150 90,34 150,80 330,80 430,150" fill="none" stroke="#E4643C" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="40" y1="150" x2="460" y2="150" stroke="#2A2826" stroke-width="1.5"/>
+<line x1="40" y1="150" x2="40" y2="20" stroke="#2A2826" stroke-width="1.5"/>
+<text x="34" y="30" font-family="Helvetica, Arial, sans-serif" font-size="10" text-anchor="end" fill="#2A2826">loud</text>
+<text x="460" y="164" font-family="Helvetica, Arial, sans-serif" font-size="10" text-anchor="end" fill="#2A2826">Time</text>
+<text x="65.0" y="180" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#2A2826">Attack</text>
+<text x="120.0" y="180" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#2A2826">Decay</text>
+<text x="240.0" y="180" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#2A2826">Sustain</text>
+<text x="380.0" y="180" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#2A2826">Release</text>
+<line x1="40" y1="24" x2="40" y2="150" stroke="#2A2826" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="44" y="20" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2A2826">Tone on</text>
+<line x1="330" y1="24" x2="330" y2="150" stroke="#2A2826" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="334" y="20" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2A2826">Tone off</text>
+<line x1="150" y1="80" x2="40" y2="80" stroke="#2A2826" stroke-width="1" stroke-dasharray="2 3"/>
+<text x="158" y="73" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2A2826">Sustain level</text>
+</svg>

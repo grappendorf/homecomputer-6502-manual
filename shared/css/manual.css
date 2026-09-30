@@ -1,0 +1,503 @@
+/*
+ * HomeComputer 6502 – Handbuch
+ *
+ * Aufbau wie das klassische C64-Bedienungshandbuch (A5, Kapitel-Deckblätter,
+ * Bildschirm-Kästen, Tasten im Text, Anhänge A–F). Schriften und Grautöne
+ * von grappendorf.net (Raleway/Lato, #454545, Kreis-Motiv), Akzente vom Gerät
+ * (Gehäuse-Orange, LCD-Blau, dunkle Tasten).
+ */
+@import url("fonts.css");
+
+:root {
+  /* Gerät */
+  --orange: #E4643C;        /* Gehäuse */
+  --orange-dunkel: #B8481F; /* Gehäusekante, kleine Schrift in Orange */
+  --orange-hell: #FBE3D9;
+  --lcd: #8FA6EA;           /* LCD-Hintergrund */
+  --lcd-rand: #6F83C8;
+  --lcd-text: #1F2B63;
+  --taste: #2A2826;         /* Tastenkörper */
+  --taste-oben: #44423F;    /* Tastenoberseite */
+
+  /* grappendorf.net */
+  --text: #3b3b3b;
+  --titel: #454545;
+  --grau: #757D75;
+  --linie: #d7d7d7;
+  --flaeche: #f3f2f0;
+  --kreis: #ececea;
+  --gelb: #fbdd90;
+  --gelb-hell: #fff4d7;
+
+  --schrift-titel: "Raleway", "Helvetica Neue", Helvetica, sans-serif;
+  --schrift-text: "Lato", "Helvetica Neue", Helvetica, sans-serif;
+  --schrift-code: "IBM Plex Mono", monospace;
+  --schrift-lcd: "VT323", monospace;
+}
+
+/* ---------------------------------------------------------------- Seiten */
+
+@page {
+  size: 420pt 595pt; /* A5, in Punkt: so sind Layout und PDF-Seite gleich breit */
+  margin: 17mm 15mm 18mm 15mm;
+}
+@page :left {
+  margin-left: 17mm;
+  margin-right: 13mm;
+  @bottom-left {
+    content: counter(page);
+    font: 700 8pt/1 var(--schrift-titel);
+    color: #fff;
+    background: var(--taste);
+    border-radius: 1.2mm;
+    width: 7mm; height: 6mm;
+    text-align: center; vertical-align: middle;
+    margin-top: 6mm;
+  }
+}
+@page :right {
+  margin-left: 13mm;
+  margin-right: 17mm;
+  @bottom-right {
+    content: counter(page);
+    font: 700 8pt/1 var(--schrift-titel);
+    color: #fff;
+    background: var(--taste);
+    border-radius: 1.2mm;
+    width: 7mm; height: 6mm;
+    text-align: center; vertical-align: middle;
+    margin-top: 6mm;
+  }
+}
+/* Ganzseitige Seiten ohne Rand, Kopf und Seitenzahl */
+@page vollbild { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+/* Vorspann und Kapitel-Deckblätter: Rand, aber ohne Seitenzahl */
+@page vorspann { @bottom-left { content: none; } @bottom-right { content: none; } }
+@page kapitelstart { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+/* Kolumnentitel je Abschnitt erzeugt build.py als „@page abschnitt-N“ */
+
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--text);
+  font: 400 9.5pt/1.5 var(--schrift-text);
+  hyphens: auto;
+  orphans: 3; widows: 3;
+}
+
+/* Bildschirmvorschau einer einzelnen Seite im Browser (nicht beim Drucken) */
+@media screen {
+  body { background: #8a8986; padding: 24px 0; }
+  main { width: 148mm; margin: 0 auto; }
+  main > section { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.25); margin-bottom: 24px; min-height: 210mm; box-sizing: border-box; }
+  main > section:not(.umschlag):not(.kapitel-start):not(.rueckseite) { padding: 17mm 15mm 18mm; }
+}
+
+/* ------------------------------------------------------------ Umschlag */
+
+.umschlag, .rueckseite {
+  page: vollbild;
+  position: relative;
+  width: 100%; height: 210mm;
+  overflow: hidden;
+  break-after: page;
+}
+.umschlag { background: var(--orange); color: #fff; }
+.umschlag .kreis, .kapitel-start .kreis, .rueckseite .kreis {
+  position: absolute; border-radius: 50%;
+}
+.umschlag .kreis-1 { width: 170mm; height: 170mm; right: -70mm; top: -60mm; background: rgba(255,255,255,.10); }
+.umschlag .kreis-2 { width: 34mm; height: 34mm; left: 14mm; top: 64mm; background: rgba(255,255,255,.12); }
+.umschlag .kopf {
+  position: absolute; left: 14mm; top: 14mm; right: 14mm;
+  display: flex; justify-content: space-between; align-items: baseline;
+  font: 700 8pt/1 var(--schrift-titel); letter-spacing: .18em; text-transform: uppercase;
+}
+.umschlag .kopf .tld { font-family: var(--schrift-text); font-weight: 300; letter-spacing: .05em; text-transform: none; }
+.umschlag h1 {
+  position: absolute; left: 14mm; right: 14mm; top: 104mm; margin: 0;
+  font: 800 30pt/1.02 var(--schrift-titel); letter-spacing: .01em; text-transform: uppercase;
+}
+.umschlag .untertitel {
+  position: absolute; left: 14mm; top: 138mm; margin: 0;
+  font: 300 15pt/1.2 var(--schrift-text);
+}
+.umschlag .geraet { position: absolute; left: 24mm; right: 10mm; top: 26mm; }
+.umschlag .geraet img { width: 100%; display: block; }
+.umschlag .fuss {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 26mm;
+  background: var(--orange-dunkel);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14mm; box-sizing: border-box;
+  font: 600 8pt/1.3 var(--schrift-titel); letter-spacing: .12em; text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------- Rückseite */
+
+.rueckseite { background: var(--taste); color: #e9e7e4; }
+.rueckseite .kreis-1 { width: 150mm; height: 150mm; left: -60mm; bottom: -70mm; background: rgba(255,255,255,.05); }
+.rueckseite .inhalt { position: absolute; left: 16mm; right: 16mm; top: 22mm; }
+.rueckseite h2 { font: 800 16pt/1.15 var(--schrift-titel); text-transform: uppercase; color: #fff; margin: 0 0 6mm; }
+.rueckseite p { font-size: 9.5pt; margin: 0 0 3mm; }
+.rueckseite dl { display: grid; grid-template-columns: 30mm 1fr; gap: 1.6mm 4mm; margin: 8mm 0 0; font-size: 8.5pt; }
+.rueckseite dt { font: 700 7.5pt/1.5 var(--schrift-titel); letter-spacing: .1em; text-transform: uppercase; color: var(--orange); }
+.rueckseite dd { margin: 0; }
+.rueckseite .streifen { position: absolute; left: 0; right: 0; bottom: 0; height: 9mm; background: var(--orange); }
+.rueckseite .marke {
+  position: absolute; left: 16mm; bottom: 16mm;
+  font: 700 9pt/1 var(--schrift-titel); letter-spacing: .06em; color: #fff;
+}
+.rueckseite .marke span { font-family: var(--schrift-text); font-weight: 300; }
+
+/* ----------------------------------------------------------- Vorspann */
+
+.vorspann { page: vorspann; break-after: page; }
+
+.impressum { display: flex; flex-direction: column; justify-content: flex-end; min-height: 170mm; font-size: 8pt; color: var(--grau); }
+.impressum p { margin: 0 0 2mm; text-align: left; }
+.impressum code { white-space: nowrap; }
+
+/* --------------------------------------------------- Inhaltsverzeichnis */
+
+.inhalt-titel, .einleitung h1, .anhang > h1 {
+  font: 800 20pt/1.1 var(--schrift-titel); text-transform: uppercase; color: var(--titel);
+  margin: 0 0 8mm; letter-spacing: .01em;
+}
+.inhalt-titel::after, .einleitung h1::after, .anhang > h1::after {
+  content: ""; display: block; width: 14mm; height: 1.4mm; background: var(--orange); margin-top: 4mm;
+}
+nav.inhalt ol { list-style: none; margin: 0; padding: 0; }
+nav.inhalt li { break-inside: avoid; margin-bottom: 0; }
+nav.inhalt a { color: inherit; text-decoration: none; display: flex; align-items: baseline; gap: 2mm; }
+nav.inhalt a .seite { margin-left: auto; font-variant-numeric: tabular-nums; }
+nav.inhalt a .fueller { flex: 1; border-bottom: .3mm dotted #b5b3b0; transform: translateY(-.8mm); }
+nav.inhalt .stufe-1 { margin-top: 3mm; }
+nav.inhalt .stufe-1 > a { font: 700 9.5pt/1.4 var(--schrift-titel); text-transform: uppercase; color: var(--titel); letter-spacing: .03em; }
+nav.inhalt .stufe-1 > a .nr { color: var(--orange-dunkel); min-width: 8mm; }
+nav.inhalt .stufe-2 > a { padding-left: 10mm; font-size: 8.8pt; line-height: 1.4; }
+
+/* -------------------------------------------------- Kapitel-Deckblatt */
+
+.kapitel-start {
+  page: kapitelstart;
+  position: relative;
+  width: 100%; height: 210mm;
+  overflow: hidden;
+  break-before: page; break-after: page;
+}
+.kapitel-start .kreis-1 { width: 150mm; height: 150mm; right: -55mm; top: -45mm; background: var(--kreis); }
+.kapitel-start .kreis-2 { width: 26mm; height: 26mm; left: 16mm; top: 104mm; background: var(--kreis); }
+.kapitel-start .marke {
+  position: absolute; left: 16mm; top: 22mm;
+  font: 700 8pt/1 var(--schrift-titel); letter-spacing: .22em; text-transform: uppercase; color: var(--orange-dunkel);
+}
+.kapitel-start .nummer {
+  position: absolute; right: 18mm; top: 20mm;
+  font: 800 96pt/1 var(--schrift-titel); color: var(--titel);
+}
+.kapitel-start h1 {
+  position: absolute; left: 16mm; right: 16mm; top: 72mm; margin: 0;
+  font: 800 24pt/1.08 var(--schrift-titel); text-transform: uppercase; color: var(--titel);
+}
+.kapitel-start .themen {
+  position: absolute; left: 50mm; right: 16mm; top: 104mm;
+  list-style: none; margin: 0; padding: 0;
+  font: 400 9.5pt/1.5 var(--schrift-text);
+}
+.kapitel-start .themen li { padding: 1.3mm 0; margin: 0; border-bottom: .3mm solid var(--linie); }
+.kapitel-start .themen li:first-child { border-top: .3mm solid var(--linie); }
+.kapitel-start .streifen { position: absolute; left: 0; right: 0; bottom: 0; height: 9mm; background: var(--orange); }
+
+/* ------------------------------------------------------ Fließtext */
+
+.kapitel > h2, .anhang h2, .einleitung h2 {
+  font: 700 12.5pt/1.2 var(--schrift-titel); text-transform: uppercase; letter-spacing: .02em; color: var(--titel);
+  margin: 9mm 0 3mm; break-after: avoid;
+}
+.kapitel > h2:first-child, .anhang > h1 + h2 { margin-top: 0; }
+h3 {
+  font: 700 10pt/1.25 var(--schrift-titel); color: var(--orange-dunkel);
+  margin: 6mm 0 2mm; break-after: avoid;
+}
+p { margin: 0 0 2.6mm; text-align: justify; }
+ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1mm; }
+ul li::marker { color: var(--orange); }
+strong { font-weight: 700; color: #262524; }
+em { font-style: italic; }
+a { color: var(--orange-dunkel); }
+
+.platzhalter { color: #8c8a86; font-style: italic; }
+
+/* Taste im Text: <kbd>RETURN</kbd> */
+kbd {
+  display: inline-block;
+  font: 700 6.8pt/1 var(--schrift-titel); letter-spacing: .06em; text-transform: uppercase;
+  color: #fff;
+  background: var(--taste-oben);
+  border-radius: .9mm;
+  padding: .9mm 1.5mm .8mm;
+  box-shadow: 0 .6mm 0 var(--taste);
+  vertical-align: .2mm;
+  white-space: nowrap;
+}
+kbd.taste-eszett { text-transform: none; }
+/* Satzzeichen hinter der Taste bleiben bei ihr, auch am Zeilenende */
+.kleb { white-space: nowrap; }
+
+/* Befehl oder Ausdruck im Text */
+code { font: 400 .92em/1 var(--schrift-code); color: #262524; background: var(--flaeche); padding: .3mm .8mm; border-radius: .6mm; }
+
+/* Programmlisting */
+pre.listing {
+  font: 400 8.2pt/1.5 var(--schrift-code);
+  color: #262524;
+  background: var(--flaeche);
+  border-radius: 1.5mm;
+  padding: 3mm 4mm;
+  margin: 3mm 0 4mm;
+  white-space: pre;
+  break-inside: avoid;
+}
+pre.listing .kommentar { color: var(--grau); }
+/* Nie breiter als die Spalte: sonst verkleinert Chrome beim Drucken das ganze Buch. */
+pre.listing { max-width: 100%; box-sizing: border-box; overflow: hidden; }
+/* Für lange Zeilen wie den Hex-Dump des Monitors (bis 74 Zeichen). */
+pre.listing.breit { font-size: 6.6pt; padding-left: 3mm; padding-right: 3mm; }
+
+/* LCD-Anzeige: 4 Zeilen × 40 Zeichen, wie auf dem Gerät */
+figure.lcd {
+  width: fit-content;
+  margin: 4mm 0 5mm;
+  background: var(--orange);
+  border-radius: 2mm;
+  padding: 3.2mm;
+  break-inside: avoid;
+}
+figure.lcd pre {
+  margin: 0;
+  background: var(--lcd);
+  border: .8mm solid var(--orange-dunkel);
+  border-radius: .8mm;
+  color: var(--lcd-text);
+  font: 400 14pt/1.05 var(--schrift-lcd);
+  width: 40ch;
+  padding: 2mm 2.4mm;
+  height: calc(4 * 1.05em);
+  white-space: pre;
+  overflow: hidden;
+}
+figure.lcd figcaption, figure.abbildung figcaption, .tabelle-titel {
+  font: 600 7.5pt/1.3 var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase;
+  color: #fff; margin-top: 2.2mm;
+}
+figure.lcd .cursor { background: var(--lcd-text); color: var(--lcd); }
+
+/* Abbildung / Bildplatzhalter */
+figure.abbildung { margin: 4mm 0 5mm; break-inside: avoid; }
+figure.abbildung figcaption { color: var(--grau); }
+.bild-platzhalter {
+  aspect-ratio: 16 / 9;
+  background: var(--flaeche);
+  border: .4mm dashed #c6c3be;
+  border-radius: 1.5mm;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  font: 600 8pt/1.4 var(--schrift-titel); color: #8c8a86; letter-spacing: .06em; text-transform: uppercase;
+  padding: 4mm; box-sizing: border-box;
+}
+
+/* Kasten: Hinweis / Achtung / Tipp */
+aside.kasten {
+  background: var(--gelb-hell);
+  border-radius: 1.5mm;
+  padding: 3mm 4mm 1mm;
+  margin: 4mm 0;
+  font-size: 9pt;
+  break-inside: avoid;
+}
+aside.kasten .kasten-titel {
+  display: inline-block;
+  font: 800 7pt/1 var(--schrift-titel); letter-spacing: .14em; text-transform: uppercase;
+  background: var(--gelb); color: var(--titel);
+  padding: 1.2mm 2mm; border-radius: .8mm; margin-bottom: 2mm;
+}
+aside.kasten.achtung { background: var(--orange-hell); }
+aside.kasten.achtung .kasten-titel { background: var(--orange); color: #fff; }
+
+/* Tabellen */
+table {
+  width: 100%; border-collapse: collapse; margin: 3mm 0 5mm;
+  font-size: 8.5pt; line-height: 1.4;
+  break-inside: auto;
+}
+thead th {
+  font: 700 7.2pt/1.3 var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--titel); text-align: left;
+  border-bottom: .5mm solid var(--titel);
+  padding: 1.4mm 2mm 1.4mm 0;
+}
+tbody td { padding: 1.3mm 2mm 1.3mm 0; border-bottom: .25mm solid var(--linie); vertical-align: top; }
+tbody tr { break-inside: avoid; }
+table.zusammen { break-inside: avoid; }
+h2:has(+ table.zusammen) { break-after: avoid; }
+td code, td.mono { font-family: var(--schrift-code); font-size: 8pt; background: none; padding: 0; }
+
+/* Tastaturbelegung: Zeichen und Wert bilden je Zelle ein rahmenloses Paar. */
+table.tastenbelegung { table-layout: fixed; }
+table.tastenbelegung th:first-child, table.tastenbelegung td:first-child { width: 28%; }
+.zeichen-code {
+  display: grid;
+  grid-template-columns: 7mm 1fr;
+  column-gap: 1.2mm;
+  align-items: baseline;
+  font-family: var(--schrift-code);
+  font-size: 8pt;
+  white-space: nowrap;
+}
+.zeichen-code > :last-child { font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------ Anhänge */
+
+.anhang { break-before: page; }
+.anhang > h1 .buchstabe { color: var(--orange); margin-right: 3mm; }
+
+/* Befehlsübersicht (Anhang A), aufgebaut wie Anhang C im C64-Handbuch:
+   Stichwort, Schreibweise, Text mit Einzug, Beispiele ohne Linien. */
+.referenz > p { text-indent: 4mm; }
+.referenz > p.syntax, .referenz > p.syntax-legende, .referenz > h3 + p { text-indent: 0; }
+.referenz > h3 {
+  font: 800 9.5pt/1.2 var(--schrift-titel); letter-spacing: .05em; color: var(--titel);
+  margin: 6mm 0 1.6mm;
+}
+.referenz > h3::before {
+  content: ""; display: inline-block; width: 2.2mm; height: 2.2mm; border-radius: 50%;
+  background: var(--orange); margin-right: 2mm; vertical-align: .2mm;
+}
+.referenz p.syntax {
+  font: 500 8.4pt/1.5 var(--schrift-code); color: var(--orange-dunkel);
+  text-align: left; margin: 0 0 2mm; break-after: avoid;
+}
+.referenz var { font: italic 400 1em var(--schrift-text); color: inherit; }
+.referenz p.syntax var { font-size: 1.05em; }
+.referenz code var { font-size: 1.05em; }
+.referenz .mono { font-family: var(--schrift-code); font-size: .92em; }
+.referenz p.syntax-legende { font-size: 8.5pt; color: var(--grau); }
+.referenz ol.teile li { margin-bottom: 1.4mm; }
+
+/* Beispiele: links der Befehl, rechts was er tut */
+table.beispiele { width: auto; margin: 1.5mm 0 3mm; break-inside: avoid; }
+.referenz > p:has(+ table.beispiele), .referenz > p:has(+ pre.listing) { break-after: avoid; }
+.referenz td code { white-space: nowrap; }
+table.beispiele td { border: 0; padding: .5mm 5mm .5mm 0; }
+table.beispiele td:first-child { white-space: nowrap; }
+table.beispiele td:first-child code { font-size: 8.2pt; }
+
+/* Funktionen: Name links, Beschreibung rechts */
+table.funktionen td:first-child { width: 30mm; white-space: nowrap; }
+table.funktionen td { text-align: left; }
+
+/* ------------------------------------------------ Zeichnungen, Legenden */
+
+img.zeichnung { display: block; width: 100%; height: auto; }
+
+/* Nummerierte Legende zu einer Zeichnung: <ol class="legende"><li><span class="nr">1</span><div>…</div></li> */
+ol.legende { list-style: none; padding: 0; margin: 0 0 4mm; }
+ol.legende li { display: flex; gap: 2.5mm; align-items: baseline; margin: 0 0 1.6mm; break-inside: avoid; }
+ol.legende .nr {
+  flex: none; width: 4.6mm; height: 4.6mm; border-radius: 50%;
+  border: .35mm solid var(--taste); box-sizing: border-box;
+  font: 700 7pt/4mm var(--schrift-titel); text-align: center; color: var(--taste);
+  transform: translateY(.6mm);
+}
+
+/* Farbfeld für Tastengruppen: <span class="farbe editieren"></span> */
+.farbe { display: inline-block; width: 3.4mm; height: 3.4mm; border-radius: .7mm; vertical-align: -.5mm; margin-right: 1.2mm; }
+.farbe.normal { background: var(--taste-oben); }
+.farbe.editieren { background: var(--orange); }
+.farbe.umschalten { background: var(--lcd); }
+.farbe.sonder { background: var(--gelb); }
+.farbe.ohne { background: #b9b6b1; }
+ul.ohne-punkt { list-style: none; padding-left: 0; }
+
+/* ------------------------------------------------------------ Schaltplan */
+
+/* Eine Schaltplanseite füllt eine A5-Seite. Die SVGs liegen in schematic/
+   (Git); extract-schematic.py erzeugt und dreht sie aus dem Schaltplan-PDF. */
+@page schaltplan { margin: 8mm; @bottom-left { content: none; } @bottom-right { content: none; } }
+.schaltplan-seite {
+  page: schaltplan;
+  break-before: page;
+  height: 193mm;
+  display: flex; align-items: center; justify-content: center;
+}
+.schaltplan-seite figure { margin: 0; display: flex; flex-direction: column; align-items: center; }
+.schaltplan-seite img { display: block; width: 126mm; height: auto; }
+.schaltplan-seite figcaption {
+  font: 600 7.5pt/1.3 var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--grau); margin-top: 2mm;
+}
+
+/* ------------------------------------------ Technische Dokumentation */
+
+/* Bauschritte: <ol class="schritte"><li><div>…</div></li> */
+ol.schritte { list-style: none; counter-reset: schritt; padding: 0; margin: 0 0 4mm; }
+ol.schritte > li { counter-increment: schritt; display: flex; gap: 2.5mm; align-items: baseline; margin: 0 0 2mm; break-inside: avoid; }
+ol.schritte > li::before {
+  content: counter(schritt); flex: none; width: 4.6mm; height: 4.6mm; border-radius: 50%;
+  background: var(--orange); color: #fff; box-sizing: border-box;
+  font: 700 7pt/4.6mm var(--schrift-titel); text-align: center; transform: translateY(.6mm);
+}
+ol.schritte > li > div { flex: 1; }
+/* start="N" wie bei normalen Listen */
+ol.schritte[start="2"] { counter-reset: schritt 1; }
+ol.schritte[start="3"] { counter-reset: schritt 2; }
+ol.schritte[start="4"] { counter-reset: schritt 3; }
+ol.schritte[start="5"] { counter-reset: schritt 4; }
+ol.schritte[start="6"] { counter-reset: schritt 5; }
+ol.schritte[start="7"] { counter-reset: schritt 6; }
+ol.schritte[start="8"] { counter-reset: schritt 7; }
+ol.schritte[start="9"] { counter-reset: schritt 8; }
+ol.schritte[start="10"] { counter-reset: schritt 9; }
+ol.schritte[start="11"] { counter-reset: schritt 10; }
+ol.schritte[start="12"] { counter-reset: schritt 11; }
+ol.schritte[start="13"] { counter-reset: schritt 12; }
+ol.schritte[start="14"] { counter-reset: schritt 13; }
+ol.schritte[start="15"] { counter-reset: schritt 14; }
+ol.schritte[start="16"] { counter-reset: schritt 15; }
+ol.schritte[start="17"] { counter-reset: schritt 16; }
+ol.schritte[start="18"] { counter-reset: schritt 17; }
+ol.schritte[start="19"] { counter-reset: schritt 18; }
+ol.schritte[start="20"] { counter-reset: schritt 19; }
+
+/* Schaltplan-Ausschnitt und Oszilloskopbild */
+img.schaltplan { display: block; width: 100%; height: auto; box-sizing: border-box; background: #fff; border: .3mm solid var(--linie); border-radius: 1.2mm; padding: 2mm; }
+img.messung { display: block; width: 100%; height: auto; border-radius: 1mm; }
+figure.abbildung.schmal img { width: 78%; margin: 0 auto; }
+
+/* Bauteilliste */
+table.bauteile td:first-child { white-space: nowrap; font: 700 8pt/1.4 var(--schrift-titel); color: var(--orange-dunkel); width: 16mm; }
+table.bauteile { break-inside: avoid; }
+
+/* Terminalfenster: Bildschirmtext des PCs, universell (kein bestimmtes Programm) */
+figure.terminal { margin: 4mm 0 5mm; break-inside: avoid; }
+figure.terminal pre {
+  margin: 0; background: #23282e; color: #d7dce1; border-radius: 1.5mm;
+  font: 400 6.7pt/1.5 var(--schrift-code); padding: 3.2mm 4mm; white-space: pre; overflow: hidden;
+}
+figure.terminal pre .eingabe { color: #f2c94c; }
+figure.terminal figcaption {
+  font: 600 7.5pt/1.3 var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--grau); margin-top: 2.2mm;
+}
+
+/* Lange Listings dürfen über Seiten laufen */
+pre.listing.lang { break-inside: auto; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+/* Tastaturmatrix: 14 Zeilen × 8 Spalten, jede Zelle Taste und Scancode */
+table.matrix { font-size: 6.2pt; line-height: 1.25; table-layout: fixed; }
+table.matrix thead th { font-size: 5.8pt; padding: 1mm .6mm 1mm 0; letter-spacing: .02em; }
+table.matrix td { padding: .8mm .6mm .8mm 0; border-bottom: .2mm solid var(--linie); text-align: left; }
+table.matrix td:first-child { width: 14mm; font-weight: 700; color: var(--orange-dunkel); }
+table.matrix td { overflow-wrap: anywhere; }
+table.matrix small { color: var(--grau); font-size: 5.4pt; }

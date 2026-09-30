@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 3</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="3" data-titel="Der Prozessor" data-kurztitel="Der Prozessor">
+  <p>Es gibt einen Takt und einen Reset, jetzt kommt der Prozessor. Noch gibt es keinen Speicher und keine Ein-/Ausgabe. Trotzdem lässt sich seine Arbeit messen, weil wir ihm einen Trick unterschieben: Er liest nur einen einzigen Befehl.</p>
+
+  <h2>Der 6502</h2>
+  <p>Der MOS 6502 ist ein 8-Bit-Prozessor mit 40 Anschlüssen. Er hat 16 Adressleitungen (A0 bis A15) und damit 64&nbsp;KB Adressraum, acht Datenleitungen (D0 bis D7) und eine Leitung R/W, die anzeigt, ob er liest oder schreibt. Dazu kommen Takt, Reset, Interrupt-Eingänge und wenige Steuerleitungen. In der Schaltung kommen folgende Pins vor:</p>
+  <table class="zusammen">
+    <thead><tr><th>Pin</th><th>Name</th><th>Bedeutung</th><th>Anschluss</th></tr></thead>
+    <tbody>
+      <tr><td>8</td><td>VCC</td><td>+5&nbsp;V</td><td>+5&nbsp;V</td></tr>
+      <tr><td>1, 21</td><td>VSS</td><td>Masse</td><td>GND</td></tr>
+      <tr><td>37</td><td>PHI0</td><td>Takteingang</td><td>CLK</td></tr>
+      <tr><td>40</td><td>/RES</td><td>Reset, Low aktiv</td><td>/RESET</td></tr>
+      <tr><td>2</td><td>RDY</td><td>High = Prozessor läuft</td><td>über R6 an +5&nbsp;V</td></tr>
+      <tr><td>4</td><td>/IRQ</td><td>Interrupt, Low aktiv</td><td>über R9 an +5&nbsp;V</td></tr>
+      <tr><td>6</td><td>/NMI</td><td>nicht maskierbarer Interrupt</td><td>über R8 an +5&nbsp;V</td></tr>
+      <tr><td>38</td><td>/SO</td><td>setzt das Overflow-Flag</td><td>über R7 an +5&nbsp;V</td></tr>
+      <tr><td>26 bis 33</td><td>D7 bis D0</td><td>Datenbus</td><td>fest auf $EA</td></tr>
+      <tr><td>9 bis 20, 22 bis 25</td><td>A0 bis A15</td><td>Adressbus</td><td>offen, wird gemessen</td></tr>
+    </tbody>
+  </table>
+  <p>Die Pins 3, 7, 34 und 39 (PHI1, SYNC, R/W, PHI2) sowie 5, 35 und 36 bleiben offen.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Diese Beschreibung gilt für den klassischen 6502. Bei den CMOS-Nachfolgern wie dem 65C02 sind einige Pins anders belegt. Prüfen Sie dann die Belegung im Datenblatt.</p>
+  </aside>
+
+  <h2>Die Idee: ein Speicher voller NOPs</h2>
+  <p>Nach dem Reset liest der Prozessor die Adressen $FFFC und $FFFD, den Reset-Vektor, und beginnt an der dort angegebenen Adresse mit dem Programm. Er liest dort einen Befehl und führt ihn aus. Einer davon tut genau nichts: NOP, Code $EA.</p>
+  <p>Legen wir die Datenleitungen fest so, dass sie immer $EA liefern, dann verhält sich der Prozessor, als gäbe es einen riesigen Speicher, der überall nur $EA enthält. Er liest $EAEA als Reset-Vektor und beginnt bei Adresse $EAEA. Er liest $EA und führt NOP aus. Dann erhöht er den Programmzähler auf $EAEB, liest wieder $EA und so weiter, bis der Programmzähler überläuft und von vorn beginnt.</p>
+  <p>Da der Programmzähler nach jedem NOP um 1 steigt, müssen wir auf den Adressleitungen Rechtecksignale messen, deren Frequenz von Leitung zu Leitung halbiert wird.</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-cpu.svg" alt="Schaltplan des Prozessors mit festen Datenleitungen und vier Pull-up-Widerständen">
+    <figcaption>Schaltplan des Prozessors</figcaption>
+  </figure>
+  <p>Die acht Datenleitungen hängen entweder an +5&nbsp;V oder an GND. Sie ergeben zusammen den Wert $EA = %11101010: D0, D2 und D4 an GND, alle anderen an +5&nbsp;V. Das ist zulässig, weil der Prozessor hier nur liest. Sicherer wäre es, in jede Leitung einen Widerstand zu setzen.</p>
+  <p>Die vier Eingänge RDY, /IRQ, /NMI und /SO liegen über je einen 3,3-kΩ-Widerstand an +5&nbsp;V. Das ist der Ruhepegel: Der Prozessor läuft, und es gibt weder Interrupt noch Overflow-Signal. C6 (100&nbsp;nF) entkoppelt die Versorgung. Die Pins PHI1 und PHI2 (Pin&nbsp;3 und 39) sind Ausgänge, die erst bei Speicherbausteinen wichtig werden.</p>
+
+  <h2>Bauteile</h2>
+  <p>Zusätzlich zu den Bauteilen der Kapitel 1 und 2, und ein zweites Steckbrett:</p>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC3</td><td>Prozessor, DIP-40</td><td>MOS 6502</td></tr>
+      <tr><td>R6 bis R9</td><td>Widerstand</td><td>3,3&nbsp;kΩ (4 Stück)</td></tr>
+      <tr><td>C6</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Aufbau</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-cpu.svg" alt="Zwei Steckbretter: oben Takt und Reset, unten der Prozessor">
+    <figcaption>Takt und Reset oben, der Prozessor auf dem zweiten Steckbrett</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Führen Sie +5&nbsp;V und GND vom ersten zum zweiten Steckbrett, und verbinden Sie dort die oberen Schienen mit den unteren.</div></li>
+    <li><div>Stecken Sie IC3 über die Rinne. Der 6502 ist breiter als die kleinen ICs: Seine Pinreihen sind sechs Löcher auseinander und sitzen deshalb in den Reihen d und h. Die Kerbe zeigt nach links, Pin&nbsp;1 sitzt in Loch 4d. Richten Sie zuerst alle Beine aus: Sie stehen leicht schräg und lassen sich auf dem Tisch geradebiegen. Drücken Sie gleichmäßig.</div></li>
+    <li><div>Versorgen Sie IC3: Pin&nbsp;8 (11a) an +5&nbsp;V, Pin&nbsp;1 (4a) und Pin&nbsp;21 (23j) an GND. Setzen Sie C6 zwischen die unteren Schienen.</div></li>
+    <li><div>Legen Sie den Datenbus fest, mit acht Drähten von den Löchern der oberen Reihe j zu den oberen Schienen. An GND: D0 (11j), D2 (13j) und D4 (15j). An +5&nbsp;V: D1 (12j), D3 (14j), D5 (16j), D6 (17j) und D7 (18j).</div></li>
+    <li><div>Setzen Sie die vier Pull-up-Widerstände: R6 an RDY (Loch 5c), R9 an /IRQ (7c) und R8 an /NMI (9c), jeweils von dort an +5&nbsp;V. R7 an /SO setzen Sie von Loch 6i an +5&nbsp;V.</div></li>
+    <li><div>Verbinden Sie den Takt: Loch 10a auf dem ersten Steckbrett mit Pin&nbsp;37 (Loch 7j) des Prozessors.</div></li>
+    <li><div>Verbinden Sie /RESET: Loch 11g auf dem ersten Steckbrett über 13c und 13a mit Pin&nbsp;40 (Loch 4j) des Prozessors.</div></li>
+    <li><div>Kontrollieren Sie alles noch einmal, bevor Sie die Spannung einschalten.</div></li>
+  </ol>
+
+  <h2>Messen</h2>
+  <figure class="abbildung">
+    <img class="messung" src="../img/de/messung-cpu.svg" alt="Oszilloskopbild: Takt und Adressleitung A0">
+    <figcaption>Kanal 1 zeigt den Takt, Kanal 2 die Adressleitung A0</figcaption>
+  </figure>
+  <p>Kanal 1 zeigt den 1-MHz-Takt, Kanal 2 die Leitung A0. Ein NOP braucht zwei Takte: Im ersten wird der Befehl geholt, im zweiten ausgeführt. A0 wechselt deshalb alle 2&nbsp;µs, und das Signal hat 250&nbsp;kHz. Jede weitere Adressleitung halbiert die Frequenz:</p>
+  <table class="zusammen">
+    <thead><tr><th>Leitung</th><th>A0</th><th>A1</th><th>A2</th><th>A3</th><th>A4</th><th>…</th><th>A14</th><th>A15</th></tr></thead>
+    <tbody><tr><td>Frequenz</td><td>250&nbsp;kHz</td><td>125&nbsp;kHz</td><td>62,5&nbsp;kHz</td><td>31,3&nbsp;kHz</td><td>15,6&nbsp;kHz</td><td>…</td><td>15,3&nbsp;Hz</td><td>7,6&nbsp;Hz</td></tr></tbody>
+  </table>
+  <figure class="abbildung schmal">
+    <img class="messung" src="../img/de/messung-adressen.svg" alt="Oszilloskopbilder aller Adressleitungen, von A15 oben bis A0 unten">
+    <figcaption>Alle Adressleitungen, A15 oben bis A0 unten. Die Zeitbasis wurde alle vier Leitungen angepasst.</figcaption>
+  </figure>
+  <p>Am Bild sehen Sie es: Jede Leitung hat die halbe Frequenz der vorigen.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Sehen Sie keine Signale? Prüfen Sie nacheinander: Liegt +5&nbsp;V an Pin&nbsp;8 und GND an Pin&nbsp;1 und 21? Läuft der Takt an Pin&nbsp;37? Geht Pin&nbsp;40 nach etwa einer halben Sekunde auf High? Und stimmen die acht Datenleitungen?</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

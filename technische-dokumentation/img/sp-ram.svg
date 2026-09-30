@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 -22 533 402" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="Schaltplan: Adressdekoder und SRAM">
+<title>Schaltplan: Adressdekoder und SRAM</title>
+<path d="M104 10 L110 10" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 20 L110 20" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 30 L110 30" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 40 L110 40" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 50 L110 50" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 60 L110 60" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 70 L110 70" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 80 L110 80" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M160 45.0 L174 45.0" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M84 140 L110 140" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M84 150 L110 150" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M160 145.0 L180 145.0" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M180 145.0 L180 145.0" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M160 145.0 L180 145.0" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M240 145.0 L244 145.0 L244 200 L250 200" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M236 210 L250 210" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M300 205.0 L314 205.0" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M330 280 L308 280" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M318 280 L318 290 L330 290" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M330 300 L308 300" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M330 350 L308 350" fill="none" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="104,10 99.8,5.8 82.5,5.8 82.5,14.2 99.8,14.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="84.5" y="12.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">A14</text>
+<polygon points="104,20 99.8,15.8 82.5,15.8 82.5,24.2 99.8,24.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="84.5" y="22.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">A13</text>
+<polygon points="104,30 99.8,25.8 82.5,25.8 82.5,34.2 99.8,34.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="84.5" y="32.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">A12</text>
+<polygon points="104,40 99.8,35.8 82.5,35.8 82.5,44.2 99.8,44.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="84.5" y="42.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">A11</text>
+<polygon points="104,50 99.8,45.8 82.5,45.8 82.5,54.2 99.8,54.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="84.5" y="52.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">A10</text>
+<polygon points="104,60 99.8,55.8 86.6,55.8 86.6,64.2 99.8,64.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="88.6" y="62.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">A9</text>
+<polygon points="104,70 99.8,65.8 86.6,65.8 86.6,74.2 99.8,74.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="88.6" y="72.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">A8</text>
+<polygon points="104,80 99.8,75.8 66.1,75.8 66.1,84.2 99.8,84.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="68.1" y="82.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/CS_ROM</text>
+<rect x="120" y="0" width="30" height="90" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/><text x="135.0" y="48.5" font-size="10" text-anchor="middle" fill="#2A2826" font-weight="700">&amp;</text>
+<line x1="110" y1="10" x2="120" y2="10" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="7.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">1</text>
+<line x1="110" y1="20" x2="120" y2="20" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="17.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">2</text>
+<line x1="110" y1="30" x2="120" y2="30" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="27.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">3</text>
+<line x1="110" y1="40" x2="120" y2="40" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="37.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">4</text>
+<line x1="110" y1="50" x2="120" y2="50" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="47.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">5</text>
+<line x1="110" y1="60" x2="120" y2="60" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="57.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">6</text>
+<line x1="110" y1="70" x2="120" y2="70" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="67.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">11</text>
+<line x1="110" y1="80" x2="120" y2="80" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="77.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">12</text>
+<circle cx="153.5" cy="45.0" r="3.5" fill="#fff" stroke="#2A2826" stroke-width="1.4"/>
+<line x1="157" y1="45.0" x2="160" y2="45.0" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="154" y="39.0" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">8</text>
+<text x="135.0" y="-4" font-size="8.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC7</text>
+<text x="135.0" y="100" font-size="8" text-anchor="middle" fill="#6f6d69" font-weight="400">74LS30</text>
+<polygon points="174,45.0 178.2,40.8 207.79999999999998,40.8 207.79999999999998,49.2 178.2,49.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="181.2" y="47.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/CS_IO</text>
+<polygon points="84,140 79.8,135.8 46.1,135.8 46.1,144.2 79.8,144.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="48.1" y="142.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/CS_ROM</text>
+<polygon points="84,150 79.8,145.8 50.2,145.8 50.2,154.2 79.8,154.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="52.2" y="152.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/CS_IO</text>
+<rect x="120" y="130" width="30" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/><text x="135.0" y="148.5" font-size="10" text-anchor="middle" fill="#2A2826" font-weight="700">&amp;</text>
+<line x1="110" y1="140" x2="120" y2="140" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="137.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">1</text>
+<line x1="110" y1="150" x2="120" y2="150" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="115" y="147.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">2</text>
+<circle cx="153.5" cy="145.0" r="3.5" fill="#fff" stroke="#2A2826" stroke-width="1.4"/>
+<line x1="157" y1="145.0" x2="160" y2="145.0" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="154" y="139.0" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">3</text>
+<text x="135.0" y="126" font-size="8.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC6A</text>
+<text x="135.0" y="170" font-size="8" text-anchor="middle" fill="#6f6d69" font-weight="400">74LS00</text>
+<text x="169" y="141.0" font-size="6.6" text-anchor="start" fill="#B8481F" font-weight="700">/RAM</text>
+<line x1="180" y1="145.0" x2="196" y2="145.0" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<polygon points="196,130.0 196,160.0 223,145.0" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4" stroke-linejoin="round"/><circle cx="226.5" cy="145.0" r="3.5" fill="#fff" stroke="#2A2826" stroke-width="1.4"/>
+<line x1="230" y1="145.0" x2="240" y2="145.0" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="185" y="141.0" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">11</text>
+<text x="235" y="141.0" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">10</text>
+<text x="208" y="124.0" font-size="8.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC1E</text>
+<text x="208" y="172.0" font-size="8" text-anchor="middle" fill="#6f6d69" font-weight="400"></text>
+<rect x="260" y="190" width="30" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/><text x="275.0" y="208.5" font-size="10" text-anchor="middle" fill="#2A2826" font-weight="700">&amp;</text>
+<line x1="250" y1="200" x2="260" y2="200" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="255" y="197.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">4</text>
+<line x1="250" y1="210" x2="260" y2="210" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="255" y="207.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">5</text>
+<circle cx="293.5" cy="205.0" r="3.5" fill="#fff" stroke="#2A2826" stroke-width="1.4"/>
+<line x1="297" y1="205.0" x2="300" y2="205.0" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="294" y="199.0" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">6</text>
+<text x="275.0" y="186" font-size="8.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC6B</text>
+<text x="247" y="141.0" font-size="6.6" text-anchor="start" fill="#B8481F" font-weight="700">RAM</text>
+<polygon points="236,210 231.8,205.8 210.4,205.8 210.4,214.2 231.8,214.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="212.4" y="212.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">PHI2</text>
+<polygon points="314,205.0 318.2,200.8 351.9,200.8 351.9,209.2 318.2,209.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="321.2" y="207.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/CS_RAM</text>
+<rect x="340" y="270" width="80" height="50" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="380.0" y="291.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC8</text>
+<text x="380.0" y="303.0" font-size="8.5" text-anchor="middle" fill="#6f6d69" font-weight="400">61256</text>
+<line x1="340" y1="280" x2="330" y2="280" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="335" y="277.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">20</text>
+<text x="344" y="282.6" font-size="7.5" text-anchor="start" fill="#2A2826" font-weight="400">/CE</text>
+<line x1="340" y1="290" x2="330" y2="290" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="335" y="287.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">22</text>
+<text x="344" y="292.6" font-size="7.5" text-anchor="start" fill="#2A2826" font-weight="400">/OE</text>
+<line x1="340" y1="300" x2="330" y2="300" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="335" y="297.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">27</text>
+<text x="344" y="302.6" font-size="7.5" text-anchor="start" fill="#2A2826" font-weight="400">/WE</text>
+<polygon points="308,280 303.8,275.8 270.1,275.8 270.1,284.2 303.8,284.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="272.1" y="282.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/CS_RAM</text>
+<polygon points="308,300 303.8,295.8 286.5,295.8 286.5,304.2 303.8,304.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="288.5" y="302.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">R/W</text>
+<rect x="340" y="340" width="80" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="380.0" y="351.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC5</text>
+<text x="380.0" y="363.0" font-size="8.5" text-anchor="middle" fill="#6f6d69" font-weight="400">6551</text>
+<line x1="340" y1="350" x2="330" y2="350" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="335" y="347.8" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">3</text>
+<text x="344" y="352.6" font-size="7.5" text-anchor="start" fill="#2A2826" font-weight="400">/CS1</text>
+<polygon points="308,350 303.8,345.8 274.2,345.8 274.2,354.2 303.8,354.2" fill="#fff" stroke="#E4643C" stroke-width="1.1" stroke-linejoin="round"/>
+<text x="276.2" y="352.5" font-size="7" text-anchor="start" fill="#B8481F" font-weight="700">/CS_IO</text>
+<line x1="300" y1="20" x2="300" y2="42.4" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="300" y1="47.6" x2="300" y2="70" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="292" y1="42.4" x2="308" y2="42.4" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="292" y1="47.6" x2="308" y2="47.6" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="311" y="44" font-size="8.5" text-anchor="start" fill="#2A2826" font-weight="700">C10</text>
+<text x="311" y="53.5" font-size="8" text-anchor="start" fill="#6f6d69" font-weight="400">100 nF</text>
+<path d="M300 20 L300 12" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M295.5 12 L304.5 12 L300 6 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="307" y="11" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<path d="M300 70 L300 73" stroke="#6f6d69" stroke-width="1.4" fill="none"/><path d="M293 73 H307 M295.4 76.4 H304.6 M297.8 79.8 H302.2" stroke="#6f6d69" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+<rect x="340" y="30" width="46" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="363.0" y="44.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC7</text>
+<line x1="363.0" y1="30" x2="363.0" y2="20" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="369.0" y="26" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">14</text>
+<line x1="363.0" y1="60" x2="363.0" y2="70" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="369.0" y="73" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">7</text>
+<path d="M363 20 L363 12" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M358.5 12 L367.5 12 L363 6 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="370" y="11" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<path d="M363 70 L363 73" stroke="#6f6d69" stroke-width="1.4" fill="none"/><path d="M356 73 H370 M358.4 76.4 H367.6 M360.8 79.8 H365.2" stroke="#6f6d69" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+<line x1="300" y1="100" x2="300" y2="122.4" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="300" y1="127.6" x2="300" y2="150" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="292" y1="122.4" x2="308" y2="122.4" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="292" y1="127.6" x2="308" y2="127.6" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="311" y="124" font-size="8.5" text-anchor="start" fill="#2A2826" font-weight="700">C11</text>
+<text x="311" y="133.5" font-size="8" text-anchor="start" fill="#6f6d69" font-weight="400">100 nF</text>
+<path d="M300 100 L300 92" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M295.5 92 L304.5 92 L300 86 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="307" y="91" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<path d="M300 150 L300 153" stroke="#6f6d69" stroke-width="1.4" fill="none"/><path d="M293 153 H307 M295.4 156.4 H304.6 M297.8 159.8 H302.2" stroke="#6f6d69" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+<rect x="340" y="110" width="46" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="363.0" y="124.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC6</text>
+<line x1="363.0" y1="110" x2="363.0" y2="100" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="369.0" y="106" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">14</text>
+<line x1="363.0" y1="140" x2="363.0" y2="150" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="369.0" y="153" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">7</text>
+<path d="M363 100 L363 92" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M358.5 92 L367.5 92 L363 86 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="370" y="91" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<path d="M363 150 L363 153" stroke="#6f6d69" stroke-width="1.4" fill="none"/><path d="M356 153 H370 M358.4 156.4 H367.6 M360.8 159.8 H365.2" stroke="#6f6d69" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+<line x1="470" y1="270" x2="470" y2="292.4" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="470" y1="297.6" x2="470" y2="320" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="462" y1="292.4" x2="478" y2="292.4" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="462" y1="297.6" x2="478" y2="297.6" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="481" y="294" font-size="8.5" text-anchor="start" fill="#2A2826" font-weight="700">C12</text>
+<text x="481" y="303.5" font-size="8" text-anchor="start" fill="#6f6d69" font-weight="400">100 nF</text>
+<path d="M470 270 L470 262" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M465.5 262 L474.5 262 L470 256 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="477" y="261" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<path d="M470 320 L470 323" stroke="#6f6d69" stroke-width="1.4" fill="none"/><path d="M463 323 H477 M465.4 326.4 H474.6 M467.8 329.8 H472.2" stroke="#6f6d69" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+<rect x="510" y="280" width="46" height="30" rx="2.5" fill="#eef1fb" stroke="#2A2826" stroke-width="1.4"/>
+<text x="533.0" y="294.0" font-size="9.5" text-anchor="middle" fill="#2A2826" font-weight="700">IC8</text>
+<line x1="533.0" y1="280" x2="533.0" y2="270" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="539.0" y="276" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">28</text>
+<line x1="533.0" y1="310" x2="533.0" y2="320" stroke="#2A2826" stroke-width="1.4" stroke-linecap="round"/>
+<text x="539.0" y="323" font-size="6.2" text-anchor="middle" fill="#9a9893" font-weight="400">14</text>
+<path d="M533 270 L533 262" stroke="#B8481F" stroke-width="1.4" fill="none"/><path d="M528.5 262 L537.5 262 L533 256 Z" fill="#E4643C" stroke="#B8481F" stroke-width=".8" stroke-linejoin="round"/>
+<text x="540" y="261" font-size="7.5" text-anchor="start" fill="#B8481F" font-weight="700">+5 V</text>
+<path d="M533 320 L533 323" stroke="#6f6d69" stroke-width="1.4" fill="none"/><path d="M526 323 H540 M528.4 326.4 H537.6 M530.8 329.8 H535.2" stroke="#6f6d69" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+<circle cx="318" cy="280" r="2.6" fill="#2A2826"/>
+</svg>

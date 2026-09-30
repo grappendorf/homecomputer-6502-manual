@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appendix E – Keyboard Layout</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang" data-buchstabe="E" data-kurztitel="Appendix E · Keyboard">
+  <h1><span class="buchstabe">E</span>Keyboard Layout</h1>
+  <p><code>KEY(0)</code> returns the code of the key that is currently pressed, or 0. The keyboard produces the same codes while you type. <kbd>Caps Lock</kbd> only swaps <code>A</code> to <code>Z</code> with <code>a</code> to <code>z</code>. <kbd>Shift</kbd> undoes that again.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/en/tastatur.svg" alt="The keyboard, key groups marked in color">
+    <figcaption>The keyboard. The colors are explained in Chapter 2</figcaption>
+  </figure>
+  <p><kbd>Ä</kbd>, <kbd>Ö</kbd>, <kbd>Ü</kbd> and <kbd class="taste-eszett">ß</kbd> as well as <kbd>Shift</kbd>+<kbd>3</kbd> do not go into the input line. <code>KEY</code> still returns their codes. The matching characters are listed in Appendix D.</p>
+
+  <h2>Characters</h2>
+  <table class="tastenbelegung">
+    <thead><tr><th>Key</th><th>plain</th><th>Shift</th><th>AltGr</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>A</kbd>–<kbd>Z</kbd></td><td><span class="zeichen-code"><span></span><span>97–122</span></span></td><td><span class="zeichen-code"><span></span><span>65–90</span></span></td><td></td></tr>
+      <tr><td><kbd>^</kbd></td><td><span class="zeichen-code"><code>^</code><span>94</span></span></td><td><span class="zeichen-code"><code>°</code><span>223</span></span></td><td></td></tr>
+      <tr><td><kbd>1</kbd></td><td><span class="zeichen-code"><code>1</code><span>49</span></span></td><td><span class="zeichen-code"><code>!</code><span>33</span></span></td><td></td></tr>
+      <tr><td><kbd>2</kbd></td><td><span class="zeichen-code"><code>2</code><span>50</span></span></td><td><span class="zeichen-code"><code>"</code><span>34</span></span></td><td><span class="zeichen-code"><code>²</code><span>7</span></span></td></tr>
+      <tr><td><kbd>3</kbd></td><td><span class="zeichen-code"><code>3</code><span>51</span></span></td><td><span class="zeichen-code"><span></span><span>242</span></span></td><td><span class="zeichen-code"><code>³</code><span>4</span></span></td></tr>
+      <tr><td><kbd>4</kbd></td><td><span class="zeichen-code"><code>4</code><span>52</span></span></td><td><span class="zeichen-code"><code>$</code><span>36</span></span></td><td></td></tr>
+      <tr><td><kbd>5</kbd></td><td><span class="zeichen-code"><code>5</code><span>53</span></span></td><td><span class="zeichen-code"><code>%</code><span>37</span></span></td><td></td></tr>
+      <tr><td><kbd>6</kbd></td><td><span class="zeichen-code"><code>6</code><span>54</span></span></td><td><span class="zeichen-code"><code>&amp;</code><span>38</span></span></td><td></td></tr>
+      <tr><td><kbd>7</kbd></td><td><span class="zeichen-code"><code>7</code><span>55</span></span></td><td><span class="zeichen-code"><code>/</code><span>47</span></span></td><td><span class="zeichen-code"><code>{</code><span>123</span></span></td></tr>
+      <tr><td><kbd>8</kbd></td><td><span class="zeichen-code"><code>8</code><span>56</span></span></td><td><span class="zeichen-code"><code>(</code><span>40</span></span></td><td><span class="zeichen-code"><code>[</code><span>91</span></span></td></tr>
+      <tr><td><kbd>9</kbd></td><td><span class="zeichen-code"><code>9</code><span>57</span></span></td><td><span class="zeichen-code"><code>)</code><span>41</span></span></td><td><span class="zeichen-code"><code>]</code><span>93</span></span></td></tr>
+      <tr><td><kbd>0</kbd></td><td><span class="zeichen-code"><code>0</code><span>48</span></span></td><td><span class="zeichen-code"><code>=</code><span>61</span></span></td><td><span class="zeichen-code"><code>}</code><span>125</span></span></td></tr>
+      <tr><td><kbd class="taste-eszett">ß</kbd></td><td><span class="zeichen-code"><span></span><span>226</span></span></td><td><span class="zeichen-code"><code>?</code><span>63</span></span></td><td><span class="zeichen-code"><code>\\</code><span>5</span></span></td></tr>
+      <tr><td><kbd>´</kbd></td><td><span class="zeichen-code"><code>´</code><span>2</span></span></td><td><span class="zeichen-code"><code>`</code><span>96</span></span></td><td></td></tr>
+      <tr><td><kbd>Q</kbd></td><td><span class="zeichen-code"><code>q</code><span>113</span></span></td><td><span class="zeichen-code"><code>Q</code><span>81</span></span></td><td><span class="zeichen-code"><code>@</code><span>64</span></span></td></tr>
+      <tr><td><kbd>E</kbd></td><td><span class="zeichen-code"><code>e</code><span>101</span></span></td><td><span class="zeichen-code"><code>E</code><span>69</span></span></td><td><span class="zeichen-code"><code>€</code><span>11</span></span></td></tr>
+      <tr><td><kbd>Ü</kbd></td><td><span class="zeichen-code"><span></span><span>245</span></span></td><td><span class="zeichen-code"><span></span><span>245</span></span></td><td></td></tr>
+      <tr><td><kbd>+</kbd></td><td><span class="zeichen-code"><code>+</code><span>43</span></span></td><td><span class="zeichen-code"><code>*</code><span>42</span></span></td><td><span class="zeichen-code"><code>~</code><span>6</span></span></td></tr>
+      <tr><td><kbd>Ö</kbd></td><td><span class="zeichen-code"><span></span><span>239</span></span></td><td><span class="zeichen-code"><span></span><span>239</span></span></td><td></td></tr>
+      <tr><td><kbd>Ä</kbd></td><td><span class="zeichen-code"><span></span><span>225</span></span></td><td><span class="zeichen-code"><span></span><span>225</span></span></td><td></td></tr>
+      <tr><td><kbd>#</kbd></td><td><span class="zeichen-code"><code>#</code><span>35</span></span></td><td><span class="zeichen-code"><code>'</code><span>39</span></span></td><td></td></tr>
+      <tr><td><kbd>M</kbd></td><td><span class="zeichen-code"><code>m</code><span>109</span></span></td><td><span class="zeichen-code"><code>M</code><span>77</span></span></td><td><span class="zeichen-code"><code>µ</code><span>1</span></span></td></tr>
+      <tr><td><kbd>,</kbd></td><td><span class="zeichen-code"><code>,</code><span>44</span></span></td><td><span class="zeichen-code"><code>;</code><span>59</span></span></td><td></td></tr>
+      <tr><td><kbd>.</kbd></td><td><span class="zeichen-code"><code>.</code><span>46</span></span></td><td><span class="zeichen-code"><code>:</code><span>58</span></span></td><td></td></tr>
+      <tr><td><kbd>-</kbd></td><td><span class="zeichen-code"><code>-</code><span>45</span></span></td><td><span class="zeichen-code"><code>_</code><span>95</span></span></td><td></td></tr>
+      <tr><td><kbd>&lt;</kbd></td><td><span class="zeichen-code"><code>&lt;</code><span>60</span></span></td><td><span class="zeichen-code"><code>&gt;</code><span>62</span></span></td><td><span class="zeichen-code"><code>|</code><span>124</span></span></td></tr>
+      <tr><td><kbd>Space</kbd></td><td><span class="zeichen-code"><span></span><span>32</span></span></td><td><span class="zeichen-code"><span></span><span>32</span></span></td><td></td></tr>
+    </tbody>
+  </table>
+  <p>On the <kbd>3</kbd> key sits <code>§</code>. <kbd>Shift</kbd> returns 242 for it.</p>
+
+  <h2>Editing</h2>
+  <table>
+    <thead><tr><th>Key</th><th>Code</th><th>Key</th><th>Code</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Return</kbd></td><td>13</td><td><kbd>←</kbd> <kbd>→</kbd></td><td>17 and 18</td></tr>
+      <tr><td><kbd>Backspace</kbd></td><td>8</td><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>19 and 20</td></tr>
+      <tr><td><kbd>Del</kbd></td><td>23</td><td><kbd>Home</kbd></td><td>21</td></tr>
+      <tr><td><kbd>Ins</kbd></td><td>24</td><td><kbd>End</kbd></td><td>22</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>27</td><td><kbd>Pause</kbd></td><td>3</td></tr>
+    </tbody>
+  </table>
+  <p><kbd>Ctrl</kbd> plus a letter gives 1 for <kbd>A</kbd> up to 26 for <kbd>Z</kbd>. <kbd>Ctrl</kbd>+<kbd>C</kbd> is code 3, like <kbd>Pause</kbd>. <kbd>F1</kbd> to <kbd>F12</kbd>, <kbd>Num</kbd>, <kbd>PrtSc</kbd>, <kbd>ScrLk</kbd>, <kbd>Tab</kbd>, <kbd>Alt</kbd>, <kbd>Menu</kbd> and the picture keys return 0. <kbd>Fn</kbd> and <kbd>Win</kbd> together restart the computer.</p>
+</section>
+</main>
+</body>
+</html>

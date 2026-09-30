@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 110" width="480" height="110" role="img" aria-label="Back of the HomeComputer 6502">
+<title>Back</title>
+<rect x="10" y="40" width="460" height="56" rx="6" fill="#000" opacity=".15"/>
+<rect x="8" y="34" width="464" height="56" rx="6" fill="#E4643C"/>
+<rect x="8" y="82" width="464" height="8" rx="3" fill="#C9542E"/>
+<circle cx="62" cy="50.0" r="6.5" fill="#A9431E"/>
+<circle cx="62" cy="50.0" r="3.8" fill="#9a8f7c"/>
+<rect x="58.2" y="49.2" width="7.6" height="1.6" fill="#5b554b"/>
+<rect x="54" y="66.0" width="16" height="7" rx="1.5" fill="#2A2826"/>
+<rect x="56.5" y="68.2" width="11" height="2.6" rx=".8" fill="#8a8781"/>
+<rect x="138" y="55.0" width="24" height="10" rx="2" fill="#2A2826"/>
+<rect x="141" y="56.0" width="9" height="8" rx="1.5" fill="#6d6a64"/>
+<rect x="330" y="55.0" width="24" height="10" rx="2" fill="#2A2826"/>
+<rect x="333" y="56.0" width="9" height="8" rx="1.5" fill="#6d6a64"/>
+<rect x="393" y="66.0" width="14" height="6" rx="2" fill="#2A2826"/>
+<rect x="395.5" y="67.8" width="9" height="2.4" rx=".8" fill="#8a8781"/>
+<line x1="62" y1="32" x2="62" y2="21" stroke="#2A2826" stroke-width="1"/>
+<circle cx="62" cy="12" r="9" fill="#ffffff" stroke="#2A2826" stroke-width="1.5"/>
+<text x="62" y="15.6" font-family="Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#2A2826">1</text>
+<line x1="88" y1="32" x2="88" y2="21" stroke="#2A2826" stroke-width="1"/>
+<circle cx="88" cy="12" r="9" fill="#ffffff" stroke="#2A2826" stroke-width="1.5"/>
+<text x="88" y="15.6" font-family="Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#2A2826">2</text>
+<line x1="150" y1="32" x2="150" y2="21" stroke="#2A2826" stroke-width="1"/>
+<circle cx="150" cy="12" r="9" fill="#ffffff" stroke="#2A2826" stroke-width="1.5"/>
+<text x="150" y="15.6" font-family="Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#2A2826">3</text>
+<line x1="342" y1="32" x2="342" y2="21" stroke="#2A2826" stroke-width="1"/>
+<circle cx="342" cy="12" r="9" fill="#ffffff" stroke="#2A2826" stroke-width="1.5"/>
+<text x="342" y="15.6" font-family="Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#2A2826">4</text>
+<line x1="400" y1="32" x2="400" y2="21" stroke="#2A2826" stroke-width="1"/>
+<circle cx="400" cy="12" r="9" fill="#ffffff" stroke="#2A2826" stroke-width="1.5"/>
+<text x="400" y="15.6" font-family="Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#2A2826">5</text>
+<line x1="88" y1="21" x2="88" y2="64.0" stroke="#2A2826" stroke-width="1"/>
+<line x1="88" y1="64.0" x2="71" y2="69.0" stroke="#2A2826" stroke-width="1"/>
+</svg>

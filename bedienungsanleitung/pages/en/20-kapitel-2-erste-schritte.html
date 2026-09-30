@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 2 – First Steps</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="2" data-titel="First Steps" data-kurztitel="First Steps">
+  <p>The computer is switched on and the cursor is waiting. In this chapter you will get to know the keyboard and the display, enter your first commands, and use the computer as a pocket calculator. You cannot break anything in the process. Feel free to try everything out.</p>
+
+  <h2>The Keyboard</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/en/tastatur.svg" alt="The keyboard, key groups marked in color">
+    <figcaption>The keyboard, key groups marked in color</figcaption>
+  </figure>
+  <p>The keyboard has the familiar German layout. The colors in the drawing show what the keys are for:</p>
+  <ul class="ohne-punkt">
+    <li><span class="farbe normal"></span><strong>Characters:</strong> letters, digits, punctuation and the space bar.</li>
+    <li><span class="farbe editieren"></span><strong>Editing:</strong> <kbd>Return</kbd>, <kbd>Backspace</kbd>, <kbd>Del</kbd>, <kbd>Ins</kbd>, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Esc</kbd> and the arrow keys. More about these at the end of this chapter.</li>
+    <li><span class="farbe umschalten"></span><strong>Shift:</strong> <kbd>Shift</kbd>, <kbd>Caps Lock</kbd>, <kbd>Alt Gr</kbd> and <kbd>Ctrl</kbd>. They change what another key types.</li>
+    <li><span class="farbe sonder"></span><strong>Special functions:</strong> <kbd>Pause</kbd> stops a running program. <kbd>Fn</kbd> and <kbd>Win</kbd> together restart the computer.</li>
+    <li><span class="farbe ohne"></span><strong>No function:</strong> <kbd>F1</kbd> to <kbd>F12</kbd>, <kbd>Num</kbd>, <kbd>PrtSc</kbd>, <kbd>ScrLk</kbd>, <kbd>Tab</kbd>, <kbd>Alt</kbd>, <kbd>Menu</kbd> and the picture keys. They currently do nothing.</li>
+  </ul>
+
+  <h3>Lower Case, Upper Case and Special Characters</h3>
+  <p>Without any other key, the keyboard types lower-case letters. Hold down <kbd>Shift</kbd> and you get upper-case letters and the upper characters of the keys, that is <code>!</code> instead of <code>1</code>. <kbd>Caps Lock</kbd> switches on upper-case letters. Press it once briefly and all letters come out upper case. Press it again and they come out lower case again. <kbd>Caps Lock</kbd> does not change digits and symbols.</p>
+  <p>With <kbd>Alt Gr</kbd> you reach the characters shown at the lower right of the keys:</p>
+  <table>
+    <thead><tr><th>Character</th><th>Keys</th><th>Character</th><th>Keys</th></tr></thead>
+    <tbody>
+      <tr><td><code>@</code></td><td><kbd>Alt Gr</kbd> + <kbd>Q</kbd></td><td><code>\\</code></td><td><kbd>Alt Gr</kbd> + <kbd>ß</kbd></td></tr>
+      <tr><td><code>{</code> <code>}</code></td><td><kbd>Alt Gr</kbd> + <kbd>7</kbd>, <kbd>0</kbd></td><td><code>|</code></td><td><kbd>Alt Gr</kbd> + <kbd>&lt;</kbd></td></tr>
+      <tr><td><code>[</code> <code>]</code></td><td><kbd>Alt Gr</kbd> + <kbd>8</kbd>, <kbd>9</kbd></td><td><code>~</code></td><td><kbd>Alt Gr</kbd> + <kbd>+</kbd></td></tr>
+      <tr><td><code>€</code></td><td><kbd>Alt Gr</kbd> + <kbd>E</kbd></td><td><code>µ</code></td><td><kbd>Alt Gr</kbd> + <kbd>M</kbd></td></tr>
+    </tbody>
+  </table>
+  <p>The umlauts <kbd>Ä</kbd>, <kbd>Ö</kbd>, <kbd>Ü</kbd> as well as <kbd>ß</kbd> and <code>§</code> do not write anything into the input line. BASIC uses the codes of these characters internally for its command words. So write AE, OE, UE and SS instead. All the examples in this manual do the same.</p>
+  <p>If you hold a key down longer, it repeats, just as you know from the PC.</p>
+
+  <h2>The Display</h2>
+  <p>The display shows four lines of 40 characters each. The small dash is the <strong>cursor</strong>. The next character appears at its position.</p>
+  <ul>
+    <li>If you type past the end of a line, input continues on the next line.</li>
+    <li>When the bottom line is full, the whole content moves up one line. The top line disappears in the process.</li>
+    <li>When the computer finishes something, it does not announce this with a word like <code>READY.</code> The cursor simply sits in the next free line.</li>
+  </ul>
+  <p>The display is backlit, so you can read it in the dark too. The contrast is fixed. How to control yourself where something appears on the display is shown in Chapter 4.</p>
+
+  <h2>Direct Mode</h2>
+  <p>Everything you type first goes into the input line. Only with <kbd>Return</kbd> do you send it to the computer. Type:</p>
+<pre class="listing">print "Hello"</pre>
+  <p>and press <kbd>Return</kbd>. The computer carries out the command immediately and writes the text between the quotation marks onto the display:</p>
+  <figure class="lcd">
+<pre>print "Hello"
+Hello
+<span class="cursor"> </span>
+</pre>
+    <figcaption>The first command</figcaption>
+  </figure>
+  <p>This way of working is called <strong>direct mode</strong>: type a command, <kbd>Return</kbd>, see the result. <code>PRINT</code> means "print". What it means is: write it on the display. It does not matter whether you type the command in lower or upper case. The text in quotation marks appears exactly as you typed it.</p>
+  <p>If you forget the second quotation mark, that is not a problem either. BASIC then takes the rest of the line as text.</p>
+
+  <h2>Calculating with PRINT</h2>
+  <p>If a calculation follows <code>PRINT</code> instead of text, the computer works it out:</p>
+  <figure class="lcd">
+<pre>print 2+3
+ 5
+print 10/4
+ 2.5</pre>
+    <figcaption>The computer as a pocket calculator</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Character</th><th>Operation</th><th>Example</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><code>+</code></td><td>Plus</td><td><code>PRINT 7+5</code></td><td>12</td></tr>
+      <tr><td><code>-</code></td><td>Minus</td><td><code>PRINT 7-5</code></td><td>2</td></tr>
+      <tr><td><code>*</code></td><td>Times</td><td><code>PRINT 7*5</code></td><td>35</td></tr>
+      <tr><td><code>/</code></td><td>Divided by</td><td><code>PRINT 7/5</code></td><td>1.4</td></tr>
+      <tr><td><code>^</code></td><td>To the power of</td><td><code>PRINT 2^10</code></td><td>1024</td></tr>
+    </tbody>
+  </table>
+  <p>As in school, multiplication and division come before addition and subtraction: <code>2+3*4</code> gives 14. If addition should come first, use parentheses: <code>(2+3)*4</code> gives 20. Exponentiation with <code>^</code> comes even before multiplication and division.</p>
+
+  <h3>How the Computer Writes Numbers</h3>
+  <ul>
+    <li>BASIC writes decimal fractions with a <strong>period</strong>, as in English: <code>2.5</code>, not 2,5. In BASIC the comma has a different job (Chapter 3).</li>
+    <li>Every number is preceded by a space, or by a minus sign for negative numbers.</li>
+    <li>BASIC leaves out a zero before the period: <code>PRINT 1/2</code> gives <code>.5</code>.</li>
+    <li>BASIC calculates with about nine digits. <code>PRINT 1/3</code> gives <code>.333333333</code>.</li>
+    <li>Very large and very small numbers appear with <code>E</code>: <code>1E+20</code> means 1 times 10 to the power of 20, that is a 1 followed by 20 zeros. <code>PRINT 123456789012</code> gives <code>1.23456789E+11</code>.</li>
+  </ul>
+  <aside class="kasten">
+    <div class="kasten-titel">Tip</div>
+    <p>The computer does not calculate with quotation marks. <code>PRINT "2+3"</code> writes <code>2+3</code>, <code>PRINT 2+3</code> writes <code>5</code>.</p>
+  </aside>
+
+  <h2>Correcting Mistakes</h2>
+  <p>As long as you have not yet pressed <kbd>Return</kbd>, you can change the input line however you like:</p>
+  <table>
+    <thead><tr><th>Key</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>move the cursor one character left or right</td></tr>
+      <tr><td><kbd>Backspace</kbd></td><td>delete the character to the left of the cursor</td></tr>
+      <tr><td><kbd>Del</kbd></td><td>delete the character under the cursor</td></tr>
+      <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>jump to the beginning or past the last character</td></tr>
+      <tr><td><kbd>Ins</kbd></td><td>switch between inserting and overwriting</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>discard the whole line</td></tr>
+      <tr><td><kbd>Return</kbd></td><td>send the line, no matter where the cursor is</td></tr>
+    </tbody>
+  </table>
+  <p>Normally, new characters push the rest of the line to the right. After <kbd>Ins</kbd>, they instead overwrite whatever is under the cursor. A second <kbd>Ins</kbd> switches back. The arrow keys <kbd>↑</kbd> and <kbd>↓</kbd> recall program lines for editing. Chapter 3 shows how that works.</p>
+  <p>If the computer does not understand a command, it reports an error:</p>
+  <figure class="lcd">
+<pre>prunt 5
+
+?SYNTAX ERROR
+<span class="cursor"> </span></pre>
+    <figcaption>A typing mistake</figcaption>
+  </figure>
+  <p><code>SYNTAX ERROR</code> means: this is not a valid BASIC command. Here <code>PRINT</code> was misspelled. Simply type the line again correctly. An error message does the computer no harm. All messages are listed in Appendix B.</p>
+</section>
+</main>
+</body>
+</html>

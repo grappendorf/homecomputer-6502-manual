@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 13</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="13" data-titel="Where to Go Next" data-kurztitel="Where to Go Next">
+  <p>The computer runs. This chapter sums up what you have built, shows how the breadboard circuit became the finished device, and offers ideas, help and sources for the next step.</p>
+
+  <h2>The Big Picture</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/en/blockschaltbild.svg" alt="Block diagram: processor, clock and reset, address and data bus, ROM, RAM, address decoder and the four IO chips with their peripherals">
+    <figcaption>Block diagram of the HomeComputer 6502</figcaption>
+  </figure>
+  <p>The 6502 processor talks to all chips over the address bus (16 lines) and the data bus (8 lines). It gets its clock and reset from the circuits of the first two chapters. The address decoder selects which chip answers an access: the ROM, the RAM or one of the four IO chips. The IO chips connect the computer to the outside world: the ACIA to the PC, the first VIA to the display and the LED, both VIAs to the keyboard, and the SID to the speaker. The interrupt lines of the ACIA and the VIAs are wired together and lead to the processor.</p>
+
+  <h2>The Chips</h2>
+  <table class="zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Purpose</th><th>Ch.</th></tr></thead>
+    <tbody>
+      <tr><td>Q1</td><td>1&nbsp;MHz crystal</td><td>Clock source, oscillates together with the 74LS04</td><td>1</td></tr>
+      <tr><td>IC1</td><td>74LS04</td><td>Clock oscillator and inverter for the reset signal</td><td>1, 2</td></tr>
+      <tr><td>IC2</td><td>NE555</td><td>Reset pulse at power-on and by button</td><td>2</td></tr>
+      <tr><td>IC3</td><td>6502</td><td>Processor</td><td>3</td></tr>
+      <tr><td>IC4</td><td>AT28C256</td><td>ROM holding the program, 32&nbsp;KB</td><td>4</td></tr>
+      <tr><td>IC5</td><td>6551</td><td>ACIA, serial interface</td><td>5</td></tr>
+      <tr><td>IC6</td><td>74LS00</td><td>NAND gates for the RAM chip select</td><td>6</td></tr>
+      <tr><td>IC7</td><td>74LS30</td><td>8-input NAND for the IO area</td><td>6</td></tr>
+      <tr><td>IC8</td><td>61256</td><td>RAM, 32&nbsp;KB</td><td>6</td></tr>
+      <tr><td>IC9</td><td>6522</td><td>VIA 1: display, LED, keyboard rows 8 to 13</td><td>8</td></tr>
+      <tr><td>IC10</td><td>74LS137</td><td>Decoder for the IO chips</td><td>8</td></tr>
+      <tr><td>IC11</td><td>6522</td><td>VIA 2: keyboard rows 0 to 7 and columns</td><td>10</td></tr>
+      <tr><td>IC12</td><td>SID 8580</td><td>Sound</td><td>12</td></tr>
+      <tr><td>T1</td><td>2N2222</td><td>Output stage of the SID</td><td>12</td></tr>
+    </tbody>
+  </table>
+  <p>Add resistors, capacitors (a 100&nbsp;nF decoupling capacitor at every IC), the second crystal (1.8432&nbsp;MHz for the ACIA), LED, buttons, trimmer and pin headers. The complete parts list of the finished device is a spreadsheet in the hardware repository of the project.</p>
+
+  <h2>Memory Map and IO Addresses</h2>
+  <table class="zusammen">
+    <thead><tr><th>Addresses</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td>$0000 to $00FF</td><td>RAM, zero page</td></tr>
+      <tr><td>$0100 to $01FF</td><td>RAM, stack</td></tr>
+      <tr><td>$0200 to $7EFF</td><td>RAM</td></tr>
+      <tr><td>$7F00 to $7FFF</td><td>IO (see below)</td></tr>
+      <tr><td>$8000 to $FFFF</td><td>ROM, with the vectors $FFFA to $FFFF at the end</td></tr>
+    </tbody>
+  </table>
+  <table class="zusammen">
+    <thead><tr><th>IO block</th><th>Addresses</th><th>Chip</th><th>Registers</th></tr></thead>
+    <tbody>
+      <tr><td>Y0</td><td>$7F00 to $7F1F</td><td>ACIA</td><td>4 (data, status, command, control)</td></tr>
+      <tr><td>Y1</td><td>$7F20 to $7F3F</td><td>VIA 1</td><td>16</td></tr>
+      <tr><td>Y2</td><td>$7F40 to $7F5F</td><td>VIA 2</td><td>16</td></tr>
+      <tr><td>Y3</td><td>$7F60 to $7F7F</td><td>SID</td><td>29</td></tr>
+      <tr><td>Y4 to Y7</td><td>$7F80 to $7FFF</td><td>free</td><td>–</td></tr>
+    </tbody>
+  </table>
+  <p>In programs, use only the base addresses ($7F00, $7F20, $7F40 and $7F60). The registers repeat inside their block; you should not use these mirrors.</p>
+
+  <h2>From Breadboard to Finished Device</h2>
+  <p>The breadboard is good for learning and trying things out. For a device you want to use, the circuit goes onto a printed circuit board. The board of this computer measures 160 × 100&nbsp;mm and is fully populated. If you make it yourself, you must solder about 200 vias by hand. Schematics and board layout are in the hardware repository, as Eagle files and as a KiCad project, plus the Gerber files for manufacturing.</p>
+  <p>Two things are new compared to the breadboard:</p>
+  <ul>
+    <li><strong>The 9&nbsp;V for the SID</strong> comes from a small boost converter module (5 to 9&nbsp;V) on the board. On the breadboard an external source was enough.</li>
+    <li><strong>The battery:</strong> a LiPo cell with a charging module and a boost converter supplies the computer with 5&nbsp;V. This makes it portable.</li>
+  </ul>
+  <p>The case is 3D printed and consists of a top and a bottom part. The top carries the display, keyboard and speaker; the bottom holds the boards and the battery. The designs are STL files in the hardware repository. To put the finished computer into operation, use the User Manual.</p>
+
+  <h2>Continuing with Software</h2>
+  <ul>
+    <li><strong>Write in C.</strong> The cc65 tools include a C compiler. You need your own start-up code that sets up the stack, the RAM and the zero page, plus the cc65 system library.</li>
+    <li><strong>The monitor.</strong> The program from chapter 7 can be extended: an assembler and a disassembler, display of the processor registers, breakpoints, single-stepping, loading and saving programs over the serial interface.</li>
+    <li><strong>BASIC.</strong> Microsoft BASIC runs on this computer. How to use it is described in the User Manual.</li>
+    <li><strong>Test without hardware.</strong> The firmware repository of the project contains an extension for the MAME emulator that models the computer: processor, ROM, RAM, ACIA, VIAs, LCD and keyboard. You can try programs with it before you burn the EEPROM.</li>
+    <li><strong>Use interrupts.</strong> The ACIA with receive interrupt, a system tick from a VIA timer, music from the timer of the second VIA: the circuit is already there.</li>
+  </ul>
+
+  <h2>Ideas for Extensions</h2>
+  <p>The board is full, and the port lines of the VIAs are used up. Still, there are ways to extend the computer:</p>
+  <ul>
+    <li><strong>SD card.</strong> If you replace the 4-bit display connection with a small I²C adapter, at least four port lines become free. That is enough for an SD card reader. I²C also lets you add other chips, such as a real-time clock. You write the I²C protocol in software.</li>
+    <li><strong>Keyboard with a counter chip.</strong> A decade counter (Johnson counter) can step through the keyboard rows, so that not every row needs its own port line.</li>
+    <li><strong>Expansion connector.</strong> Many home computers of the seventies and eighties had a connector that brought address, data and control lines to the outside. The HomeComputer has none. You can add one with an extra board between the socket and the processor: it carries pins pointing down and a new socket for the processor on top, and so gives access to all signals.</li>
+    <li><strong>More IO chips.</strong> Four outputs of the 74LS137 decoder (Y4 to Y7) are still free. You can connect four more chips to them.</li>
+    <li><strong>Graphics.</strong> For video output you would have to plan a graphics chip and a larger board.</li>
+  </ul>
+
+  <h2>When Something Does Not Work</h2>
+  <p>Troubleshooting is the most unpleasant part of hardware and software if you do not know what is going wrong. This order has proved useful:</p>
+  <ol class="schritte">
+    <li><div><strong>Supply:</strong> Measure +5&nbsp;V between VCC and GND at every IC. At the SID also the 9&nbsp;V.</div></li>
+    <li><div><strong>Clock:</strong> Do you see 1&nbsp;MHz at the processor (pin&nbsp;37)? Is PHI2 running at pin&nbsp;39?</div></li>
+    <li><div><strong>Reset:</strong> Does /RESET stay Low briefly after power-on and then go High?</div></li>
+    <li><div><strong>Address bus:</strong> Are the address lines toggling? If A0 to A2 do not toggle, the processor is stuck.</div></li>
+    <li><div><strong>Chip select:</strong> Exactly one chip may be selected in each clock cycle. Two selected chips drive the data bus at the same time and disturb each other.</div></li>
+    <li><div><strong>Data bus:</strong> Pull suspicious chips one at a time (with the power off) and check whether the behaviour changes.</div></li>
+    <li><div><strong>The last step:</strong> Suspect the stage you built last first, and the wires there. On a breadboard, loose contacts and swapped wires are the most common cause.</div></li>
+    <li><div><strong>Simple programs:</strong> A program that only loops, or the monitor from chapter 7, shows whether the hardware reaches the processor before you suspect BASIC.</div></li>
+  </ol>
+  <p>Good tools help: a multimeter, an oscilloscope and especially a logic analyzer with at least 16 channels, on which you see the address and data lines at the same time.</p>
+
+  <h2>Important Terms</h2>
+  <table class="zusammen">
+    <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Bus</td><td>Lines that several chips share: address bus, data bus and control lines</td></tr>
+      <tr><td>Chip select</td><td>Input of a chip that selects it. Usually active Low and written with a slash, for example /CS_ROM</td></tr>
+      <tr><td>Address decoding</td><td>The logic that generates the chip-select signals from address lines</td></tr>
+      <tr><td>φ2 (PHI2)</td><td>Output of the 6502 that marks the second half of each clock cycle, in which the data is valid</td></tr>
+      <tr><td>Vector</td><td>Address at the end of memory to which the processor jumps on reset, NMI and IRQ ($FFFA to $FFFF)</td></tr>
+      <tr><td>IRQ, NMI</td><td>Interrupt inputs of the processor; the first can be masked, the second cannot</td></tr>
+      <tr><td>Open collector</td><td>Output that only pulls a line down, so that several outputs can be wired together (wired OR)</td></tr>
+      <tr><td>Pull-up</td><td>Resistor to +5&nbsp;V that holds a line High at rest</td></tr>
+      <tr><td>VIA</td><td>Versatile Interface Adapter 6522: input and output ports with timers</td></tr>
+      <tr><td>ACIA</td><td>Asynchronous Communications Interface Adapter 6551: serial interface</td></tr>
+      <tr><td>Monitor</td><td>Small program in ROM that displays and changes memory and starts programs</td></tr>
+      <tr><td>Scancode</td><td>Number of a key by row and column of the keyboard matrix</td></tr>
+      <tr><td>Bounce</td><td>Brief back-and-forth switching of a mechanical contact when it is pressed</td></tr>
+      <tr><td>ADSR</td><td>Envelope of a tone made of attack, decay, sustain and release</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Books and Sources</h2>
+  <p><strong>Books</strong></p>
+  <ul>
+    <li>Rodnay Zaks: <em>Programming the 6502</em></li>
+    <li>Lance A. Leventhal: <em>6502 Assembly Language Programming</em></li>
+    <li>MOS Technology: <em>MCS6500 Microcomputer Family Programming Manual</em> and <em>Hardware Manual</em></li>
+    <li>Commodore: <em>Commodore 64 Programmer's Reference Guide</em> (the SID and the keyboard from the C64's point of view)</li>
+    <li>Noam Nisan, Shimon Schocken: <em>The Elements of Computing Systems</em></li>
+    <li>Charles Petzold: <em>Code</em> (how a computer arises from switches)</li>
+    <li>Paul Horowitz, Winfield Hill: <em>The Art of Electronics</em></li>
+  </ul>
+  <p><strong>Online</strong></p>
+  <ul>
+    <li>6502.org: data sheets, tutorials, forum and a list of home-built 6502 computers</li>
+    <li>Garth Wilson: <em>6502 Primer</em>, wilsonminesco.com/6502primer</li>
+    <li>Ben Eater: video series “Build a 6502 computer”, eater.net/6502</li>
+    <li>The 6502 under the microscope, simulated transistor by transistor: visual6502.org</li>
+    <li>cc65, compiler, assembler and linker for the 6502: cc65.github.io</li>
+    <li>C64 programming, also on the SID: codebase64.org</li>
+    <li>The SID in detail: sid.kubarth.com</li>
+    <li>This project: github.com/grappendorf/homecomputer-6502 and grappendorf.net</li>
+  </ul>
+  <p><strong>Data sheets</strong> of the chips used: MOS 6502, Rockwell R6522 and R6551, MOS 6581 and 8580, Atmel AT28C256, Hitachi HD44780, NE555 and the 74LS chips from Texas Instruments. You find them online and in the hardware repository of the project.</p>
+</section>
+</main>
+</body>
+</html>

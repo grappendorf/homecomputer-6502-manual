@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 1</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="1" data-titel="Clock Generation" data-kurztitel="Clock generation">
+  <p>Every computer needs a heartbeat: a square wave that drives the processor from step to step. In this chapter you build it from a quartz crystal and a 74LS04, the first chip of the computer.</p>
+
+  <h2>What is the clock for?</h2>
+  <p>A simple processor like the 6502 works like this: in the first clock cycle it fetches the next instruction from memory. In the following cycles it fetches the operands, executes the operation and writes the result back. Every step takes at least one clock cycle.</p>
+  <p>How fast the clock may be depends on the type: a normal 6502 can be clocked up to 1&nbsp;MHz, a 6502A up to 2&nbsp;MHz, a 6502B up to 3&nbsp;MHz. That really is megahertz, not gigahertz. The HomeComputer 6502 runs at 1&nbsp;MHz.</p>
+
+  <h2>The circuit</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-takt.svg" alt="Schematic of the clock generation: three inverters, crystal, two resistors and a capacitor">
+    <figcaption>Schematic of the clock generation</figcaption>
+  </figure>
+  <p>It is a classic crystal oscillator built from three inverters of the 74LS04. The first two, together with the crystal, two resistors and a capacitor, form a series resonant gate oscillator. It oscillates at the frequency of the crystal. The third inverter acts as a buffer and separates the output from the oscillator.</p>
+  <p>The two resistors R1 and R2 (1&nbsp;kΩ each) bias the inverters to a point between “0” and “1”, where they behave like amplifiers. C1 couples the two stages. The crystal Q1 sits between the input of the first and the output of the second inverter and lets through only its own frequency. The output is pin&nbsp;6 of the 74LS04. That is where the clock signal CLK appears.</p>
+  <p>The capacitor C2 (100&nbsp;nF) sits close to the IC between +5&nbsp;V and GND. It supplies short current peaks when the chip switches and keeps the supply quiet. Every IC in this computer gets such a capacitor.</p>
+
+  <h2>Parts</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Ref.</th><th>Part</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>IC1</td><td>Hex inverter, DIP-14</td><td>74LS04</td></tr>
+      <tr><td>Q1</td><td>Crystal, fundamental</td><td>1&nbsp;MHz</td></tr>
+      <tr><td>R1, R2</td><td>Resistor</td><td>1&nbsp;kΩ</td></tr>
+      <tr><td>C1</td><td>Ceramic capacitor</td><td>68&nbsp;nF</td></tr>
+      <tr><td>C2</td><td>Ceramic capacitor</td><td>100&nbsp;nF</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Assembly</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-takt.svg" alt="Breadboard with the clock generator: 74LS04, two resistors, capacitor and crystal">
+    <figcaption>The clock generation on the breadboard</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Switch the power off. Connect +5&nbsp;V and GND to the upper rails at the left. Connect the upper rails to the lower ones so that both sides have power.</div></li>
+    <li><div>Insert IC1 across the center channel. The notch points left, pin&nbsp;1 sits in hole 5e.</div></li>
+    <li><div>Power IC1: pin&nbsp;14 (hole 5j) to +5&nbsp;V, pin&nbsp;7 (hole 11a) to GND. Place C2 between the upper rails.</div></li>
+    <li><div>Insert R1 between pin&nbsp;1 and pin&nbsp;2 (5b and 6b) and R2 between pin&nbsp;3 and pin&nbsp;4 (7b and 8b).</div></li>
+    <li><div>Insert C1 between pin&nbsp;2 and pin&nbsp;3 (6c and 7c).</div></li>
+    <li><div>Insert the crystal Q1 between pin&nbsp;1 and pin&nbsp;4 (5a and 8a). It has no polarity.</div></li>
+    <li><div>Connect pin&nbsp;4 to pin&nbsp;5 (8d and 9d). This feeds the signal to the third inverter.</div></li>
+    <li><div>Check everything once more and switch the power on. The clock signal is at pin&nbsp;6 (hole 10c).</div></li>
+  </ol>
+  <p>The unused gates of the 74LS04 stay open. With this type of chip that is not critical.</p>
+
+  <h2>Measuring</h2>
+  <figure class="abbildung">
+    <img class="messung" src="../img/en/messung-takt.svg" alt="Oscilloscope screenshot of the clock signal">
+    <figcaption>The clock signal at pin 6 of the 74LS04</figcaption>
+  </figure>
+  <p>On the oscilloscope you see a square wave with a period of 1&nbsp;µs, that is 1&nbsp;MHz. It is not a perfect square wave: it rings after each edge and the high level only slowly rises to about 4.2&nbsp;V. For a 6502 that is perfectly sufficient.</p>
+  <p>If you have no oscilloscope, chapter 3 checks the clock indirectly: the processor only works if the clock runs.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Note</div>
+    <p>In the finished computer a crystal oscillator module takes the place of this circuit. It delivers 1&nbsp;MHz at TTL level and is much more convenient. For understanding and experimenting, though, the inverter circuit is more instructive.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

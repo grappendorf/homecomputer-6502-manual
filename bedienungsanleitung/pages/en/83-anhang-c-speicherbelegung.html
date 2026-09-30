@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appendix C – Memory Map</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang" data-buchstabe="C" data-kurztitel="Appendix C · Memory Map">
+  <h1><span class="buchstabe">C</span>Memory Map</h1>
+  <p>RAM runs from <code>$0000</code> to <code>$7EFF</code>. The zero page and the stack are at the bottom, followed by the system variables, then your BASIC program. Starting at <code>$7F00</code> are the chips for the interface, keyboard, display, and sound. From <code>$8000</code> upward lies permanent storage with BASIC, Kernal, and Monitor. The six bytes at the very top are the jump vectors for NMI, Reset, and IRQ.</p>
+  <table>
+    <thead><tr><th>Address</th><th>Contents</th><th>Size</th></tr></thead>
+    <tbody>
+      <tr><td><code>$0000–$00FF</code></td><td>Zero page</td><td>256 B</td></tr>
+      <tr><td><code>$0100–$01FF</code></td><td>Processor stack</td><td>256 B</td></tr>
+      <tr><td><code>$0200–$0278</code></td><td>BASIC line buffer</td><td>121 B</td></tr>
+      <tr><td><code>$0279–$031F</code></td><td>Display</td><td>167 B</td></tr>
+      <tr><td><code>$0320–$03FE</code></td><td>SID sound chip</td><td>223 B</td></tr>
+      <tr><td><code>$03FF</code></td><td>Disk drive</td><td>1 B</td></tr>
+      <tr><td><code>$0400–$043F</code></td><td>Serial console</td><td>64 B</td></tr>
+      <tr><td><code>$0440–$7EFF</code></td><td>BASIC program memory</td><td>31424 B</td></tr>
+      <tr><td><code>$7F00–$7FFF</code></td><td>Input/output (ACIA, VIA1, VIA2, SID)</td><td>256 B</td></tr>
+      <tr><td><code>$8000–$FFFF</code></td><td>ROM: BASIC, Kernal, Monitor</td><td>32 KB</td></tr>
+      <tr><td><code>$FFFA–$FFFF</code></td><td>Vectors NMI, RESET, IRQ</td><td>6 B</td></tr>
+    </tbody>
+  </table>
+  <h2>Input/Output</h2>
+  <table class="zusammen">
+    <thead><tr><th>Address</th><th>Chip</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td><code>$7F00</code></td><td>ACIA 6551</td><td>Serial interface</td></tr>
+      <tr><td><code>$7F20</code></td><td>VIA1 6522</td><td>LCD, LED, keyboard, 10 ms clock tick</td></tr>
+      <tr><td><code>$7F40</code></td><td>VIA2 6522</td><td>Keyboard, 20 ms clock tick for the SID</td></tr>
+      <tr><td><code>$7F60</code></td><td>SID 8580</td><td>Sound</td></tr>
+    </tbody>
+  </table>
+  <h2>System Variables</h2>
+  <p>From <code>$0200</code> to <code>$0278</code> lies the BASIC line buffer. From <code>$0279</code> on follow the firmware variables, in the order in which they sit in memory.</p>
+  <table>
+    <thead><tr><th>Address</th><th>Name</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td><code>$0200–$0278</code></td><td><code>BUF</code></td><td>Input line, 120 characters plus the terminating zero</td></tr>
+      <tr><td><code>$0279</code></td><td><code>lcd_porta</code></td><td>Shadow of VIA1 port A, including the LED bit</td></tr>
+      <tr><td><code>$027A</code></td><td><code>lcd_enable</code></td><td>Which LCD enable is set</td></tr>
+      <tr><td><code>$027B</code></td><td><code>lcd_row</code></td><td>Cursor row, 0 to 3</td></tr>
+      <tr><td><code>$027C</code></td><td><code>lcd_col</code></td><td>Cursor column, 0 to 39</td></tr>
+      <tr><td><code>$027D</code></td><td><code>lcd_chr</code></td><td>Last character written</td></tr>
+      <tr><td><code>$027E</code></td><td><code>lcd_tmp</code></td><td>Intermediate value while writing to the LCD</td></tr>
+      <tr><td><code>$027F–$031E</code></td><td><code>lcd_buf</code></td><td>Screen buffer, 4 lines of 40 characters</td></tr>
+      <tr><td><code>$031F</code></td><td><code>lcd_mode</code></td><td>Display, underline, and blinking</td></tr>
+      <tr><td><code>$0320–$0322</code></td><td><code>sid_fl</code></td><td>Frequency, low byte, three voices</td></tr>
+      <tr><td><code>$0323–$0325</code></td><td><code>sid_fh</code></td><td>Frequency, high byte</td></tr>
+      <tr><td><code>$0326–$0328</code></td><td><code>sid_pl</code></td><td>Pulse width, low byte</td></tr>
+      <tr><td><code>$0329–$032B</code></td><td><code>sid_ph</code></td><td>Pulse width, high byte</td></tr>
+      <tr><td><code>$032C–$032E</code></td><td><code>sid_ct</code></td><td>Waveform and gate</td></tr>
+      <tr><td><code>$032F–$0331</code></td><td><code>sid_ad</code></td><td>Attack and decay</td></tr>
+      <tr><td><code>$0332–$0334</code></td><td><code>sid_sr</code></td><td>Sustain and release</td></tr>
+      <tr><td><code>$0335</code></td><td><code>sid_mv</code></td><td>Volume and filter, as the SID sees them</td></tr>
+      <tr><td><code>$0336</code></td><td><code>sid_mode</code></td><td>Filter type: low-pass, band-pass, high-pass</td></tr>
+      <tr><td><code>$0337–$033E</code></td><td><code>ins_wave</code></td><td>Waveform of the eight instruments</td></tr>
+      <tr><td><code>$033F–$0346</code></td><td><code>ins_ad</code></td><td>Attack and decay of the instruments</td></tr>
+      <tr><td><code>$0347–$034E</code></td><td><code>ins_sr</code></td><td>Sustain and release of the instruments</td></tr>
+      <tr><td><code>$034F–$0356</code></td><td><code>ins_pw</code></td><td>Pulse width of the instruments</td></tr>
+      <tr><td><code>$0357–$0359</code></td><td><code>v_mode</code></td><td>Operating mode of the three voices</td></tr>
+      <tr><td><code>$035A–$035C</code></td><td><code>v_left</code></td><td>Clock ticks until the next step</td></tr>
+      <tr><td><code>$035D–$035F</code></td><td><code>v_pos</code></td><td>Position in the melody</td></tr>
+      <tr><td><code>$0360–$0362</code></td><td><code>v_oct</code></td><td>Octave</td></tr>
+      <tr><td><code>$0363–$0365</code></td><td><code>v_ins</code></td><td>Instrument</td></tr>
+      <tr><td><code>$0366–$0368</code></td><td><code>v_len</code></td><td>Note length in sixteenths</td></tr>
+      <tr><td><code>$0369–$036B</code></td><td><code>v_ptr</code></td><td>Pointer into the melody, low byte</td></tr>
+      <tr><td><code>$036C–$036E</code></td><td><code>v_ptrh</code></td><td>Pointer into the melody, high byte</td></tr>
+      <tr><td><code>$036F–$03FE</code></td><td><code>tune_buf</code></td><td>Three melodies, 48 bytes each</td></tr>
+      <tr><td><code>$03FF</code></td><td><code>disk_bad</code></td><td>Flag: load or save has failed</td></tr>
+      <tr><td><code>$0400</code></td><td><code>mon_basic</code></td><td>1 as long as BASIC owns the serial line</td></tr>
+      <tr><td><code>$0401</code></td><td><code>io_def</code></td><td>Default: 1 display, 2 serial</td></tr>
+      <tr><td><code>$0402</code></td><td><code>ser_cols</code></td><td>Terminal columns, initially 80</td></tr>
+      <tr><td><code>$0403</code></td><td><code>ser_rows</code></td><td>Terminal rows, initially 24</td></tr>
+      <tr><td><code>$0404</code></td><td><code>ser_row</code></td><td>Cursor row on the terminal</td></tr>
+      <tr><td><code>$0405</code></td><td><code>ser_col</code></td><td>Cursor column on the terminal</td></tr>
+      <tr><td><code>$0406</code></td><td><code>ser_ncm</code></td><td>Width of a <code>PRINT</code> column</td></tr>
+      <tr><td><code>$0407</code></td><td><code>ser_lim</code></td><td>Limit for the comma in <code>PRINT</code></td></tr>
+      <tr><td><code>$0408</code></td><td><code>ser_hello</code></td><td>Greeting on the serial line still pending</td></tr>
+      <tr><td><code>$0409</code></td><td><code>ser_last</code></td><td>Last character received</td></tr>
+      <tr><td><code>$040A</code></td><td><code>ser_head</code></td><td>Write pointer of the receive buffer</td></tr>
+      <tr><td><code>$040B</code></td><td><code>ser_tail</code></td><td>Read pointer of the receive buffer</td></tr>
+      <tr><td><code>$040C</code></td><td><code>CHANNL</code></td><td>Device from <code>#1</code> or <code>#2</code>, 0 means default</td></tr>
+      <tr><td><code>$040D</code></td><td><code>ed_ser</code></td><td>The line editor is running on the terminal</td></tr>
+      <tr><td><code>$040E</code></td><td><code>ed_sidx</code></td><td>Cursor position in the editor on the terminal</td></tr>
+      <tr><td><code>$040F</code></td><td><code>ser_parm</code></td><td>Number in an ANSI escape sequence</td></tr>
+      <tr><td><code>$0410–$043F</code></td><td><code>ser_buf</code></td><td>Receive buffer, 48 bytes</td></tr>
+    </tbody>
+  </table>
+</section>
+</main>
+</body>
+</html>

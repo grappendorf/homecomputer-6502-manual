@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 10</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="10" data-titel="Die Tastatur" data-kurztitel="Tastatur">
+  <p>Nach der Anzeige braucht der Computer eine Eingabe. Eine Notebook-Tastatur ist dafür ideal: Sie ist flach, hat über 80 Tasten und besteht nur aus einer Schaltmatrix. Dafür kommt ein zweites VIA dazu.</p>
+
+  <h2>Die Tastaturmatrix</h2>
+  <p>Eine Tastatur mit 80 Tasten hätte 80 Leitungen, wenn jede Taste ihren eigenen Anschluss bekäme. Stattdessen sind die Tasten in einem Gitter angeordnet. Jede Taste verbindet eine Zeilenleitung mit einer Spaltenleitung. Bei einer Matrix aus 14 Zeilen und 8 Spalten kommt man mit 22 Leitungen für 112 Tasten aus.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/de/matrix.svg" alt="Tastaturmatrix mit drei Zeilen und vier Spalten, eine gedrückte Taste ist orange">
+    <figcaption>Das Prinzip der Matrix, hier mit 3 Zeilen und 4 Spalten</figcaption>
+  </figure>
+  <p>Gelesen wird so: Die Zeilen sind Ausgänge, die Spalten Eingänge. Der Computer legt genau eine Zeile auf Low und liest alle Spalten. Die Eingänge haben einen Pull-up-Widerstand und lesen darum 1, solange keine Taste sie nach unten zieht. Ist in der gewählten Zeile eine Taste gedrückt, liest die zugehörige Spalte eine 0. Zeile für Zeile entsteht so ein Bild aller Tasten.</p>
+  <p>Aus Zeile und Spalte wird ein Scancode: <code>Zeile × 8 + Spalte</code>. Er läuft von 0 bis 111. Der Wert $FF bedeutet „keine Taste“.</p>
+  <p>Zwei Dinge sind zu beachten. Mechanische Kontakte prellen: Beim Drücken schalten sie einige Millisekunden lang hin und her. Das Programm tastet darum zweimal im Abstand von 10&nbsp;ms ab und glaubt nur, was zweimal gleich ist. Und ohne Dioden an den Tasten können mehrere gleichzeitig gedrückte Tasten „Geistertasten“ erzeugen. Unser Programm meldet deshalb immer nur eine Taste.</p>
+
+  <h2>Die Tastatur dieses Buches</h2>
+  <p>Die Tastatur stammt aus einem ausgeschlachteten Notebook, mit deutschem Layout und 89 Tasten. Von der Platine bleiben nur die Tastenfolie und ihre Anschlusspads. Die Matrix hat 14 Zeilen und 8 Spalten, belegt sind 87 Positionen. Die Tasten Fn und Windows liegen nicht in der Matrix.</p>
+  <p>Hier ist die Matrix, jede Zelle mit der Taste und dem Scancode darunter:</p>
+  <table class="matrix">
+    <thead><tr><th>Zeile</th><th>Sp. 0</th><th>Sp. 1</th><th>Sp. 2</th><th>Sp. 3</th><th>Sp. 4</th><th>Sp. 5</th><th>Sp. 6</th><th>Sp. 7</th></tr></thead>
+    <tbody>
+      <tr><td>0<br><small>VIA2 PB0</small></td><td>1 !<br><small>0</small></td><td>A<br><small>1</small></td><td>^ °<br><small>2</small></td><td>Q @<br><small>3</small></td><td></td><td>Esc<br><small>5</small></td><td>Y<br><small>6</small></td><td>Tab<br><small>7</small></td></tr>
+      <tr><td>1<br><small>VIA2 PB1</small></td><td>3 § ³<br><small>8</small></td><td>D<br><small>9</small></td><td>F2<br><small>10</small></td><td>E €<br><small>11</small></td><td></td><td>F4<br><small>13</small></td><td>C<br><small>14</small></td><td>F3<br><small>15</small></td></tr>
+      <tr><td>2<br><small>VIA2 PB2</small></td><td>4 $<br><small>16</small></td><td>F<br><small>17</small></td><td>5 %<br><small>18</small></td><td>R<br><small>19</small></td><td>B<br><small>20</small></td><td>G<br><small>21</small></td><td>V<br><small>22</small></td><td>T<br><small>23</small></td></tr>
+      <tr><td>3<br><small>VIA2 PB3</small></td><td>7 / {<br><small>24</small></td><td>J<br><small>25</small></td><td>6 &amp;<br><small>26</small></td><td>U<br><small>27</small></td><td>N<br><small>28</small></td><td>H<br><small>29</small></td><td>M µ<br><small>30</small></td><td>Z<br><small>31</small></td></tr>
+      <tr><td>4<br><small>VIA2 PB4</small></td><td>8 ( [<br><small>32</small></td><td>K<br><small>33</small></td><td>´ `<br><small>34</small></td><td>I<br><small>35</small></td><td></td><td>F6<br><small>37</small></td><td>, ;<br><small>38</small></td><td>+ * ~<br><small>39</small></td></tr>
+      <tr><td>5<br><small>VIA2 PB5</small></td><td>0 = }<br><small>40</small></td><td>Ö<br><small>41</small></td><td>ß ? \<br><small>42</small></td><td>P<br><small>43</small></td><td>- _<br><small>44</small></td><td>Ä<br><small>45</small></td><td># &#x27;<br><small>46</small></td><td>Ü<br><small>47</small></td></tr>
+      <tr><td>6<br><small>VIA2 PB6</small></td><td>Druck<br><small>48</small></td><td></td><td></td><td>Rollen<br><small>51</small></td><td>AltGr<br><small>52</small></td><td>Alt<br><small>53</small></td><td></td><td></td></tr>
+      <tr><td>7<br><small>VIA2 PB7</small></td><td>Ende<br><small>56</small></td><td></td><td>Pos1<br><small>58</small></td><td></td><td>Cursor ←<br><small>60</small></td><td>Cursor ↑<br><small>61</small></td><td>Pause<br><small>62</small></td><td>Menü<br><small>63</small></td></tr>
+      <tr><td>8<br><small>VIA1 PB0</small></td><td>F12<br><small>64</small></td><td>S<br><small>65</small></td><td>Einfg<br><small>66</small></td><td>W<br><small>67</small></td><td>Cursor →<br><small>68</small></td><td></td><td><br><small>69</small></td><td>X<br><small>70</small></td><td>Caps Lock<br><small>71</small></td></tr>
+      <tr><td>9<br><small>VIA1 PB1</small></td><td>F10<br><small>72</small></td><td></td><td>F9<br><small>74</small></td><td></td><td>Leertaste<br><small>76</small></td><td>F5<br><small>77</small></td><td>Enter<br><small>78</small></td><td>Rück<br><small>79</small></td></tr>
+      <tr><td>10<br><small>VIA1 PB2</small></td><td>Bild ▼<br><small>80</small></td><td>L<br><small>81</small></td><td>Bild ▲<br><small>82</small></td><td>O<br><small>83</small></td><td></td><td></td><td>. :<br><small>86</small></td><td>F7<br><small>87</small></td></tr>
+      <tr><td>11<br><small>VIA1 PB3</small></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Shift rechts<br><small>94</small></td><td>Shift links<br><small>95</small></td></tr>
+      <tr><td>12<br><small>VIA1 PB4</small></td><td>F11<br><small>96</small></td><td>2 &quot; ²<br><small>97</small></td><td>Entf<br><small>98</small></td><td>9 ) ]<br><small>99</small></td><td>Cursor ↓<br><small>100</small></td><td>F8<br><small>101</small></td><td>Num<br><small>102</small></td><td>F1<br><small>103</small></td></tr>
+      <tr><td>13<br><small>VIA1 PB5</small></td><td></td><td></td><td>Strg (links)<br><small>106</small></td><td></td><td></td><td></td><td>Strg (rechts)<br><small>110</small></td><td></td></tr>
+    </tbody>
+  </table>
+  <aside class="kasten">
+    <div class="kasten-titel">Eigene Tastatur</div>
+    <p>Eine andere Tastatur hat eine andere Matrix. Messen Sie sie aus: Legen Sie die Anschlusspads der Folie frei und halten Sie eine Prüfspitze eines Durchgangsprüfers an ein Pad. Mit der anderen Spitze berühren Sie die übrigen Pads, während Sie nacheinander alle Tasten drücken. Der Prüfer piept, wenn eine Taste die beiden Pads verbindet. Notieren Sie für jede Taste das Padpaar. Die Pads fallen so in zwei Gruppen, die Zeilen und die Spalten.</p>
+  </aside>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-tastatur.svg" alt="Schaltplan: zweites VIA, Tastaturanschluss JP3 und die Zeilen 8 bis 13 am ersten VIA">
+    <figcaption>Schaltplan der Tastatur</figcaption>
+  </figure>
+  <p>Ein zweites VIA (IC11) bekommt den Ausgang Y2 des Dekoders als Chip-Select. Es liegt damit bei $7F40 bis $7F5F: Port B bei $7F40, Port A bei $7F41, die Richtungsregister bei $7F42 und $7F43.</p>
+  <ul>
+    <li><strong>Spalten:</strong> Port A des zweiten VIA, PA0 bis PA7, als Eingänge. Der 6522 hat an Port A eigene Pull-up-Widerstände, sie brauchen keine externen.</li>
+    <li><strong>Zeilen 0 bis 7:</strong> Port B des zweiten VIA, PB0 bis PB7, als Ausgänge.</li>
+    <li><strong>Zeilen 8 bis 13:</strong> PB0 bis PB5 des ersten VIA. Das ist der Grund, weshalb die LED im Kapitel 9 von PB0 nach PA7 umgezogen ist. PB6 und PB7 bleiben frei.</li>
+  </ul>
+  <p>Die Tastatur ist über 22 Drähte an die Stiftleiste JP3 angeschlossen. In den Zeichnungen heißen die Zeilen R0 bis R13 (Row) und die Spalten C0 bis C7 (Column):</p>
+  <table class="zusammen">
+    <thead><tr><th>JP3, Pin</th><th>Signal</th><th>Anschluss</th></tr></thead>
+    <tbody>
+      <tr><td>1 bis 6</td><td>R13 bis R8</td><td>VIA 1, PB5 bis PB0 (Pin 15 bis 10)</td></tr>
+      <tr><td>7 bis 14</td><td>R7 bis R0</td><td>VIA 2, PB7 bis PB0 (Pin 17 bis 10)</td></tr>
+      <tr><td>15 bis 22</td><td>C7 bis C0</td><td>VIA 2, PA7 bis PA0 (Pin 9 bis 2)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>IC11</td><td>VIA, DIP-40</td><td>6522</td></tr>
+      <tr><td>C15</td><td>Keramikkondensator</td><td>100&nbsp;nF</td></tr>
+      <tr><td>JP3</td><td>Stiftleiste, 22-polig</td><td></td></tr>
+      <tr><td>–</td><td>Tastatur mit Matrix, 22 Drähte</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Dazu zwei weitere Steckbretter.</p>
+
+  <h2>Aufbau</h2>
+  <p>Zuerst bekommt der Dekoder seinen zweiten Ausgang:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-dekoder137-via2.svg" alt="Steckbrett 7 mit dem Dekoder und dem neuen Ausgang Y2">
+    <figcaption>Der Dekoder mit Ausgang Y2 für das zweite VIA</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Führen Sie Y2 (Pin&nbsp;13 von IC10, Loch 8j) als /CS_VIA2 heraus.</div></li>
+  </ol>
+  <p>Dann das zweite VIA:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via2.svg" alt="Steckbrett 10 mit dem zweiten VIA 6522 und Drähten mit Signalnamen">
+    <figcaption>Das zweite VIA auf Steckbrett 10</figcaption>
+  </figure>
+  <ol class="schritte" start="2">
+    <li><div>Führen Sie +5&nbsp;V und GND zu einem neuen Steckbrett und verbinden Sie dort die oberen Schienen mit den unteren.</div></li>
+    <li><div>Stecken Sie IC11 über die Rinne, Kerbe links, Pin&nbsp;1 in Loch 4d (breites IC, Reihen d und h).</div></li>
+    <li><div>Versorgung wie beim ersten VIA: Pin&nbsp;20 (Loch 23a) an +5&nbsp;V, Pin&nbsp;1 (4a) an GND, CS1 (Pin&nbsp;24, Loch 20j) an +5&nbsp;V. C15 zwischen die oberen Schienen. /IRQ (Pin&nbsp;21) bleibt offen.</div></li>
+    <li><div>Verbinden Sie die Drähte der Steuerung mit den gleichnamigen Anschlüssen. Die Tabelle zeigt die Pins.</div></li>
+  </ol>
+  <table class="zusammen">
+    <thead><tr><th>Signal</th><th>6502 (Pin)</th><th>6522 (Pin)</th></tr></thead>
+    <tbody>
+      <tr><td>D0 – D7</td><td>33, 32, 31, 30, 29, 28, 27, 26</td><td>33, 32, 31, 30, 29, 28, 27, 26</td></tr>
+      <tr><td>A0 – A3</td><td>9, 10, 11, 12</td><td>38, 37, 36, 35</td></tr>
+      <tr><td>R/W</td><td>34</td><td>22</td></tr>
+      <tr><td>PHI2</td><td>39</td><td>25</td></tr>
+      <tr><td>/RESET</td><td>Steckbrett 1, Loch 11j</td><td>34</td></tr>
+      <tr><td>/CS_VIA2</td><td>IC10, Pin 13</td><td>23 (/CS2)</td></tr>
+    </tbody>
+  </table>
+  <p>Die Zeilen 8 bis 13 liegen am ersten VIA. Dort bekommen die Pins&nbsp;10 bis 15 (PB0 bis PB5, Löcher 13a bis 18a) je einen Draht R8 bis R13:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via-tast.svg" alt="Steckbrett 8 mit dem ersten VIA: Display, LED und die Zeilen R8 bis R13">
+    <figcaption>Das erste VIA mit Port A für das Display und den Zeilen R8 bis R13</figcaption>
+  </figure>
+  <p>Schließlich die Tastatur:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-tastatur.svg" alt="Steckbrett 11 mit der Stiftleiste JP3 und den 22 Drähten zur Tastatur">
+    <figcaption>Die Tastatur am Steckbrett 11 (nicht maßstäblich)</figcaption>
+  </figure>
+  <ol class="schritte" start="6">
+    <li><div>Löten Sie 22 Drähte an die Anschlusspads der Tastaturfolie, in der Reihenfolge aus der Tabelle der Matrix.</div></li>
+    <li><div>Stecken Sie die Stiftleiste JP3 in die Löcher 5c bis 26c und führen Sie die Drähte in die Löcher 5d bis 26d. Pin&nbsp;1 ist links.</div></li>
+    <li><div>Verbinden Sie R0 bis R7 und C0 bis C7 mit dem zweiten VIA und R8 bis R13 mit dem ersten VIA, jeweils mit dem Draht gleichen Namens.</div></li>
+  </ol>
+
+  <h2>Das Programm</h2>
+  <p>Das Programm meldet jede neu gedrückte Taste mit ihrem Scancode über die serielle Schnittstelle. Es tastet in <code>keys_scan</code> die 14 Zeilen nacheinander ab. <code>keys_update</code> wiederholt die Abtastung nach 10&nbsp;ms und merkt sich den Code nur, wenn beide Ergebnisse übereinstimmen.</p>
+  <p>Wichtig: Die Zeilen 8 bis 13 liegen an Port B des ersten VIA, dessen PB6 und PB7 anderweitig benutzt werden können. Das Programm ändert deshalb nur die unteren sechs Bits, mit einer Maske. Hauptprogramm:</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+ACIA_DATA    = $7f00
+ACIA_STATUS  = $7f01
+ACIA_COMMAND = $7f02
+ACIA_CONTROL = $7f03
+VIA1_ORB     = $7f20
+VIA1_DDRB    = $7f22
+VIA2_ORB     = $7f40
+VIA2_IRA     = $7f41
+VIA2_DDRB    = $7f42
+VIA2_DDRA    = $7f43
+
+        .zeropage
+ptr:    .res 2
+tmp:    .res 1
+code:   .res 1                  <span class="kommentar">; Code der gedrückten Taste ($FF = keine)</span>
+last:   .res 1                  <span class="kommentar">; zuletzt gemeldeter Code</span>
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff
+        txs
+        jsr acia_init
+        jsr keys_init
+        lda #$ff
+        sta last
+loop:   jsr keys_update
+        lda code
+        cmp last                <span class="kommentar">; nur Änderungen melden</span>
+        beq loop
+        sta last
+        cmp #$ff
+        beq loop                <span class="kommentar">; Loslassen wird nicht gemeldet</span>
+        lda #&lt<span class="kommentar">;msg_key</span>
+        ldx #&gt<span class="kommentar">;msg_key</span>
+        jsr puts
+        lda code
+        jsr puthex
+        jsr newline
+        jmp loop</pre>
+  <p>Die Abtastung der Tastatur:</p>
+  <pre class="listing breit lang"><span class="kommentar">; Ports einstellen: Zeilen Ausgang, Spalten Eingang</span>
+keys_init:
+        lda #$ff
+        sta VIA2_DDRB           <span class="kommentar">; VIA2 Port B: Zeilen 0 bis 7 als Ausgang</span>
+        lda #$00
+        sta VIA2_DDRA           <span class="kommentar">; VIA2 Port A: Spalten 0 bis 7 als Eingang</span>
+        lda VIA1_DDRB
+        ora #$3f                <span class="kommentar">; VIA1 PB0 bis PB5: Zeilen 8 bis 13 als Ausgang</span>
+        sta VIA1_DDRB
+        jmp rows_idle
+
+<span class="kommentar">; alle Zeilen auf High</span>
+rows_idle:
+        lda #$ff
+        sta VIA2_ORB
+        lda VIA1_ORB
+        ora #$3f
+        sta VIA1_ORB
+        rts
+
+<span class="kommentar">; X = Zeile (0 bis 13): nur diese Zeile auf Low</span>
+select_row:
+        jsr rows_idle
+        cpx #8
+        bcs @via1
+        lda row_mask,x
+        sta VIA2_ORB
+        rts
+@via1:  lda row_mask - 8,x
+        and VIA1_ORB
+        sta VIA1_ORB
+        rts
+
+row_mask: .byte $fe, $fd, $fb, $f7, $ef, $df, $bf, $7f
+
+<span class="kommentar">; Tastatur abtasten: A = Scancode oder $FF</span>
+keys_scan:
+        ldx #0
+@row:   jsr select_row
+        lda VIA2_IRA
+        eor #$ff                <span class="kommentar">; gedrückt = Bit gesetzt</span>
+        bne @found
+        inx
+        cpx #14
+        bne @row
+        jsr rows_idle
+        lda #$ff
+        rts
+@found: ldy #0
+@bit:   lsr
+        bcs @done
+        iny
+        bne @bit
+@done:  sty tmp                 <span class="kommentar">; Y = Spalte</span>
+        txa
+        asl
+        asl
+        asl
+        ora tmp                 <span class="kommentar">; Zeile * 8 + Spalte</span>
+        pha
+        jsr rows_idle
+        pla
+        rts
+
+<span class="kommentar">; Abtasten mit Entprellen: Code in code</span>
+keys_update:
+        jsr keys_scan
+        cmp #$ff
+        beq @none
+        sta code
+        ldx #10                 <span class="kommentar">; 10 ms warten und noch einmal abtasten</span>
+        jsr delay_ms
+        jsr keys_scan
+        cmp code
+        beq @done
+@none:  lda #$ff
+        sta code
+@done:  rts
+
+delay_ms:
+@ms:    ldy #199
+@us:    dey
+        bne @us
+        dex
+        bne @ms
+        rts</pre>
+  <p>Die Routinen zur Ausgabe über die ACIA (<code>putc</code>, <code>puts</code>, <code>puthex</code> und <code>newline</code>) kennen Sie aus Kapitel 7. Das vollständige Programm steht in <code>programme/de/tastatur.s</code>.</p>
+  <p>Übersetzen und in den EEPROM schreiben, wie in den Kapiteln davor. Öffnen Sie dann das Terminal und tippen Sie ein paar Tasten:</p>
+  <figure class="terminal">
+<pre>Scancode: $01
+Scancode: $1F
+Scancode: $4C
+Scancode: $51</pre>
+    <figcaption>Die Tasten A, Z, Leertaste und L</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Meldet sich keine Taste, dann prüfen Sie zuerst, ob das zweite VIA unter $7F40 antwortet (mit dem Monitor: <code>w 7f42 ff</code> und danach <code>m 7f40</code>). Meldet eine Taste den falschen Scancode, sind zwei Drähte vertauscht. Die Tabelle der Matrix zeigt, welcher.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

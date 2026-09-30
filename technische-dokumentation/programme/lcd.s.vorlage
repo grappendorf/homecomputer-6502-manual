@@ -1,0 +1,189 @@
+        .setcpu "6502"
+
+VIA_ORA  = $7f21
+VIA_DDRA = $7f23
+
+LCD_RS = %00010000              ;{rs}
+LCD_E1 = %00100000              ;{e1}
+LCD_E2 = %01000000              ;{e2}
+
+        .zeropage
+ptr:    .res 2
+lcd_e:  .res 1                  ;{lcd_e}
+led:    .res 1                  ;{led}
+tmp:    .res 1
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff
+        txs
+        jsr lcd_init
+        lda #<msg_welcome
+        ldx #>msg_welcome
+        jsr lcd_puts
+        ldx #0                  ;{col}
+        ldy #1                  ;{row}
+        jsr lcd_goto
+        lda #'>'
+        jsr lcd_putc
+        jsr lcd_cursor_blink
+        jsr led_on              ;{ledon}
+        ldx #0
+        ldy #2                  ;{row2}
+        jsr lcd_goto
+        lda #<msg_second
+        ldx #>msg_second
+        jsr lcd_puts
+halt:   jmp halt
+
+;{lcd_init}
+lcd_init:
+        lda #$ff                ;{ddra}
+        sta VIA_DDRA
+        lda led
+        sta VIA_ORA
+        ldx #40                 ;{wait40}
+        jsr delay_ms
+        lda #LCD_E1 | LCD_E2    ;{both}
+        sta lcd_e
+        lda #3                  ;{init3}
+        jsr lcd_write4
+        ldx #5
+        jsr delay_ms
+        lda #3
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #3
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #2                  ;{init2}
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #%00101000          ;{func}
+        jsr lcd_cmd
+        lda #%00001000          ;{dispoff}
+        jsr lcd_cmd
+        jsr lcd_clear
+        lda #%00000110          ;{entry}
+        jsr lcd_cmd
+        lda #%00001100          ;{dispon}
+        jsr lcd_cmd
+        lda #LCD_E1             ;{select}
+        sta lcd_e
+        rts
+
+;{write4}
+lcd_write4:
+        and #$1f
+        ora led                 ;{keepled}
+        sta tmp
+        sta VIA_ORA
+        ora lcd_e
+        sta VIA_ORA
+        lda tmp
+        sta VIA_ORA
+        rts
+
+;{cmd}
+lcd_cmd:
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        jsr lcd_write4
+        pla
+        and #$0f
+        jsr lcd_write4
+        ldx #2
+        jmp delay_ms
+
+lcd_putc:
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        ora #LCD_RS
+        jsr lcd_write4
+        pla
+        and #$0f
+        ora #LCD_RS
+        jsr lcd_write4
+        ldx #10                 ;{delay50}
+@wait:  dex
+        bne @wait
+        rts
+
+lcd_clear:
+        lda #%00000001
+        jmp lcd_cmd
+
+lcd_cursor_blink:
+        lda #%00001111
+        jmp lcd_cmd
+
+;{goto}
+lcd_goto:
+        cpy #2
+        bcs @lower
+        lda #LCD_E1
+        bne @set
+@lower: lda #LCD_E2
+        dey
+        dey
+@set:   sta lcd_e
+        txa
+        cpy #0
+        beq @cmd
+        clc
+        adc #$40                ;{line2}
+@cmd:   ora #$80
+        jmp lcd_cmd
+
+lcd_puts:
+        sta ptr
+        stx ptr+1
+        ldy #0
+@loop:  lda (ptr),y
+        beq @done
+        jsr lcd_putc
+        iny
+        bne @loop
+@done:  rts
+
+;{delay_ms}
+delay_ms:
+@ms:    ldy #199
+@us:    dey
+        bne @us
+        dex
+        bne @ms
+        rts
+
+;{ledfn}
+led_on: lda #$80
+        sta led
+        sta VIA_ORA
+        rts
+
+led_off:
+        lda #0
+        sta led
+        sta VIA_ORA
+        rts
+
+msg_welcome: .byte "Welcome to the 6502 HomeComputer!", $00
+msg_second:  .byte "This is line 3.", $00

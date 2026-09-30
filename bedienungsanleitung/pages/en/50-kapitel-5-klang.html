@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chapter 5 – Making Sounds with the SID</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="5" data-titel="Making Sounds with the SID" data-kurztitel="Sound">
+  <p>Inside the HomeComputer 6502 is the same sound chip as in the Commodore 64: the <strong>SID</strong>, in the later 8580 version. SID stands for <em>Sound Interface Device</em>. It has three voices that can play different tones at the same time. Each voice has its own timbre and its own volume curve. In this chapter you will make it sing: first single tones, then melodies, then multi-voice music. At the end, the computer becomes a piano.</p>
+
+  <h2>The SID Sound Chip</h2>
+  <p>All sound commands work in the background. The command starts the tone and returns immediately. Your program keeps running while the music plays. This way a game can play music and respond to keys at the same time.</p>
+  <p>Two controls determine how loud it gets. The control on the back (Chapter 1) sets the amplifier. In BASIC you set the SID volume with <code>VOL</code>, from 0 (silent) to 15 (loudest):</p>
+<pre class="listing">VOL 15</pre>
+  <p>After power-on the volume is already set to 15.</p>
+
+  <h2>Single Tones with SOUND</h2>
+  <p>The simplest sound command is <code>SOUND</code>. It plays one tone on one voice:</p>
+<pre class="listing">SOUND 1,4389,8</pre>
+  <p>This plays middle C for one second. The three numbers mean:</p>
+  <table>
+    <thead><tr><th>Value</th><th>Meaning</th><th>Range</th></tr></thead>
+    <tbody>
+      <tr><td>Voice</td><td>which of the three voices plays</td><td>1 to 3</td></tr>
+      <tr><td>Frequency</td><td>the pitch, as a number for the SID</td><td>0 to 65535</td></tr>
+      <tr><td>Duration</td><td>how long, in sixteenths</td><td>1 to 255</td></tr>
+      <tr><td>Instrument</td><td>optional, the timbre (see below)</td><td>0 to 7</td></tr>
+    </tbody>
+  </table>
+  <p>The frequency is not given in hertz, but as the value the SID expects. For the tones around middle C these are the numbers:</p>
+  <table>
+    <thead><tr><th>Tone</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>A</th><th>H</th><th>C'</th></tr></thead>
+    <tbody>
+      <tr><td>Frequency</td><td>4389</td><td>4927</td><td>5530</td><td>5859</td><td>6577</td><td>7382</td><td>8286</td><td>8778</td></tr>
+    </tbody>
+  </table>
+  <p>One octave higher the number is twice as large, one octave lower half as large. So the low C is 2194 and the high C is 8778.</p>
+  <p>The duration counts in sixteenths of a bar. How fast a sixteenth passes is set by <code>TEMPO</code>: the number of sixteenths per second, from 1 to 50. After power-on it is 8. A duration of 8 then lasts one second, a duration of 4 half a second.</p>
+
+  <h3>A Scale</h3>
+<pre class="listing">10 FOR I=1 TO 8
+20 READ F
+30 SOUND 1,F,4
+40 SLEEP 0.5
+50 NEXT I
+60 DATA 4389,4927,5530,5859,6577,7382,8286,8778</pre>
+  <p>Because <code>SOUND</code> does not wait for the tone to finish, the loop needs a <code>SLEEP</code>. Otherwise all eight tones would be started almost at once and you would only hear the last one. A new tone on the same voice replaces the old one.</p>
+
+  <h2>Timbres</h2>
+  <p>Whether a tone sounds soft like a flute or bright like a trumpet depends on its <strong>waveform</strong>. The SID knows four:</p>
+  <table>
+    <thead><tr><th>No.</th><th>Waveform</th><th>Sound</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Triangle</td><td>soft, round, like a flute</td></tr>
+      <tr><td>1</td><td>Sawtooth</td><td>bright and strong, like brass or strings</td></tr>
+      <tr><td>2</td><td>Pulse</td><td>hollow to nasal, depending on the pulse width</td></tr>
+      <tr><td>3</td><td>Noise</td><td>not a tone, but a hiss</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The Instruments</h3>
+  <p>So that you do not have to set everything individually each time, BASIC has eight built-in <strong>instruments</strong>. An instrument is a ready-made combination of waveform and volume curve. You append its number as the fourth value to <code>SOUND</code>:</p>
+<pre class="listing">SOUND 1,4389,8,1</pre>
+  <table>
+    <thead><tr><th>No.</th><th>Instrument</th><th>Waveform</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Organ</td><td>Triangle</td><td>sounds at constant volume until the tone ends</td></tr>
+      <tr><td>1</td><td>Piano</td><td>Sawtooth</td><td>short attack, then fades out</td></tr>
+      <tr><td>2</td><td>Bass</td><td>Pulse</td><td>attack, then sustained</td></tr>
+      <tr><td>3</td><td>Noise</td><td>Noise</td><td>for sound effects and percussion</td></tr>
+      <tr><td>4 to 7</td><td>free</td><td>Triangle</td><td>like the organ, for your own designs</td></tr>
+    </tbody>
+  </table>
+  <p>Without an instrument number the voice keeps its timbre. After power-on all three voices are set to the organ.</p>
+
+  <h3>Changing the Waveform Directly</h3>
+  <p><code>WAVE</code> changes a voice's waveform immediately, even in the middle of a tone:</p>
+<pre class="listing">SOUND 1,4389,16:SLEEP 1:WAVE 1,2,512</pre>
+  <p>The first number is the voice, the second the waveform from the table above. For the pulse wave you can give the <strong>pulse width</strong> as a third number, from 0 to 4095. 2048 gives a symmetrical square wave with a full, hollow sound. The further the value is from that, the thinner and more nasal it sounds. The next <code>SOUND</code> with an instrument number restores the instrument's waveform.</p>
+
+  <h2>Envelopes</h2>
+  <p>A guitar string sounds different from an organ pipe, even at the same pitch. This is mostly due to how the volume of a tone changes over time. This curve is called the <strong>envelope</strong>. On the SID it has four phases:</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/en/adsr.svg" alt="Envelope with the attack, decay, sustain and release phases">
+    <figcaption>The four phases of an envelope</figcaption>
+  </figure>
+  <ul>
+    <li><strong>Attack</strong>: How quickly the tone gets louder at the start.</li>
+    <li><strong>Decay</strong>: How quickly it then falls to the sustain level.</li>
+    <li><strong>Sustain</strong>: How loud it stays for as long as the tone lasts. This is a level, not a time.</li>
+    <li><strong>Release</strong>: How quickly it fades away once the tone is over.</li>
+  </ul>
+  <p>With <code>ENVELOPE</code> you give an instrument its own envelope:</p>
+<pre class="listing">ENVELOPE 4,0,10,0,10
+SOUND 1,6577,8,4</pre>
+  <p>The first number is the instrument (0 to 7), then follow attack, decay, sustain and release, each from 0 to 15. For the three times, 0 means very fast, only a few thousandths of a second, and 15 very slow: the attack then takes 8 seconds, decay and release up to 24 seconds. For sustain, 0 is silent and 15 full volume. The example above turns instrument 4 into a bell: immediately at full volume, then slowly fading.</p>
+  <table>
+    <thead><tr><th>Sound</th><th>Attack</th><th>Decay</th><th>Sustain</th><th>Release</th></tr></thead>
+    <tbody>
+      <tr><td>Organ (instrument 0)</td><td>0</td><td>0</td><td>15</td><td>0</td></tr>
+      <tr><td>Piano (instrument 1)</td><td>0</td><td>9</td><td>0</td><td>0</td></tr>
+      <tr><td>Bell</td><td>0</td><td>10</td><td>0</td><td>10</td></tr>
+      <tr><td>Strings, soft attack</td><td>8</td><td>0</td><td>15</td><td>8</td></tr>
+    </tbody>
+  </table>
+  <p><code>ENVELOPE</code> only changes the envelope. The instrument's waveform stays as it was. The new envelope applies from the next tone played with this instrument.</p>
+
+  <h2>Melodies with TUNE and PLAY</h2>
+  <p>Playing a melody tone by tone with <code>SOUND</code> and <code>SLEEP</code> is tedious. <code>TUNE</code> makes it easier. With it you write down a whole melody as text, in a kind of musical notation. <code>PLAY</code> then plays it in the background:</p>
+<pre class="listing">10 TUNE 1,"I1CDEFL8GGL4AAAAL8GL4AAAAL8GL4FFFFL8EEL4DDDDL8C"
+20 PLAY 1</pre>
+  <p>That is “Alle meine Entchen” (“All My Ducklings”). The notation consists of letters with a few additions:</p>
+  <table>
+    <thead><tr><th>Character</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>C D E F G A B</code></td><td>the notes. The German H is called <strong>B</strong> here.</td></tr>
+      <tr><td><code>#</code> after the note</td><td>one semitone higher: <code>F#</code> is F sharp</td></tr>
+      <tr><td>digit after the note</td><td>the octave of that note: <code>C5</code> is the C one octave higher</td></tr>
+      <tr><td><code>O</code> and digit 0 to 7</td><td>octave for all following notes. At the start it is 4.</td></tr>
+      <tr><td><code>L</code> and digit 1 to 8</td><td>length of the following notes in sixteenths. At the start it is 4, i.e. a quarter note.</td></tr>
+      <tr><td><code>R</code> and digit</td><td>a rest. The digit is the length of this rest only.</td></tr>
+      <tr><td><code>I</code> and digit 0 to 7</td><td>instrument for the following notes</td></tr>
+    </tbody>
+  </table>
+  <p>In the example, <code>I1</code> selects the piano. <code>CDEF</code> are four quarter notes. <code>L8</code> makes the following notes eighth notes, <code>L4</code> switches back to quarters. You may insert spaces for readability; they are skipped. Upper or lower case does not matter.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Caution</div>
+    <p>Always write <code>B</code> for the note H. An <code>H</code> and any other unknown character ends the melody at that point.</p>
+  </aside>
+  <aside class="kasten">
+    <div class="kasten-titel">Tip</div>
+    <p>With the organ, identical tones in a row merge into one long tone, because it keeps sounding steadily. The piano strikes each tone anew. That is why the example uses <code>I1</code>.</p>
+  </aside>
+  <p>A note text may be at most 47 characters long. The first number after <code>TUNE</code> is the slot, 1 to 3. Each slot belongs to one voice, so <code>TUNE 2</code> plays on voice 2. <code>PLAY</code> knows these forms:</p>
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>PLAY 1</code></td><td>play melody 1 once</td></tr>
+      <tr><td><code>PLAY 1 ON</code></td><td>play melody 1 over and over from the start</td></tr>
+      <tr><td><code>PLAY 1 OFF</code></td><td>stop voice 1 only</td></tr>
+      <tr><td><code>PLAY 0</code></td><td>stop all voices</td></tr>
+      <tr><td><code>PLAY 1,2</code></td><td>start melodies 1 and 2 together</td></tr>
+    </tbody>
+  </table>
+  <p>With <code>TEMPO</code> you make any melody faster or slower. <code>TEMPO 16</code> plays twice as fast as at the start, <code>TEMPO 4</code> half as fast.</p>
+
+  <h2>Multi-Voice Music</h2>
+  <p>Because the SID has three voices, up to three melodies can run at the same time. A nice example is a round: everyone sings the same song, but the second voice starts later. This is how “Bruder Jakob” (“Brother Jacob”) sounds in two voices:</p>
+<pre class="listing">10 TEMPO 8
+20 TUNE 1,"I0L4CDECCDECEFL8GL4EFL8G"
+30 TUNE 2,"I1R8R8R8R8L4CDECCDECEFL8GL4EFL8G"
+40 PLAY 1,2</pre>
+  <p>Voice 1 plays with the organ. Voice 2 plays the same notes with the piano, but first waits through four eighth rests, i.e. two bars. Then it comes in while voice 1 is already further along.</p>
+
+  <h2>Noises and Effects</h2>
+  <p>For games there are nine ready-made sound effects:</p>
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th><th>Sound</th><th>Duration</th></tr></thead>
+    <tbody>
+      <tr><td><code>EFFECT 1</code></td><td>Shot</td><td>noise, fades quickly</td><td>0.2 s</td></tr>
+      <tr><td><code>EFFECT 2</code></td><td>Explosion</td><td>noise, a long fading rumble</td><td>0.9 s</td></tr>
+      <tr><td><code>EFFECT 3</code></td><td>Laser</td><td>sawtooth, quickly sweeps downward</td><td>0.2 s</td></tr>
+      <tr><td><code>EFFECT 4</code></td><td>Jump</td><td>pulse, quickly rises</td><td>0.2 s</td></tr>
+      <tr><td><code>EFFECT 5</code></td><td>Coin</td><td>pulse, two bright tones (H, then E)</td><td>0.6 s</td></tr>
+      <tr><td><code>EFFECT 6</code></td><td>Bonus</td><td>triangle, a chord arpeggio spanning two octaves upward</td><td>0.5 s</td></tr>
+      <tr><td><code>EFFECT 7</code></td><td>Error</td><td>sawtooth, two low tones downward</td><td>0.6 s</td></tr>
+      <tr><td><code>EFFECT 8</code></td><td>Siren</td><td>triangle, twice up and down</td><td>0.6 s</td></tr>
+      <tr><td><code>EFFECT 9</code></td><td>Falling bomb</td><td>sawtooth, a long downward sweep</td><td>0.6 s</td></tr>
+    </tbody>
+  </table>
+  <p>Effects always play on voice 3. A new effect replaces a running one. <code>TEMPO</code> does not change their duration. Voices 1 and 2 keep playing meanwhile. That way the music can stay in the background while things go bang. You can build your own noises with the noise instrument 3. For example, <code>SOUND 3,20000,1,3</code> sounds like a short snare-drum hit.</p>
+  <p>The game <code>gem.bas</code> in the firmware project uses music and effects together. It is a good example to study.</p>
+
+  <h2>A Keyboard Piano</h2>
+  <p>Finally, the keyboard becomes a piano. The keys <kbd>A</kbd> through <kbd>K</kbd> play the tones C through C'. With <kbd>1</kbd> through <kbd>4</kbd> you choose the sound. The computer remembers what you play and plays it back when you press <kbd>Return</kbd>.</p>
+  <figure class="lcd">
+<pre>KEYBOARD PIANO         SOUND: BELL
+A TO K TO PLAY, 1-4 SOUND, ESC QUIT
+ENTER REPLAY, BACKSPACE CLEARS
+TONE: C   RECORDED: 9 TONES</pre>
+    <figcaption>The keyboard piano</figcaption>
+  </figure>
+  <p>The program combines much from the previous chapters: arrays and <code>DATA</code>, reading the keyboard with <code>KEY</code>, subroutines, string functions, <code>LOCATE</code> and the LED. New are <code>SOUND</code>, <code>ENVELOPE</code>, <code>TUNE</code> and <code>PLAY</code>. You can also find it as <code>examples/klavier.bas</code>. If the drive from Chapter 6 is connected, load it with <code>LOAD "klavier"</code>.</p>
+
+  <h3>Preparation</h3>
+<pre class="listing">10 REM KEYBOARD PIANO
+20 DIM F(7),N$(7),T$(7),K$(4)
+30 FOR I=0 TO 7:READ F(I),N$(I),T$(I):NEXT I
+40 FOR I=1 TO 4:READ K$(I):NEXT I
+50 TA$="asdfghjk":IS$="0124"
+60 ENVELOPE 4,0,10,0,10
+70 VOL 15:TEMPO 8
+80 CLS:CURSOR OFF
+90 PRINT "KEYBOARD PIANO"
+100 PRINT "A TO K TO PLAY, 1-4 SOUND, ESC QUIT"
+110 PRINT "ENTER REPLAY, BACKSPACE CLEARS";
+120 KL=1:GOSUB 450
+130 IF KEY(0)&lt;&gt;0 THEN 130</pre>
+  <p>For each of the eight tones, line 30 reads three values: the frequency for <code>SOUND</code> into F, the name for the display into N$ and the note for <code>TUNE</code> into T$. Line 40 reads the names of the four sounds. TA$ contains the eight playing keys in the order of the tones. IS$ maps the sounds 1 to 4 to the instruments 0, 1, 2 and 4. Instrument 4 is turned into a bell by line 60. KL is the selected sound.</p>
+
+  <h3>The Main Loop</h3>
+<pre class="listing">200 REM MAIN LOOP
+210 K=KEY(0):IF K=0 THEN 210
+220 IF K&gt;=65 AND K&lt;=90 THEN K=K+32
+230 IF K=27 THEN 600
+240 IF K&gt;=49 AND K&lt;=52 THEN KL=K-48:GOSUB 400:GOTO 300
+250 IF K=13 THEN GOSUB 500:GOTO 300
+260 IF K=8 THEN GOSUB 450:GOTO 300
+270 P=0
+280 FOR J=1 TO 8:IF MID$(TA$,J,1)=CHR$(K) THEN P=J
+285 NEXT J
+290 IF P&gt;0 THEN GOSUB 350
+300 IF KEY(0)&lt;&gt;0 THEN 300
+310 LED OFF
+320 GOTO 210</pre>
+  <p>Line 210 waits for a key. Line 220 converts capital letters to lowercase so the piano also plays with <kbd>Shift</kbd> held down. Then the key is dispatched: <kbd>Esc</kbd> quits, <kbd>1</kbd> through <kbd>4</kbd> (codes 49 to 52) switch the sound, <kbd>Return</kbd> plays back, the backspace key clears the recording. For anything else, the loop in lines 280 and 285 looks it up in TA$. If the key is found, P is the number of the tone. Line 300 waits until the key is released, then the LED goes out.</p>
+
+  <h3>Playing, Switching Sounds, Clearing the Recording</h3>
+<pre class="listing">350 REM PLAY AND RECORD TONE
+360 SOUND 1,F(P-1),4,VAL(MID$(IS$,KL,1))
+370 LED ON
+380 IF LEN(R$)&lt;46 THEN R$=R$+T$(P-1):N=N+1
+390 GOSUB 700:RETURN
+400 REM SWITCH SOUND
+410 IF LEN(R$)&lt;46 THEN R$=R$+"I"+MID$(IS$,KL,1)
+420 GOSUB 700:RETURN
+450 REM CLEAR RECORDING
+460 R$="I"+MID$(IS$,KL,1):N=0:P=0
+470 GOSUB 700:RETURN</pre>
+  <p>Line 360 plays the tone with the instrument of the selected sound. <code>MID$</code> picks the instrument number as a digit out of IS$, <code>VAL</code> turns it into a number. The LED lights up for as long as the key is held down.</p>
+  <p>The recording is simply a note text for <code>TUNE</code>. Line 380 appends each played note to R$, for example <code>C4</code>. A sound switch appends an <code>I</code> with the instrument number in line 410. Because a note text may be at most 47 characters long, the program only records while there is still room. That is enough for about 20 tones.</p>
+
+  <h3>Playback, Ending and Display</h3>
+<pre class="listing">500 REM REPLAY
+510 IF N=0 THEN RETURN
+520 TUNE 1,R$:PLAY 1
+530 RETURN
+600 PLAY 0:LED OFF:CLS:CURSOR ON:END
+700 REM STATUS LINE
+710 LOCATE 0,24:PRINT "SOUND: ";K$(KL);"  ";
+720 LOCATE 3,0:PRINT "TONE: ";
+730 IF P&gt;0 THEN PRINT N$(P-1);
+740 IF P=0 THEN PRINT "-";
+750 PRINT "   RECORDED:";N;"TONES   ";
+760 RETURN
+800 DATA 4389,C,C4,4927,D,D4,5530,E,E4,5859,F,F4
+810 DATA 6577,G,G4,7382,A,A4,8286,H,B4,8778,C,C5
+820 DATA ORGAN,PIANO,BASS,BELL</pre>
+  <p>For playback, line 520 hands the recording to <code>TUNE</code> and starts it. Every note lasts one quarter, no matter how long you held the key. The subroutine from line 700 writes sound, last tone and length of the recording to the display. In the <code>DATA</code> lines you see the difference once more: the sixth tone is named H, but in the notation it is called <code>B4</code>.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Keep Going</div>
+    <p>Experiment with the envelope in line 60 and listen to how the bell changes. Or map the black keys to the top key row: the notes would then be called, for example, <code>C#4</code>.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

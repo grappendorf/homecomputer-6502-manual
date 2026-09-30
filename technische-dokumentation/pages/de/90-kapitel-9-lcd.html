@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 9</title>
+<link rel="stylesheet" href="../../../shared/css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="9" data-titel="Die LCD-Anzeige" data-kurztitel="LCD-Anzeige">
+  <p>Mit dem VIA ist eine Anzeige schnell angeschlossen. Dieses Kapitel hängt ein Textdisplay mit dem Controller HD44780 an Port A. Zum ersten Mal zeigt der Computer selbst etwas an.</p>
+
+  <h2>Das Display</h2>
+  <p>Der HD44780 ist der Standardcontroller für Textdisplays. Man schickt ihm Zeichen und Befehle über vier oder acht Datenleitungen, dazu kommen die Leitungen RS (Befehl oder Zeichen) und E (Enable, übernimmt die Daten). Der 4-Bit-Betrieb spart vier Leitungen: Jedes Byte geht in zwei Hälften über D4 bis D7.</p>
+  <p>Unser Display hat vier Zeilen zu 40 Zeichen und enthält zwei unabhängige Controller. Jeder steuert zwei Zeilen und hat sein eigenes Enable (E1 für die Zeilen 1 und 2, E2 für die Zeilen 3 und 4). Das Display in diesem Buch ist ein Electronic Assembly Blue Line EA W404B-NLW. Lesen können wir von ihm nicht, denn R/W liegt fest an GND. So sparen wir eine Leitung, müssen aber nach jedem Befehl eine feste Zeit warten, statt auf das Busy-Flag zu schauen.</p>
+  <p>Außer den Steuerleitungen braucht das Display die Versorgung, eine einstellbare Kontrastspannung und für die Hintergrundbeleuchtung einen Vorwiderstand. Bei diesem Display passt ein Widerstand von 150&nbsp;Ω.</p>
+  <p>Man kann ein Display auch direkt an Daten- und Adressbus hängen. Dann muss man PHI2 berücksichtigen wie beim Chip-Select des RAMs. Wir bleiben beim Anschluss über den VIA.</p>
+
+  <h2>Die Schaltung</h2>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/sp-lcd.svg" alt="Schaltplan: Port A des VIA und der Anschluss des Displays mit Trimmer und Vorwiderstand">
+    <figcaption>Schaltplan des Display-Anschlusses</figcaption>
+  </figure>
+  <p>Port A des VIA liefert sieben Leitungen: PA0 bis PA3 gehen an D4 bis D7 des Displays, PA4 an RS, PA5 an E1 und PA6 an E2. An PA7 hängt jetzt die LED. Sie zieht von PB0 hierher um, denn Port B gehört ab Kapitel 10 der Tastatur. Die Datenleitungen D0 bis D3 des Displays bleiben offen. Die Kontrastspannung V0 kommt vom Schleifer eines 10-kΩ-Trimmers, der zwischen +5&nbsp;V und GND liegt. Die Hintergrundbeleuchtung hängt über R11 an +5&nbsp;V.</p>
+  <p>Die Pinbelegung der Anschlussleiste für das Display des Buches:</p>
+  <table class="zusammen">
+    <thead><tr><th>Pin</th><th>Name</th><th>Anschluss</th><th>Pin</th><th>Name</th><th>Anschluss</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>D7</td><td>PA3</td><td>10</td><td>R/W</td><td>GND</td></tr>
+      <tr><td>2</td><td>D6</td><td>PA2</td><td>11</td><td>RS</td><td>PA4</td></tr>
+      <tr><td>3</td><td>D5</td><td>PA1</td><td>12</td><td>V0</td><td>Trimmer</td></tr>
+      <tr><td>4</td><td>D4</td><td>PA0</td><td>13</td><td>VSS</td><td>GND</td></tr>
+      <tr><td>5 bis 8</td><td>D3 bis D0</td><td>offen</td><td>14</td><td>VDD</td><td>+5&nbsp;V</td></tr>
+      <tr><td>9</td><td>E1</td><td>PA5</td><td>15</td><td>E2</td><td>PA6</td></tr>
+      <tr><td></td><td></td><td></td><td>17</td><td>LED+</td><td>über R11 an +5&nbsp;V</td></tr>
+      <tr><td></td><td></td><td></td><td>18</td><td>LED−</td><td>GND</td></tr>
+    </tbody>
+  </table>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Diese Belegung gilt für das Display aus diesem Buch. Andere Module belegen ihre Anschlüsse anders und brauchen einen anderen Vorwiderstand für die Beleuchtung. Prüfen Sie das Datenblatt, bevor Sie Spannung anlegen.</p>
+  </aside>
+
+  <h2>Bauteile</h2>
+  <table class="bauteile zusammen">
+    <thead><tr><th>Bez.</th><th>Bauteil</th><th>Wert</th></tr></thead>
+    <tbody>
+      <tr><td>LCD</td><td>Textdisplay 4 × 40 mit zwei HD44780</td><td>zum Beispiel EA W404B-NLW</td></tr>
+      <tr><td>R11</td><td>Widerstand (Beleuchtung)</td><td>150&nbsp;Ω</td></tr>
+      <tr><td>R12</td><td>Trimmer (Kontrast)</td><td>10&nbsp;kΩ</td></tr>
+      <tr><td>JP2</td><td>Stiftleiste, 18-polig, mit Kabel zum Display</td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Aufbau</h2>
+  <p>Zuerst der VIA. Port A bekommt sieben kurze Drähte mit den Namen PA0 bis PA6. Die LED bleibt an PB0.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-via-lcd.svg" alt="Steckbrett 8 mit dem VIA, Port A mit Drähten PA0 bis PA6">
+    <figcaption>Der VIA mit Port A für das Display</figcaption>
+  </figure>
+  <ol class="schritte">
+    <li><div>Schalten Sie die Spannung aus. Stecken Sie an die Pins&nbsp;2 bis 8 des VIA (Löcher 5a bis 11a) je einen Draht und beschriften Sie sie PA0 bis PA6.</div></li>
+    <li><div>Die LED zieht um: Der Draht von PB0 (Loch 13b) nach 27b wandert nach PA7 (Pin&nbsp;9, Loch 12b). R10 und die LED bleiben stehen.</div></li>
+  </ol>
+  <p>Dann der Anschluss für das Display auf einem neuen Steckbrett. Die Leiste ist hier als eine Reihe mit 18 Pins gezeichnet. Hat Ihr Display einen Stecker mit zwei Reihen, so übernehmen Sie die Nummerierung des Moduls.</p>
+  <figure class="abbildung">
+    <img class="zeichnung" src="../img/bb-lcd.svg" alt="Steckbrett 9 mit dem Display-Anschluss, Trimmer und Vorwiderstand">
+    <figcaption>Der Display-Anschluss auf Steckbrett 9</figcaption>
+  </figure>
+  <ol class="schritte" start="3">
+    <li><div>Führen Sie +5&nbsp;V und GND zu einem neuen Steckbrett und verbinden Sie dort die oberen Schienen mit den unteren.</div></li>
+    <li><div>Stecken Sie die Leiste JP2 in die Löcher 5c bis 22c, Pin&nbsp;1 links.</div></li>
+    <li><div>GND: Pin&nbsp;10, 13 und 18. +5&nbsp;V: Pin&nbsp;14.</div></li>
+    <li><div>Die Beleuchtung: R11 von Pin&nbsp;17 (Loch 21b) an +5&nbsp;V.</div></li>
+    <li><div>Der Kontrast: Stecken Sie den Trimmer R12 in die Löcher 26c bis 28c. Das linke Bein kommt an +5&nbsp;V, das rechte an GND und der Schleifer in der Mitte über einen Draht (27d nach 16d) an Pin&nbsp;12.</div></li>
+    <li><div>Die Signale: Verbinden Sie PA0 bis PA6 vom VIA mit den Drähten gleichen Namens auf diesem Brett, nach der Tabelle oben.</div></li>
+  </ol>
+
+  <h2>Das Programm</h2>
+  <p>Der Controller wartet nach jedem Befehl eine feste Zeit. Das Programm macht es in drei Schritten:</p>
+  <ul>
+    <li><strong>Ein Nibble senden:</strong> Daten und RS an Port A legen, E kurz auf High setzen und wieder auf Low. Der Controller übernimmt beim Fallen von E.</li>
+    <li><strong>Ein Byte senden:</strong> Zuerst das obere, dann das untere Nibble. Danach warten, bis der Controller fertig ist (etwa 40&nbsp;µs, bei „Display löschen“ 1,5&nbsp;ms).</li>
+    <li><strong>Zwei Controller:</strong> Die Variable <code>lcd_e</code> merkt sich, ob E1 oder E2 pulsiert. Die Zeilen 0 und 1 gehören zu E1, die Zeilen 2 und 3 zu E2.</li>
+    <li><strong>Die LED:</strong> PA7 teilt sich das Port-A-Register mit dem Display. Die Variable <code>led</code> merkt sich ihren Zustand, und jeder Schreibzugriff auf Port A nimmt ihn mit. <code>led_on</code> und <code>led_off</code> schalten die LED.</li>
+  </ul>
+  <p>Beim Einschalten ist das Display im 8-Bit-Betrieb. Die Initialisierung bringt es in den 4-Bit-Betrieb und folgt dabei der Vorgabe des Herstellers:</p>
+  <table class="zusammen">
+    <thead><tr><th>Schritt</th><th>Wert</th><th>Danach warten</th></tr></thead>
+    <tbody>
+      <tr><td>mindestens 40&nbsp;ms nach dem Einschalten</td><td></td><td></td></tr>
+      <tr><td>Nibble</td><td>$3</td><td>mehr als 4,1&nbsp;ms</td></tr>
+      <tr><td>Nibble</td><td>$3</td><td>mehr als 100&nbsp;µs</td></tr>
+      <tr><td>Nibble</td><td>$3</td><td>mehr als 100&nbsp;µs</td></tr>
+      <tr><td>Nibble</td><td>$2 (4-Bit-Betrieb)</td><td>mehr als 40&nbsp;µs</td></tr>
+      <tr><td>Befehl</td><td>$28: 4 Bit, zwei Zeilen, 5×8 Punkte</td><td>40&nbsp;µs</td></tr>
+      <tr><td>Befehl</td><td>$08: Anzeige aus</td><td>40&nbsp;µs</td></tr>
+      <tr><td>Befehl</td><td>$01: Anzeige löschen</td><td>1,5&nbsp;ms</td></tr>
+      <tr><td>Befehl</td><td>$06: Cursor läuft nach rechts</td><td>40&nbsp;µs</td></tr>
+      <tr><td>Befehl</td><td>$0C: Anzeige an</td><td>40&nbsp;µs</td></tr>
+    </tbody>
+  </table>
+  <p>Das Programm wartet nach jedem Befehl 2&nbsp;ms. Das ist langsam, aber sicher. Zuerst die Konstanten und das Hauptprogramm:</p>
+  <pre class="listing breit lang">        .setcpu "6502"
+
+VIA_ORA  = $7f21
+VIA_DDRA = $7f23
+
+LCD_RS = %00010000              <span class="kommentar">; Register Select: Befehl (0) oder Zeichen (1)</span>
+LCD_E1 = %00100000              <span class="kommentar">; Enable des oberen Controllers (Zeilen 1, 2)</span>
+LCD_E2 = %01000000              <span class="kommentar">; Enable des unteren Controllers (Zeilen 3, 4)</span>
+
+        .zeropage
+ptr:    .res 2
+lcd_e:  .res 1                  <span class="kommentar">; gerade gewählter Controller</span>
+led:    .res 1                  <span class="kommentar">; Zustand der LED an PA7 (Bit 7)</span>
+tmp:    .res 1
+
+        .segment "VECTORS"
+        .word   nmi
+        .word   reset
+        .word   irq
+
+        .code
+reset:  jmp main
+nmi:    rti
+irq:    rti
+
+main:   cld
+        ldx #$ff
+        txs
+        jsr lcd_init
+        lda #&lt<span class="kommentar">;msg_welcome</span>
+        ldx #&gt<span class="kommentar">;msg_welcome</span>
+        jsr lcd_puts
+        ldx #0                  <span class="kommentar">; Spalte 0</span>
+        ldy #1                  <span class="kommentar">; Zeile 1 (die zweite)</span>
+        jsr lcd_goto
+        lda #'&gt<span class="kommentar">;'</span>
+        jsr lcd_putc
+        jsr lcd_cursor_blink
+        jsr led_on              <span class="kommentar">; LED an</span>
+        ldx #0
+        ldy #2                  <span class="kommentar">; Zeile 2 (die dritte)</span>
+        jsr lcd_goto
+        lda #&lt<span class="kommentar">;msg_second</span>
+        ldx #&gt<span class="kommentar">;msg_second</span>
+        jsr lcd_puts
+halt:   jmp halt</pre>
+  <p>Die Initialisierung:</p>
+  <pre class="listing breit lang"><span class="kommentar">; Display initialisieren (4-Bit-Betrieb, beide Controller)</span>
+lcd_init:
+        lda #$ff                <span class="kommentar">; alle Leitungen von Port A sind Ausgänge</span>
+        sta VIA_DDRA
+        lda led
+        sta VIA_ORA
+        ldx #40                 <span class="kommentar">; 40 ms nach dem Einschalten warten</span>
+        jsr delay_ms
+        lda #LCD_E1 | LCD_E2    <span class="kommentar">; beide Controller ansprechen</span>
+        sta lcd_e
+        lda #3                  <span class="kommentar">; dreimal $3: 8-Bit-Betrieb sicherstellen</span>
+        jsr lcd_write4
+        ldx #5
+        jsr delay_ms
+        lda #3
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #3
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #2                  <span class="kommentar">; dann $2: auf 4-Bit-Betrieb umschalten</span>
+        jsr lcd_write4
+        ldx #1
+        jsr delay_ms
+        lda #%00101000          <span class="kommentar">; 4 Bit, zwei Zeilen, 5×8 Punkte</span>
+        jsr lcd_cmd
+        lda #%00001000          <span class="kommentar">; Anzeige aus</span>
+        jsr lcd_cmd
+        jsr lcd_clear
+        lda #%00000110          <span class="kommentar">; Cursor läuft nach rechts</span>
+        jsr lcd_cmd
+        lda #%00001100          <span class="kommentar">; Anzeige an, Cursor aus</span>
+        jsr lcd_cmd
+        lda #LCD_E1             <span class="kommentar">; ab jetzt oberen Controller wählen</span>
+        sta lcd_e
+        rts</pre>
+  <p>Und die Routinen, mit denen das Hauptprogramm das Display bedient:</p>
+  <pre class="listing breit lang"><span class="kommentar">; A = RS und Nibble: Daten setzen, E kurz High (RS und Daten bleiben stehen)</span>
+lcd_write4:
+        and #$1f
+        ora led                 <span class="kommentar">; die LED (PA7) bleibt bei jedem Schreiben erhalten</span>
+        sta tmp
+        sta VIA_ORA
+        ora lcd_e
+        sta VIA_ORA
+        lda tmp
+        sta VIA_ORA
+        rts
+
+<span class="kommentar">; A = Befehl (RS = 0): zuerst oberes, dann unteres Nibble</span>
+lcd_cmd:
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        jsr lcd_write4
+        pla
+        and #$0f
+        jsr lcd_write4
+        ldx #2
+        jmp delay_ms
+
+lcd_putc:
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        ora #LCD_RS
+        jsr lcd_write4
+        pla
+        and #$0f
+        ora #LCD_RS
+        jsr lcd_write4
+        ldx #10                 <span class="kommentar">; etwa 50 µs warten</span>
+@wait:  dex
+        bne @wait
+        rts
+
+lcd_clear:
+        lda #%00000001
+        jmp lcd_cmd
+
+lcd_cursor_blink:
+        lda #%00001111
+        jmp lcd_cmd
+
+<span class="kommentar">; X = Spalte, Y = Zeile (0 bis 3)</span>
+lcd_goto:
+        cpy #2
+        bcs @lower
+        lda #LCD_E1
+        bne @set
+@lower: lda #LCD_E2
+        dey
+        dey
+@set:   sta lcd_e
+        txa
+        cpy #0
+        beq @cmd
+        clc
+        adc #$40                <span class="kommentar">; zweite Zeile beginnt bei Adresse $40</span>
+@cmd:   ora #$80
+        jmp lcd_cmd
+
+lcd_puts:
+        sta ptr
+        stx ptr+1
+        ldy #0
+@loop:  lda (ptr),y
+        beq @done
+        jsr lcd_putc
+        iny
+        bne @loop
+@done:  rts
+
+<span class="kommentar">; X Millisekunden warten (bei 1 MHz, je Millisekunde 1001 Takte)</span>
+delay_ms:
+@ms:    ldy #199
+@us:    dey
+        bne @us
+        dex
+        bne @ms
+        rts
+
+<span class="kommentar">; LED ein- und ausschalten: PA7 teilt sich Port A mit dem Display</span>
+led_on: lda #$80
+        sta led
+        sta VIA_ORA
+        rts
+
+led_off:
+        lda #0
+        sta led
+        sta VIA_ORA
+        rts
+
+msg_welcome: .byte "Welcome to the 6502 HomeComputer!", $00
+msg_second:  .byte "This is line 3.", $00</pre>
+  <p>Übersetzen und in den EEPROM schreiben, wie in den Kapiteln davor:</p>
+  <pre class="listing">$ ca65 -o lcd.o lcd.s
+$ ld65 -C erste.cfg -o lcd.bin lcd.o
+$ minipro -p AT28C256 -w lcd.bin</pre>
+
+  <h2>Das Ergebnis</h2>
+  <p>Nach dem Einschalten dauert es einen Moment, dann erscheint der Text. Die LED leuchtet. In der zweiten Zeile steht ein Größerzeichen mit blinkendem Cursor, und in der dritten Zeile (dem zweiten Controller) steht der letzte Satz. Falls nichts zu sehen ist, drehen Sie am Trimmer: Bei falscher Kontrastspannung bleibt das Display leer.</p>
+  <figure class="lcd">
+<pre>Welcome to the 6502 HomeComputer!
+&gt;<span class="cursor"> </span>
+This is line 3.
+</pre>
+    <figcaption>Das Display nach dem Programmstart</figcaption>
+  </figure>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Bleibt das Display leer, obwohl die Beleuchtung leuchtet, stimmt meist der Kontrast nicht oder die Initialisierung ist nicht durchgekommen. Prüfen Sie dann E1 und E2 (Pin&nbsp;9 und 15) auf Impulse und ob die Datenleitungen an der richtigen Stelle sitzen. Erscheinen nur die oberen zwei Zeilen, fehlt E2.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

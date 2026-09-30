@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kapitel 6 – Serielle Schnittstelle, Monitor und Diskette</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="kapitel" data-nr="6" data-titel="Serielle Schnittstelle, Monitor und Diskette" data-kurztitel="Monitor und Diskette">
+  <p>Über die Micro-USB-Buchse auf der Rückseite verbinden Sie den HomeComputer 6502 mit einem PC. Damit öffnen sich drei neue Möglichkeiten: Sie können mit dem <strong>Monitor</strong> in den Speicher schauen, Programme auf einer <strong>Diskette</strong> am PC speichern und laden, und Sie können <strong>BASIC am PC</strong> bedienen, mit großem Bildschirm und PC-Tastatur.</p>
+
+  <h2>Die Verbindung zum PC</h2>
+  <p>Stecken Sie ein USB-Kabel in die Micro-USB-Buchse 5 auf der Rückseite (Kapitel 1) und das andere Ende in den PC. Im Computer sitzt ein USB-Seriell-Wandler. Der PC sieht ihn als serielle Schnittstelle. Unter Linux heißt sie meist <code>/dev/ttyUSB0</code>.</p>
+  <p>Die Schnittstelle arbeitet mit 19200 Baud, 8 Datenbits, ohne Parität, mit einem Stoppbit. Kurz: 19200 8N1. Um die Einstellungen müssen Sie sich aber nicht kümmern. Das übernehmen drei Scripts aus dem Ordner <code>tools</code> des Firmware-Projekts, eines für jede Betriebsart:</p>
+  <table>
+    <thead><tr><th>Betriebsart</th><th>Script</th><th>Wofür</th></tr></thead>
+    <tbody>
+      <tr><td>Monitor</td><td><code>tools/terminal/serial-pico.sh</code></td><td>in den Speicher schauen und ihn ändern</td></tr>
+      <tr><td>Diskette</td><td><code>tools/disk/serial-disk.sh</code></td><td><code>DIR</code>, <code>LOAD</code>, <code>SAVE</code> und <code>DELETE</code> am Gerät</td></tr>
+      <tr><td>BASIC am PC</td><td><code>tools/terminal/serial-basic.sh</code></td><td>BASIC im Terminal des PCs, Diskette inklusive</td></tr>
+    </tbody>
+  </table>
+  <p>Die Scripts laufen unter Linux. Sie brauchen das Terminalprogramm <code>picocom</code> und die Programmiersprache Ruby. Ist Ihre Schnittstelle nicht <code>/dev/ttyUSB0</code>, geben Sie den Namen als letztes Argument an, zum Beispiel <code>tools/terminal/serial-pico.sh /dev/ttyUSB1</code>.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Hinweis</div>
+    <p>Es kann immer nur ein Programm die Schnittstelle benutzen. Beenden Sie das eine Script, bevor Sie das nächste starten.</p>
+  </aside>
+
+  <h2>Der Monitor</h2>
+  <p>Der Monitor ist ein kleines Programm in der Firmware, das ständig im Hintergrund an der seriellen Schnittstelle lauscht. Mit ihm sehen Sie sich den Speicher des Computers Byte für Byte an, ändern ihn und starten Maschinenprogramme. Er arbeitet unabhängig von BASIC: Während Sie am PC im Monitor sind, können Sie am Gerät ganz normal weiter BASIC benutzen.</p>
+  <p>Starten Sie am PC:</p>
+<pre class="listing">tools/terminal/serial-pico.sh</pre>
+  <p>Sie können sich auch direkt mit <code>picocom</code> verbinden:</p>
+<pre class="listing">picocom -b 19200 --imap lfcrlf --omap crlf /dev/ttyUSB0</pre>
+  <p>Das Script stellt die Schnittstelle vorher zusätzlich richtig ein. Kommen Ihre Tasten mit dem direkten Aufruf erst nach <kbd>Enter</kbd> an, nehmen Sie das Script. Der Monitor meldet sich mit einem Stern <code>*</code> als Eingabeaufforderung. Tippen Sie <code>?</code> und <kbd>Enter</kbd>, erscheint eine kurze Hilfe:</p>
+<pre class="listing">*?
+A[.B] dump  A:hh poke  AG jsr
+*</pre>
+
+  <h3>Die Befehle</h3>
+  <p>Alle Adressen und Werte schreiben Sie hexadezimal, also mit den Ziffern 0 bis 9 und A bis F, groß oder klein. Ein <code>$</code> davor ist nicht nötig.</p>
+  <table>
+    <thead><tr><th>Eingabe</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>8000</code></td><td>16 Bytes ab Adresse 8000 zeigen, als Hexzahlen und als Zeichen</td></tr>
+      <tr><td><code>8000.80FF</code></td><td>alle Bytes von 8000 bis 80FF zeigen</td></tr>
+      <tr><td><kbd>Enter</kbd> allein</td><td>die nächsten 16 Bytes zeigen</td></tr>
+      <tr><td><code>1000: 12 34 AB</code></td><td>die Bytes 12, 34 und AB ab Adresse 1000 schreiben</td></tr>
+      <tr><td><code>1000G</code></td><td>das Maschinenprogramm ab Adresse 1000 starten</td></tr>
+      <tr><td><code>?</code></td><td>Hilfe zeigen</td></tr>
+      <tr><td><kbd>Strg</kbd> + <kbd>C</kbd></td><td>eine lange Ausgabe oder die Eingabezeile abbrechen</td></tr>
+    </tbody>
+  </table>
+  <p>So sieht das aus:</p>
+<pre class="listing breit">*8000
+8000 78 D8 A2 FF 9A A9 00 AA 95 00 E8 D0 FB 20 72 80  x............ r.
+*1000: 12 34 ab
+*1000.1003
+1000 12 34 AB 00  .4..
+*xyz
+?
+*</pre>
+  <p>Jede Zeile beginnt mit der Adresse. Dann folgen die Bytes, rechts dieselben Bytes als Zeichen. Nicht darstellbare Zeichen erscheinen als Punkt. Versteht der Monitor eine Eingabe nicht, antwortet er mit <code>?</code>. Eine Eingabezeile darf höchstens 31 Zeichen lang sein. Beenden Sie <code>picocom</code> mit <kbd>Strg</kbd> + <kbd>A</kbd> und danach <kbd>Strg</kbd> + <kbd>X</kbd>.</p>
+  <aside class="kasten achtung">
+    <div class="kasten-titel">Achtung</div>
+    <p>Der Monitor schreibt überall hin, auch mitten in Ihr BASIC-Programm. Programm und Variablen liegen von 0440 bis 7EFF. Ab 7F00 liegen die Ein- und Ausgabebausteine, ab 8000 der Festspeicher, der sich nicht ändern lässt. Die Speicherbelegung steht in Anhang C.</p>
+  </aside>
+  <p>Ein Maschinenprogramm, das Sie mit <code>G</code> starten, muss mit dem Befehl <code>RTS</code> enden. Dann kehrt der Monitor zurück und zeigt wieder den Stern. Wie man Maschinenprogramme schreibt, zeigt Kapitel 7.</p>
+
+  <h2>Die Diskette</h2>
+  <p>Der HomeComputer 6502 hat kein eigenes Laufwerk. Stattdessen wird ein Ordner auf dem PC zur Diskette. Starten Sie am PC:</p>
+<pre class="listing">tools/disk/serial-disk.sh</pre>
+  <p>Ohne weitere Angabe ist der Ordner <code>examples</code> des Firmware-Projekts die Diskette. Mit ihm lernen Sie die Befehle am besten kennen, denn dort liegen schon die Beispielprogramme aus diesem Handbuch. Für Ihre eigenen Programme geben Sie einen anderen Ordner an, etwa <code>tools/disk/serial-disk.sh ~/meine-programme</code>. Das Script meldet:</p>
+<pre class="listing">Diskette bereit: …/homecomputer-6502-firmware/examples
+Gerät: /dev/ttyUSB0</pre>
+  <p>Solange es läuft, versteht BASIC am Gerät vier neue Befehle:</p>
+  <table>
+    <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>DIR</code></td><td>zeigt, was auf der Diskette liegt</td></tr>
+      <tr><td><code>LOAD "name"</code></td><td>lädt ein Programm und ersetzt das im Speicher</td></tr>
+      <tr><td><code>SAVE "name"</code></td><td>speichert das Programm aus dem Speicher</td></tr>
+      <tr><td><code>DELETE "name"</code></td><td>löscht ein Programm von der Diskette</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Was auf der Diskette liegt</h3>
+  <figure class="lcd">
+<pre>0627 adventure.bas
+0058 blink.bas
+0484 build.sh
+MORE - PRESS A KEY</pre>
+    <figcaption>DIR zeigt Größe und Namen</figcaption>
+  </figure>
+  <p><code>DIR</code> zeigt jede Datei im Ordner mit ihrer Größe in Bytes und ihrem Namen, alphabetisch sortiert, auch Dateien, die keine Programme sind. Nach drei Dateien wartet die Anzeige mit <code>MORE - PRESS A KEY</code> auf eine Taste, die LED leuchtet dabei. Am Ende steht <code>END OF DIRECTORY</code>. Mit <kbd>Pause</kbd> brechen Sie ab.</p>
+
+  <h3>Laden und speichern</h3>
+  <figure class="lcd">
+<pre>load "ratespiel"
+[████████████████████] 100%
+LOADED
+<span class="cursor"> </span></pre>
+    <figcaption>Ein Programm wird geladen</figcaption>
+  </figure>
+  <p>Beim Laden und Speichern zeigt ein Balken den Fortschritt. Danach steht <code>LOADED</code> oder <code>SAVED</code> auf der Anzeige. Ein paar Regeln:</p>
+  <ul>
+    <li>Ein Name hat höchstens 16 Zeichen und steht in Anführungszeichen.</li>
+    <li>Ohne Endung sucht der Computer zuerst eine Datei mit <code>.prg</code>, dann mit <code>.bas</code>. <code>.bas</code>-Dateien sind BASIC-Programme, <code>.prg</code>-Dateien Maschinenprogramme (Kapitel 7).</li>
+    <li><code>SAVE</code> schreibt das Programm als gewöhnliche Textdatei mit der Endung <code>.bas</code>, genau so, wie <code>LIST</code> es zeigt. Sie können es am PC mit jedem Texteditor ansehen und ändern.</li>
+    <li>Gibt es die Datei nicht, meldet der Computer <code>FILE NOT FOUND</code>. Das Programm im Speicher bleibt dann erhalten.</li>
+    <li>Ist kein Programm im Speicher, meldet <code>SAVE</code> nur <code>NO PROGRAM</code> und schreibt nichts.</li>
+  </ul>
+
+  <h3>Löschen</h3>
+<pre class="listing">delete "test"
+DELETE? (Y/N) y
+DELETED</pre>
+  <p><code>DELETE</code> fragt vorher nach. Nur <kbd>Y</kbd> löscht die Datei, jede andere Taste lässt sie stehen.</p>
+
+  <h3>Die Diskette auswerfen</h3>
+  <p>Drücken Sie am PC im Fenster des Scripts <kbd>Strg</kbd> + <kbd>C</kbd>. Das Script meldet <code>Ausgeworfen</code> und beendet sich, der Monitor ist wieder bereit. Versuchen Sie danach <code>DIR</code>, <code>LOAD</code> oder <code>SAVE</code>, meldet der Computer <code>?NO DISK ERROR</code>.</p>
+
+  <h2>BASIC am PC</h2>
+  <p>Längere Programme schreiben sich bequemer am PC: großer Bildschirm, vertraute Tastatur, Kopieren und Einfügen. Dafür holen Sie BASIC ins Terminal des PCs:</p>
+<pre class="listing">tools/terminal/serial-basic.sh</pre>
+  <p>Das Script startet <code>picocom</code> und schaltet BASIC auf die serielle Schnittstelle um. Im Terminal erscheint die Begrüßung von BASIC, und Sie arbeiten dort genauso wie am Gerät. Tastatur und Anzeige des Computers sind währenddessen still.</p>
+<pre class="listing">6502 HOMECOMPUTER BASIC V1.1
+COPYRIGHT 1978 MICROSOFT
+31423 BYTES FREE
+print 2+3
+ 5</pre>
+  <p>Die Diskette ist gleich mit dabei: <code>DIR</code>, <code>LOAD</code>, <code>SAVE</code> und <code>DELETE</code> funktionieren im Terminal wie gewohnt, wieder mit dem Ordner <code>examples</code>. Einen anderen Ordner geben Sie wie bei der Diskette an: <code>tools/terminal/serial-basic.sh ~/meine-programme</code>. Ein paar Unterschiede zum Gerät:</p>
+  <ul>
+    <li><code>LIST</code> und <code>DIR</code> laufen ohne <code>MORE</code> durch. Das Terminal kann ja zurückblättern.</li>
+    <li>Das Terminal hat 80 Spalten und 24 Zeilen. <code>CLS</code> und <code>LOCATE</code> beziehen sich auf diese Größe. Mit <code>TERM 100,30</code> stellen Sie eine andere Größe ein, <code>TERM</code> allein zeigt die aktuelle. Das Terminalfenster muss mindestens so groß sein.</li>
+    <li><code>CURSOR BLINK</code> und <code>DISPLAY</code> wirken im Terminal nicht.</li>
+  </ul>
+
+  <h3>Gerät und PC zusammen</h3>
+  <p>Auch wenn BASIC im Terminal läuft, erreicht ein Programm Anzeige und Tastatur des Geräts. Hängen Sie dazu <code>#1</code> an <code>PRINT</code> oder <code>INPUT</code>. <code>#2</code> meint die serielle Schnittstelle, also das Terminal:</p>
+<pre class="listing">10 PRINT #1,"DEIN NAME";
+20 INPUT #1,N$
+30 PRINT #1,"DANKE"
+40 PRINT "AM GERAET GETIPPT: ";N$</pre>
+  <p>Das Programm stellt die Frage auf der Anzeige des Geräts, liest die Antwort von seiner Tastatur und schreibt das Ergebnis ins Terminal. So bauen Sie zum Beispiel ein Quiz, bei dem der Spielleiter am PC sitzt.</p>
+
+  <h3>Zurück zum Gerät</h3>
+  <p>Tippen Sie <code>QUIT</code>. BASIC kehrt auf Anzeige und Tastatur zurück, und im Terminal meldet sich wieder der Monitor. Dasselbe passiert, wenn Sie <code>picocom</code> mit <kbd>Strg</kbd> + <kbd>A</kbd>, <kbd>Strg</kbd> + <kbd>X</kbd> beenden. Ihr Programm bleibt dabei im Speicher.</p>
+  <aside class="kasten">
+    <div class="kasten-titel">Im Emulator</div>
+    <p>Für den Emulator gibt es dieselben Scripts mit <code>mame</code> statt <code>serial</code> im Namen: <code>mame-pico.sh</code>, <code>mame-disk.sh</code> und <code>mame-basic.sh</code>. Sie finden die Schnittstelle des Emulators von selbst.</p>
+  </aside>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appendix B – Error Messages</title>
+<link rel="stylesheet" href="../css/manual.css">
+</head>
+<body>
+<main>
+<section class="anhang referenz" data-buchstabe="B" data-kurztitel="Appendix B · Error Messages">
+  <h1><span class="buchstabe">B</span>Error Messages</h1>
+  <p>An error message begins with a question mark and ends with <code>ERROR</code>. If a program is running, <code>IN</code> and the line number follow:</p>
+  <p class="syntax">?SYNTAX ERROR IN 10</p>
+  <p>In direct mode the line number is missing. The program stops. The variables keep their values, and you can look at them with <code>PRINT</code>. Correct the line and start again with <code>RUN</code>.</p>
+  <p><code>BREAK IN 10</code> is not an error message. <kbd>Pause</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>, or <code>STOP</code> halted the program. <code>CONT</code> resumes it.</p>
+
+  <h2>In a Program</h2>
+
+  <h3>NEXT WITHOUT FOR</h3>
+  <p class="syntax">?NEXT WITHOUT FOR ERROR</p>
+  <p>A <code>NEXT</code> has no matching <code>FOR</code>. The name after <code>NEXT</code> must be the same as the one after <code>FOR</code>, or you can leave it off.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 NEXT I</code></td><td>no <code>FOR I</code> before it</td></tr></tbody>
+  </table>
+  <p>Write the loop out in full, for example <code>10 FOR I=1 TO 5</code> and <code>20 NEXT I</code>.</p>
+
+  <h3>SYNTAX</h3>
+  <p class="syntax">?SYNTAX ERROR</p>
+  <p>The computer does not understand the line. Often a command is misspelled, a character is missing, or a name contains a BASIC keyword.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 PRONT "HELLO"</code></td><td><code>PRINT</code> misspelled</td></tr></tbody>
+  </table>
+  <p>The line must read <code>10 PRINT "HELLO"</code>. If the error is in a <code>DATA</code> line, the message points to that line.</p>
+
+  <h3>RETURN WITHOUT GOSUB</h3>
+  <p class="syntax">?RETURN WITHOUT GOSUB ERROR</p>
+  <p>A <code>RETURN</code> is reached even though no <code>GOSUB</code> jumped there.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 RETURN</code></td><td>no <code>GOSUB</code> before it</td></tr></tbody>
+  </table>
+  <p>Call the subroutine with <code>GOSUB</code>. <code>RETURN</code> belongs at its end, not at the start of the program.</p>
+
+  <h3>OUT OF DATA</h3>
+  <p class="syntax">?OUT OF DATA ERROR</p>
+  <p><code>READ</code> wants another value, but the <code>DATA</code> list is exhausted. The message points to the line containing the <code>READ</code>.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 READ A,B</code></td><td></td></tr><tr><td><code>20 DATA 1</code></td><td>one value short</td></tr></tbody>
+  </table>
+  <p>Add to the list, here <code>20 DATA 1,2</code>. To read the same list a second time, use <code>RESTORE</code> first.</p>
+
+  <h3>ILLEGAL QUANTITY</h3>
+  <p class="syntax">?ILLEGAL QUANTITY ERROR</p>
+  <p>A number is outside the permitted range. <code>SQR</code> and <code>LOG</code> do not accept negative numbers. <code>CHR$</code> takes 0 to 255. With <code>POKE</code>, the address runs from 0 to 65535 and the value from 0 to 255. A filename may be 1 to 16 characters long.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT SQR(-1)</code></td><td>square root of a negative number</td></tr></tbody>
+  </table>
+  <p>Enter a value within the permitted range. Before taking a square root, check with something like <code>IF X&gt;=0 THEN PRINT SQR(X)</code>.</p>
+
+  <h3>OVERFLOW</h3>
+  <p class="syntax">?OVERFLOW ERROR</p>
+  <p>The result is too large. The largest number is about <code>1.7E+38</code>.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT 1E38*10</code></td><td>is beyond that</td></tr></tbody>
+  </table>
+  <p>Work with smaller numbers, or catch large intermediate results before multiplying further.</p>
+
+  <h3>OUT OF MEMORY</h3>
+  <p class="syntax">?OUT OF MEMORY ERROR</p>
+  <p>Memory is insufficient. Usually an array is too large, or strings take up too much space. After switching on, 31423 bytes are free for program and variables.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>DIM A(100,100)</code></td><td>over 50&nbsp;000 bytes</td></tr></tbody>
+  </table>
+  <p>Choose a smaller array. You can delete long strings by assigning <code>""</code> to the variable. <code>CLEAR</code> frees all variable memory; the program stays.</p>
+
+  <h3>UNDEF'D STATEMENT</h3>
+  <p class="syntax">?UNDEF'D STATEMENT ERROR</p>
+  <p><code>GOTO</code>, <code>GOSUB</code>, or <code>RUN</code> targets a line that does not exist.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 GOTO 20</code></td><td>line 20 is missing</td></tr></tbody>
+  </table>
+  <p>Create the line, or change the number in the jump. <code>LIST</code> shows which lines actually exist.</p>
+
+  <h3>BAD SUBSCRIPT</h3>
+  <p class="syntax">?BAD SUBSCRIPT ERROR</p>
+  <p>An array index is out of range, or the number of indices is wrong. The first index is 0. <code>DIM A(2)</code> provides slots 0, 1, and 2. Without <code>DIM</code>, the index runs from 0 to 10.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 DIM A(2):PRINT A(3)</code></td><td>3 does not exist</td></tr></tbody>
+  </table>
+  <p>Stay within the range, or make the array larger with <code>DIM</code>. An array with two indices must be accessed with two: <code>B(1,2)</code>, not <code>B(1)</code>.</p>
+
+  <h3>REDIM'D ARRAY</h3>
+  <p class="syntax">?REDIM'D ARRAY ERROR</p>
+  <p><code>DIM</code> creates an array that already exists in this run. Even the same size counts as a second time.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>10 DIM A(2)</code></td><td></td></tr><tr><td><code>20 DIM A(3)</code></td><td>A already exists</td></tr></tbody>
+  </table>
+  <p>Leave out the second <code>DIM</code>. <code>RUN</code> and <code>CLEAR</code> forget the arrays; after that, <code>DIM</code> is allowed again.</p>
+
+  <h3>DIVISION BY ZERO</h3>
+  <p class="syntax">?DIVISION BY ZERO ERROR</p>
+  <p>Division by 0 was attempted.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT 1/0</code></td><td></td></tr></tbody>
+  </table>
+  <p>Check the divisor first: <code>IF N&lt;&gt;0 THEN PRINT 1/N</code>.</p>
+
+  <h3>ILLEGAL DIRECT</h3>
+  <p class="syntax">?ILLEGAL DIRECT ERROR</p>
+  <p><code>INPUT</code> and <code>DEF FN</code> work only in a program, not in direct mode.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>INPUT A</code></td><td>typed without a line number</td></tr></tbody>
+  </table>
+  <p>Write <code>10 INPUT A</code> and start it with <code>RUN</code>.</p>
+
+  <h3>TYPE MISMATCH</h3>
+  <p class="syntax">?TYPE MISMATCH ERROR</p>
+  <p>Number and text are mixed up. <code>A</code> is a number, <code>A$</code> a string. You may not assign one to the other or combine them in a calculation.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>A="HELLO"</code></td><td>text into a numeric variable</td></tr></tbody>
+  </table>
+  <p>The string belongs in <code>A$="HELLO"</code>. <code>VAL</code> gets a number from a string, <code>STR$</code> a string from a number.</p>
+
+  <h3>STRING TOO LONG</h3>
+  <p class="syntax">?STRING TOO LONG ERROR</p>
+  <p>A string grows longer than 255 characters. A filename over 16 characters does not fall under this either; it produces <code>ILLEGAL QUANTITY</code>.</p>
+<pre class="listing">10 A$=""
+20 FOR I=1 TO 256
+30 A$=A$+"X"
+40 NEXT I</pre>
+  <p>In line 30 it fails at 256 characters. Let the loop run only to 255, or split the string across several variables.</p>
+
+  <h3>FORMULA TOO COMPLEX</h3>
+  <p class="syntax">?FORMULA TOO COMPLEX ERROR</p>
+  <p>A string expression needs more than three intermediate results at once. BASIC cannot hold that many.</p>
+  <p>Split the expression. First put two parts into a variable, then the rest:</p>
+<pre class="listing">A$=LEFT$("AB",1)+MID$("CD",2,1)
+PRINT A$+RIGHT$("EF",1)</pre>
+
+  <h3>CAN'T CONTINUE</h3>
+  <p class="syntax">?CAN'T CONTINUE ERROR</p>
+  <p><code>CONT</code> cannot resume. Either the program is not stopped at a <code>STOP</code>, at <kbd>Pause</kbd>, or at <kbd>Ctrl</kbd>+<kbd>C</kbd>, or you changed it while it was halted.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>CONT</code></td><td>right after switching on</td></tr></tbody>
+  </table>
+  <p>Stop with <code>STOP</code> and type <code>CONT</code> without changing a line first. After a change, only <code>RUN</code> helps.</p>
+
+  <h3>UNDEF'D FUNCTION</h3>
+  <p class="syntax">?UNDEF'D FUNCTION ERROR</p>
+  <p><code>FN</code> calls a function that <code>DEF FN</code> has not defined in this run.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>PRINT FNA(1)</code></td><td>no <code>DEF FNA</code></td></tr></tbody>
+  </table>
+  <p>Define it earlier in the program, for example <code>10 DEF FNA(X)=X*X</code>, and only then call it.</p>
+
+  <h3>REDO FROM START</h3>
+  <p class="syntax">?REDO FROM START</p>
+  <p><code>INPUT</code> expected a number and received a string. The program does not abort. You enter the whole line again.</p>
+<pre class="listing">10 INPUT A</pre>
+  <p>If you type, say, <code>HELLO</code> at the question mark, the message appears and <code>INPUT</code> asks again. Type a number.</p>
+
+  <h3>EXTRA IGNORED</h3>
+  <p class="syntax">?EXTRA IGNORED</p>
+  <p><code>INPUT</code> received more values than there are variables. The surplus ones are discarded, and the program continues.</p>
+<pre class="listing">10 INPUT A</pre>
+  <p>If you type <code>1,2</code>, <code>A</code> stays 1 and the 2 disappears. If you need both, write <code>INPUT A,B</code>.</p>
+
+  <h2>Disk Drive</h2>
+  <p>These messages come from <code>LOAD</code>, <code>SAVE</code>, <code>DIR</code>, and <code>DELETE</code>. How to connect the disk drive is described in Chapter 6.</p>
+
+  <h3>NO DISK</h3>
+  <p class="syntax">?NO DISK ERROR</p>
+  <p>No drive is connected to the serial port.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOAD "test"</code></td><td>with no disk drive connected</td></tr></tbody>
+  </table>
+  <p>Connect it as described in Chapter 6 and enter the command again.</p>
+
+  <h3>FILE NOT FOUND</h3>
+  <p class="syntax">FILE NOT FOUND</p>
+  <p>The file does not exist on the disk. The program in memory stays as it is. Uppercase and lowercase matter.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOAD "missing"</code></td><td>no missing.prg and no missing.bas</td></tr></tbody>
+  </table>
+  <p><code>DIR</code> shows the existing names. Load one of those, or save the file first with <code>SAVE</code>.</p>
+
+  <h3>BAD LOAD</h3>
+  <p class="syntax">BAD LOAD</p>
+  <p>A <code>.prg</code> file does not fit into memory. The first two bytes must be the load address <code>$0441</code>, that is 65 and 4, and the file must not be too large. Memory stays empty.</p>
+  <p>Use a file built the way Chapter 7 describes. Load a BASIC program as <code>.bas</code>, not as <code>.prg</code>.</p>
+
+  <h3>NO PROGRAM</h3>
+  <p class="syntax">NO PROGRAM</p>
+  <p><code>SAVE</code> finds no program in memory.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>NEW</code></td><td></td></tr><tr><td><code>SAVE "empty"</code></td><td>nothing to save</td></tr></tbody>
+  </table>
+  <p>Write a program first, then <code>SAVE</code>.</p>
+
+  <h3>EMPTY FILE</h3>
+  <p class="syntax">EMPTY FILE</p>
+  <p>The file exists but contains no program.</p>
+  <table class="beispiele">
+    <tbody><tr><td><code>LOAD "empty"</code></td><td>the file has no lines</td></tr></tbody>
+  </table>
+  <p>Save the program again, or load a different file. <code>DIR</code> shows the size. 0 bytes means empty.</p>
+</section>
+</main>
+</body>
+</html>
